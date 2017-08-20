@@ -11,7 +11,7 @@ namespace NM {
         constexpr inline Vec4(const double buff[4]) :
             buff{buff[0], buff[1], buff[2], buff[3]} {}
 
-        constexpr inline Vec4(double x, double y, double z, double w = 0.0) :
+        constexpr inline Vec4(double x, double y, double z, double w = 1.0) :
             buff{x, y, z, w} {}
 
         inline double& x() {
@@ -67,7 +67,7 @@ namespace NM {
             return ! (*this == other);
         }
 
-        inline operator BuffType&() {
+        inline explicit operator BuffType&() {
             return buff;
         }
 
@@ -140,6 +140,4 @@ namespace NM {
             in * other[3]
         };
     }
-
-
 }

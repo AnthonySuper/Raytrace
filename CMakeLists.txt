@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.2)
 
-project(nmtt)
+project(raytrace)
 
 enable_testing()
 
@@ -8,7 +8,8 @@ set(PROJECT_SRCS)
 
 set(PROJECT_INCLUDES
   include/vec4.hpp
-  include/mat4.hpp)
+  include/mat4.hpp
+  include/transform.hpp)
 
 set(PROJECT_TEST_SRCS
   test/test_vec4.cpp
