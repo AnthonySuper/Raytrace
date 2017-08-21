@@ -1,58 +1,75 @@
 #pragma once
 #include <array>
+#include <globals.hpp>
 
 namespace NM {
     struct Vec4 {
-        using BuffType = double[4];
+        using BuffType = FloatType[4];
         BuffType buff;
 
         constexpr inline Vec4(const Vec4& other) = default;
         constexpr inline Vec4(Vec4&& other) = default;
-        constexpr inline Vec4(const double buff[4]) :
+        constexpr inline Vec4(const FloatType buff[4]) :
             buff{buff[0], buff[1], buff[2], buff[3]} {}
 
-        constexpr inline Vec4(double x, double y, double z, double w = 1.0) :
+        constexpr inline Vec4(FloatType x, FloatType y, FloatType z, FloatType w = 1.0) :
             buff{x, y, z, w} {}
 
-        inline double& x() {
+        inline FloatType& x() {
             return buff[0];
         }
 
-        inline constexpr double x() const {
+        inline constexpr FloatType x() const {
             return buff[0];
         }
 
-        inline double& y() {
+        inline FloatType& y() {
             return buff[1];
         }
 
-        inline constexpr double y() const {
+        inline constexpr FloatType y() const {
             return buff[1];
         }
 
-        inline double& z() {
+        inline FloatType& z() {
             return buff[2];
         }
 
-        inline constexpr double z() const {
+        inline constexpr FloatType z() const {
             return buff[2];
         }
 
-        inline double& w() {
+        inline FloatType& w() {
             return buff[3];
         }
 
-        inline constexpr double w() const {
+        inline constexpr FloatType w() const {
             return buff[3];
         }
 
-        inline double& operator[](int i) {
+		inline constexpr FloatType r() const {
+			return buff[0];
+		}
+
+		inline constexpr FloatType g() const {
+			return buff[1];
+		}
+
+		inline constexpr FloatType b() const {
+			return buff[2];
+		}
+
+		inline constexpr FloatType a() const {
+			return buff[3];
+		}
+
+        inline FloatType& operator[](int i) {
             return buff[i];
         }
 
         Vec4& operator=(const Vec4& other) = default;
 
-        inline constexpr double operator[](int i) const {
+        inline constexpr FloatType operator[](int i) const {
             return buff[i];
         }
 

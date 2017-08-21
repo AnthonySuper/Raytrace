@@ -1,12 +1,12 @@
 #pragma once
 #include <vec4.hpp>
-
+#include <globals.hpp>
 
 namespace NM {
     struct Mat4 {
-        using ItemType = double;
-        using RowType = ItemType[4];
-        ItemType data[4][4];
+        
+        using RowType = FloatType[4];
+        FloatType data[4][4];
 
         inline constexpr Mat4() : data{0} {}
 

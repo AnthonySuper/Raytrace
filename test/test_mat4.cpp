@@ -5,7 +5,7 @@
 using namespace NM;
 
 TEST_CASE("Mat4 is the right size") {
-    static_assert(sizeof(Mat4) == 4*4*sizeof(Mat4::ItemType),
+    static_assert(sizeof(Mat4) == 4*4*sizeof(FloatType),
             "The matrix must be the right size");
 }
 

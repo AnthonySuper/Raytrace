@@ -9,7 +9,8 @@ set(PROJECT_SRCS)
 set(PROJECT_INCLUDES
   include/vec4.hpp
   include/mat4.hpp
-  include/transform.hpp)
+  include/transform.hpp
+  include/globals.hpp)
 
 set(PROJECT_TEST_SRCS
   test/test_vec4.cpp
