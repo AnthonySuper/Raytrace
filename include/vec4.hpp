@@ -67,7 +67,7 @@ namespace NM {
             return ! (*this == other);
         }
 
-        inline explicit operator BuffType&() {
+        inline operator BuffType&() {
             return buff;
         }
 

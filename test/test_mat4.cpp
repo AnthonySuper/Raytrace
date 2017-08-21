@@ -26,7 +26,7 @@ TEST_CASE("Mat4 fakes being an aggregate") {
 
 TEST_CASE("Mat4 can be constructed with row vectors") {
     Vec4 vec{1, 0, 0};
-    Mat4 mat{vec, vec, vec, vec};
+    Mat4 mat(vec, vec, vec, vec);
     REQUIRE(mat[0][0] == 1);
 }
 

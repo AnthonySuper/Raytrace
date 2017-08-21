@@ -25,4 +25,5 @@ add_executable(catch_test test/main.cpp
 target_include_directories(catch_test PUBLIC include/)
 target_include_directories(catch_test PUBLIC lib/)
 
-set_property(TARGET catch_test PROPERTY CXX_STANDARD 14)
+set(CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
