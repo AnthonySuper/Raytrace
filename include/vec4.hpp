@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include <globals.hpp>
+#include <ostream>
 
 namespace NM {
     struct Vec4 {
@@ -157,4 +158,8 @@ namespace NM {
             in * other[3]
         };
     }
+
+
+  std::ostream& operator<<(std::ostream& os, NM::Vec4 const & vec);
 }
+
