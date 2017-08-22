@@ -2,6 +2,7 @@
 #include <array>
 #include <globals.hpp>
 #include <ostream>
+#include <stdexcept>
 
 namespace NM {
     struct Vec4 {
@@ -64,11 +65,18 @@ namespace NM {
 			return buff[3];
 		}
 
-        inline FloatType& operator[](int i) {
+        inline constexpr FloatType& operator[](int i) {
             return buff[i];
         }
 
         Vec4& operator=(const Vec4& other) = default;
+
+        inline constexpr Vec4 normalized() {
+            if(w() == 0) throw std::overflow_error("Normalize with w=0");
+            if(w() == 1.0) return *this;
+            auto w = this->w();
+            return {x() / w, y() / w, z() / w, 1.0};
+        }
 
         inline constexpr FloatType operator[](int i) const {
             return buff[i];
