@@ -71,7 +71,7 @@ namespace NM {
 
         Vec4& operator=(const Vec4& other) = default;
 
-        inline constexpr Vec4 normalized() {
+        inline constexpr Vec4 normalized() const {
             if(w() == 0) throw std::overflow_error("Normalize with w=0");
             if(w() == 1.0) return *this;
             auto w = this->w();
