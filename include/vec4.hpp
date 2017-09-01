@@ -5,10 +5,14 @@
 #include <stdexcept>
 
 namespace NM {
+    
     struct Vec4 {
+        constexpr static int height = 4;
+        constexpr static int width = 1;
+
         using BuffType = FloatType[4];
         BuffType buff;
-
+        
         constexpr inline Vec4(const Vec4& other) = default;
         constexpr inline Vec4(Vec4&& other) = default;
         constexpr inline Vec4(const FloatType buff[4]) :
@@ -111,6 +115,16 @@ namespace NM {
             buff[2] -= other[2];
             buff[3] -= other[3];
             return *this;
+        }
+        
+        inline constexpr Vec4 cross(const Vec4& other) {
+            auto u = normalized();
+            auto v = other.normalized();
+            return {
+                u[1]*v[2] - u[2]*v[1],
+                u[2]*v[0] - u[0]*v[2],
+                u[0]*v[1] - u[1]*v[0],
+            };
         }
 
         template<typename T>

@@ -44,3 +44,15 @@ TEST_CASE("Mat4 * Vec4 by id works") {
     Mat4 id = Mat4::id();
     REQUIRE((id * vec) == vec);
 }
+
+TEST_CASE("Mat4 * Vec4 works arbitrarily") {
+    Mat4 mat{1, 2, 3, 4,
+        5, 6, 7, 8,
+        9, 10, 11, 12,
+        13, 14, 15, 16
+    };
+    Vec4 vec{1, 2, 3};
+    Vec4 expect{18, 46, 74, 102};
+    REQUIRE((mat * vec) == expect);
+    
+}

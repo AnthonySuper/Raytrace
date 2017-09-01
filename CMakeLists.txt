@@ -16,7 +16,8 @@ set(PROJECT_INCLUDES
 
 set(PROJECT_TEST_SRCS
   test/test_vec4.cpp
-  test/test_mat4.cpp)
+  test/test_mat4.cpp
+  test/test_transforms.cpp)
 
 add_test(unit_tests COMMAND ./catch_test)
 

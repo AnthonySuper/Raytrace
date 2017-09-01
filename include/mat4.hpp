@@ -95,7 +95,7 @@ namespace NM {
             for(int i = 0; i < 4; ++i) {
                 double tmp = 0;
                 for(int k = 0; k < 4; ++k) {
-                    tmp += data[i][k] * other[i];
+                    tmp += data[i][k] * other[k];
                 }
                 d[i] = tmp;
             }
@@ -118,6 +118,10 @@ namespace NM {
                 0, 1, 0, 0,
                 0, 0, 1, 0,
                 0, 0, 0, 1};
+        }
+        
+        inline constexpr Vec4 operator()(const Vec4& in) {
+            return (*this) * in;
         }
     };
 
