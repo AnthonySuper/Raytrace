@@ -29,5 +29,9 @@ namespace NM {
                 0, 0, 0, 1
             };
         }
+        
+        Mat4 axisAngle(Vec4 axis, double angle);
+        
+        Mat4 rotateZ(double angle);
     }
 }

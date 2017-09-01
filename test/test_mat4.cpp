@@ -54,5 +54,30 @@ TEST_CASE("Mat4 * Vec4 works arbitrarily") {
     Vec4 vec{1, 2, 3};
     Vec4 expect{18, 46, 74, 102};
     REQUIRE((mat * vec) == expect);
+}
+
+TEST_CASE("Mat4 identity inverse is the identity") {
+    Mat4 inv = Mat4::id();
+    REQUIRE(inv.inverse() == inv);
+}
+
+TEST_CASE("Mat4 identity inverse works with a random matrix") {
+    Mat4 example = {
+        2, 3, 1, 5,
+        1, 0, 3, 1,
+        0, 2, -3, 1,
+        0, 2, 3, 1
+    };
+    Mat4 expected = {
+        - 0.666666666666666, 2.333333333333333, 1.5555555555555, -0.5555555555555,
+        - 0.3333333333333333, 0.66666666666666, 0.7777777777777, 0.22222222222222,
+        -0.0, -0.0, -0.1666666666666666, 0.166666666666666666,
+        0.666666666666, -1.3333333333333333, -1.05555555555555, 0.0555555555555555
+    };
+    REQUIRE(
+        (example * example.inverse()).truncedZeros().toString() ==
+            Mat4::id().toString()
+    );
+    REQUIRE(example.inverse().toString() == expected.toString());
     
 }

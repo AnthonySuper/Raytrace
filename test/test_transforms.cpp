@@ -39,3 +39,9 @@ TEST_CASE("Translation in many directions", "[translation]") {
     Vec4 expect{6, 6, 6};
     REQUIRE((mat * test) == expect);
 }
+
+TEST_CASE("Transform about the Z axis", "[transform]") {
+    auto mat = Transform::axisAngle({0, 0, 1}, M_PI);
+    auto expect = Transform::rotateZ(M_PI);
+    REQUIRE(mat == expect);
+}

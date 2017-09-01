@@ -76,3 +76,10 @@ TEST_CASE("Test operator *") {
     REQUIRE((a * 2.0) == res);
     REQUIRE((2.0 * a) == res);
 }
+
+TEST_CASE("Test manitude") {
+    Vec4 easy(1, 0, 0);
+    REQUIRE(easy.magnitude() == 1.0);
+    Vec4 harder(2, 2, 2);
+    REQUIRE(harder.magnitude() == Approx(3.46410161514));
+}

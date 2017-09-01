@@ -1,10 +1,13 @@
 #pragma once
 #include <vec4.hpp>
 #include <globals.hpp>
+#include <string>
+#include <sstream>
+#include <cmath>
 
 namespace NM {
     struct Mat4 {
-        
+        constexpr static float InverseZeroBound = 0.000001;
         using RowType = FloatType[4];
         FloatType data[4][4];
 
@@ -123,6 +126,38 @@ namespace NM {
         inline constexpr Vec4 operator()(const Vec4& in) {
             return (*this) * in;
         }
+        
+        inline constexpr Mat4 transpose() const {
+            Mat4 toRet;
+            for(int i = 0; i < 4; ++i) {
+                for(int k = 0; k < 4; ++k) {
+                    toRet[k][i] = (*this)[i][k];
+                }
+            }
+            return toRet;
+        }
+        
+        Mat4 truncedZeros() const;
+        
+        class NonInvertableError: std::runtime_error {
+        public:
+            NonInvertableError() :
+                runtime_error("Matrix is not inverable")
+            {}
+        };
+        
+        /**
+         * Get the inverse of a matrix.
+         * 
+         * This code is modified from the MESA library.
+         * This library is licensed under the MIT license.
+         */
+        Mat4 inverse() const;
+        
+        std::string toString() const;
+        
+    private:
+        static FloatType truncToZero(FloatType in);
     };
 
     std::ostream& operator<<(std::ostream& os, Mat4 const & mat);

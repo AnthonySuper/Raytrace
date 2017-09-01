@@ -76,10 +76,30 @@ namespace NM {
         Vec4& operator=(const Vec4& other) = default;
 
         inline constexpr Vec4 normalized() const {
-            if(w() == 0) throw std::overflow_error("Normalize with w=0");
             if(w() == 1.0) return *this;
+            if(w() == 0) throw std::overflow_error("Normalize with w=0");
             auto w = this->w();
             return {x() / w, y() / w, z() / w, 1.0};
+        }
+        
+        inline FloatType magnitude() const {
+            const auto square = [](FloatType in) { return in * in; };
+            const auto norm = normalized();
+            const auto sum = square(norm.x()) +
+                square(norm.y()) +
+                square(norm.z());
+            return std::sqrt(sum);
+        }
+        
+        inline Vec4 toUnit() const {
+            auto ref = normalized();
+            auto mag = ref.magnitude();
+            if(mag == 0) throw std::overflow_error("Zero Magnitude");
+            return {
+                x() / mag,
+                y() / mag,
+                z() / mag
+            };
         }
 
         inline constexpr FloatType operator[](int i) const {
@@ -115,6 +135,14 @@ namespace NM {
             buff[2] -= other[2];
             buff[3] -= other[3];
             return *this;
+        }
+        
+        inline constexpr Vec4 operator-() const {
+            return {
+                - buff[0],
+                - buff[1],
+                - buff[2]
+            };
         }
         
         inline constexpr Vec4 cross(const Vec4& other) {

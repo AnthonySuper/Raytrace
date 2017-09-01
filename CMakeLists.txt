@@ -6,7 +6,8 @@ enable_testing()
 
 set(PROJECT_SRCS
   src/vec4.cpp
-  src/mat4.cpp)
+  src/mat4.cpp
+  src/transforms.cpp)
 
 set(PROJECT_INCLUDES
   include/vec4.hpp
