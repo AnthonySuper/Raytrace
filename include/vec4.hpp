@@ -71,7 +71,7 @@ namespace NM {
 			return buff[3];
 		}
 
-        inline constexpr FloatType& operator[](int i) {
+        inline FloatType& operator[](int i) {
             return buff[i];
         }
 
