@@ -147,7 +147,7 @@ namespace NM {
             };
         }
         
-        inline constexpr Vec4 cross(const Vec4& other) {
+        inline Vec4 cross(const Vec4& other) {
             auto u = normalized();
             auto v = other.normalized();
             return {
