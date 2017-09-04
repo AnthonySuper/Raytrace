@@ -44,7 +44,7 @@ namespace NM {
             {c0, c1, c2, c3},
             {d0, d1, d2, d3}} {}
 
-        inline const RowType& operator[](int i) const {
+        inline constexpr const RowType& operator[](int i) const {
             return data[i];
         }
 
