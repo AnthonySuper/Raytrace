@@ -8,4 +8,22 @@ namespace NM {
             vec.z() << ", " << \
             vec.w() << "}";
     }
+    
+    std::istream& operator>>(std::istream& is, Vec4& vec) {
+        FloatType x, y, z, w;
+        is >> x;
+        is >> y;
+        is >> z;
+        if(! is) {
+            throw ParseError("Coordinate read failed");
+        }
+        is >> w;
+        if( ! is) {
+            vec = {x, y, z};
+        }
+        else {
+            vec = {x, y, z, w};
+        }
+        return is;
+    }
 }

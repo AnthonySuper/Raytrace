@@ -22,7 +22,18 @@ namespace NM {
             {row2[0], row2[1], row2[2], row2[3]},
             {row3[0], row3[1], row3[2], row3[3]},
             {row4[0], row4[1], row4[2], row4[3]}} {}
-
+        
+        inline constexpr Mat4(const Vec4 r1,
+                              const Vec4 r2,
+                              const Vec4 r3,
+                              const Vec4 r4) :
+        data{
+            {r1[0], r1[1], r1[2], r1[3]},
+            {r2[0], r2[1], r2[2], r2[3]},
+            {r3[0], r3[1], r3[2], r3[3]},
+            {r4[0], r4[1], r4[2], r4[3]}
+        } {}
+        
         // could probably be done with templates, oh well...
         inline constexpr Mat4(double a0, double a1, double a2, double a3,
                 double b0, double b1, double b2, double b3,

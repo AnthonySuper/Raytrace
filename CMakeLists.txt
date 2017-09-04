@@ -7,13 +7,21 @@ enable_testing()
 set(PROJECT_SRCS
   src/vec4.cpp
   src/mat4.cpp
-  src/transforms.cpp)
+  src/transforms.cpp
+  src/model.cpp
+  src/errors.cpp
+  src/driver.cpp
+  src/file_utils.cpp)
 
 set(PROJECT_INCLUDES
   include/vec4.hpp
   include/mat4.hpp
   include/transforms.hpp
-  include/globals.hpp)
+  include/globals.hpp
+  include/model.hpp
+  include/errors.hpp
+  include/driver.hpp
+  include/file_utils.hpp)
 
 set(PROJECT_TEST_SRCS
   test/test_vec4.cpp

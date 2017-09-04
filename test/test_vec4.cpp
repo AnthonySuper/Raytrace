@@ -1,5 +1,6 @@
 #include "vec4.hpp"
 #include "catch.hpp"
+#include <sstream>
 
 using namespace NM;
 
@@ -82,4 +83,27 @@ TEST_CASE("Test manitude") {
     REQUIRE(easy.magnitude() == 1.0);
     Vec4 harder(2, 2, 2);
     REQUIRE(harder.magnitude() == Approx(3.46410161514));
+}
+
+TEST_CASE("Vec4 can be read via streams without w") {
+    Vec4 toRead{0, 0, 0};
+    Vec4 expect{1, 3, 4};
+    std::string str("1 3 4");
+    std::istringstream ios(str);
+    ios >> toRead;
+    REQUIRE(toRead == expect);
+}
+
+TEST_CASE("Vec4 can be read via streams with w") {
+    Vec4 toRead{0, 0, 0};
+    Vec4 expect{1, 3, 4, 5};
+    std::istringstream ios("1 3 4 5");
+    ios >> toRead;
+    REQUIRE(toRead == expect);
+}
+
+TEST_CASE("Vec4 throws when reading from a bad stream") {
+    Vec4 toRead{0, 0, 0};
+    std::istringstream ios("1 garbage 2 3");
+    REQUIRE_THROWS(ios >> toRead);
 }

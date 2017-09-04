@@ -15,7 +15,14 @@ namespace NM {
         Mat4 axisAngle(Vec4 axis, double angle) {
             Vec4 w = axis.toUnit();
             Vec4 tmp = axis;
-            tmp[0] = 1.0;
+            if(tmp[0] != 1.0) tmp[0] = 1.0;
+            else {
+                // cances of somebody pointing in this direction are
+                // probably really small, right?
+                tmp[0] = 0.000123123;
+                tmp[1] = 0.12312;
+                tmp[2] = 123;
+            }
             tmp = tmp.toUnit();
             Vec4 u = w.cross(tmp).toUnit();
             Vec4 v = - u.cross(w).toUnit();
