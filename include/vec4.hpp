@@ -12,16 +12,16 @@ namespace NM {
         constexpr static int height = 4;
         constexpr static int width = 1;
 
-        using BuffType = std::array<FloatType, 4>;
+        using BuffType = FloatType[4];
         BuffType buff;
         
         constexpr inline Vec4(const Vec4& other) = default;
         constexpr inline Vec4(Vec4&& other) = default;
         constexpr inline Vec4(const FloatType buff[4]) :
-            buff{{buff[0], buff[1], buff[2], buff[3]}} {}
+            buff{buff[0], buff[1], buff[2], buff[3]} {}
 
         constexpr inline Vec4(FloatType x, FloatType y, FloatType z, FloatType w = 1.0) :
-            buff{{x, y, z, w}} {}
+            buff{x, y, z, w} {}
 
         inline FloatType& x() {
             return buff[0];
@@ -71,7 +71,7 @@ namespace NM {
 			return buff[3];
 		}
 
-        inline FloatType& operator[](int i) {
+        inline constexpr FloatType& operator[](int i) {
             return buff[i];
         }
 
