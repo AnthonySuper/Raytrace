@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
         NM::Driver d = NM::Driver::fromFile(argv[1]);
         d.writeOut();
     }
-    catch(std::runtime_error &e) {
+    catch(std::exception &e) {
         cerr << "Got error: " << e.what() << endl;
         return -1;
     }

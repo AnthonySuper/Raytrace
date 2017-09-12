@@ -8,8 +8,19 @@
 #include <vec4.hpp>
 
 namespace NM {
+    /**
+     * @brief Represent a .obj file style model.
+     *
+     * This class follows the actual file format almost exactly.
+     * Eventually, it will probably subclass some sort of "drawable" class.
+     * I'm not 100% positive on that, I suppose.
+     * Meh.
+     */
     class Model {
     public:
+        /**
+         * What type do we use to list out all the verticies?
+         */
         using PointVector = std::vector<Vec4>;
        
         using size_type = ssize_t;
@@ -27,13 +38,17 @@ namespace NM {
         Model(const Model&) = default;
         Model(Model&&) = default;
         Model() = default;
+        /**
+         * @brief Write a new obj file to the stream.
+         * This will include commenst, normals, and all other components.
+         */
         void writeObj(std::ostream& stream) const;
         
     private:
         PointVector points;
         PointVector normals;
         std::vector<FaceDescriptor> faces;
-        
+        std::vector<std::string> topCommentBlock;
         
         friend std::ostream& operator<<(std::ostream&, const Model&);
         friend Model operator*(const Mat4& mat, const Model&);
@@ -49,6 +64,4 @@ namespace NM {
     
     std::ostream& operator<<(std::ostream&, const Model&);
     Model operator*(const Mat4& mat, const Model&);
-    
-    
 }

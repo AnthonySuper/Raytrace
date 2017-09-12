@@ -6,14 +6,25 @@
 #include <cmath>
 
 namespace NM {
+    /**
+     * @brief A 4x4 matrix, which can also be considered a transformation.
+     */
     struct Mat4 {
         constexpr static float InverseZeroBound = 0.000001;
         using RowType = FloatType[4];
         FloatType data[4][4];
 
+        /**
+         * Default constructor returns a zero matrix
+         */
         inline constexpr Mat4() : data{{0}} {}
-
+        /**
+         * Copy constructor is defauled
+         */
         inline Mat4(const Mat4& other) = default;
+        /**
+         * Move constructor is default
+         */
         inline Mat4(Mat4&& other) = default;
 
         inline constexpr Mat4(const RowType &row1, const RowType &row2,
@@ -56,17 +67,17 @@ namespace NM {
             return data[i];
         }
 
-        constexpr Vec4 rowAt(int i) {
+        constexpr Vec4 rowAt(int i) noexcept {
             return Vec4(data[i]);
         }
 
-        constexpr double at(int i, int j) const {
+        constexpr double at(int i, int j) const noexcept {
             return data[i][j];
         }
 
         Mat4& operator=(const Mat4& other) = default;
 
-        inline constexpr Mat4 operator+(const Mat4& other) const {
+        inline constexpr Mat4 operator+(const Mat4& other) const noexcept {
             Mat4 tmp;
             for(int i = 0; i < 4; ++i) {
                 for(int k = 0; k < 4; ++k) {
@@ -76,7 +87,7 @@ namespace NM {
             return tmp;
         }
 
-        inline constexpr Mat4& operator+=(const Mat4& other) {
+        inline constexpr Mat4& operator+=(const Mat4& other) noexcept {
             for(int i = 0; i < 4; ++i) {
                 for(int k = 0; k < 4; ++k) {
                     data[i][k] += other[i][k];
@@ -85,7 +96,7 @@ namespace NM {
             return *this;
         }
 
-        inline constexpr Mat4 operator*(const Mat4& other) const {
+        inline constexpr Mat4 operator*(const Mat4& other) const noexcept {
             Mat4 buff;
             for(int i = 0; i < 4; ++i) {
                 for(int j = 0; j < 4; ++j) {
@@ -99,12 +110,12 @@ namespace NM {
             return buff;
         }
 
-        inline constexpr Mat4& operator*=(const Mat4& other) {
+        inline constexpr Mat4& operator*=(const Mat4& other) noexcept {
             *this = (*this * other);
             return *this;
         }
 
-        inline constexpr Vec4 operator*(const Vec4& other) const {
+        inline constexpr Vec4 operator*(const Vec4& other) const noexcept {
             Vec4 d{0, 0, 0};
             for(int i = 0; i < 4; ++i) {
                 double tmp = 0;
@@ -116,7 +127,7 @@ namespace NM {
             return d;
         }
 
-        inline constexpr bool operator==(const Mat4& other) const {
+        inline constexpr bool operator==(const Mat4& other) const noexcept {
             for(int i = 0; i < 4; ++i) {
                 for(int k = 0; k < 4; ++k) {
                     if(data[i][k] != other[i][k]) {
@@ -127,18 +138,21 @@ namespace NM {
             return true;
         }
 
-        inline constexpr static Mat4 id() {
+        inline constexpr static Mat4 id() noexcept {
             return {1, 0, 0, 0,
                 0, 1, 0, 0,
                 0, 0, 1, 0,
                 0, 0, 0, 1};
         }
         
-        inline constexpr Vec4 operator()(const Vec4& in) {
+        /**
+         * @brief Apply a transformation to a vector.
+         */
+        inline constexpr Vec4 operator()(const Vec4& in) noexcept {
             return (*this) * in;
         }
         
-        inline constexpr Mat4 transpose() const {
+        inline constexpr Mat4 transpose() const noexcept {
             Mat4 toRet;
             for(int i = 0; i < 4; ++i) {
                 for(int k = 0; k < 4; ++k) {
@@ -150,6 +164,9 @@ namespace NM {
         
         Mat4 truncedZeros() const;
         
+        /**
+         * @brief An exception to be thrown when a Matrix cannot be inverted.
+         */
         class NonInvertableError: std::runtime_error {
         public:
             NonInvertableError() :
@@ -158,10 +175,12 @@ namespace NM {
         };
         
         /**
-         * Get the inverse of a matrix.
+         * @brief Get the inverse of a matrix.
          * 
          * This code is modified from the MESA library.
          * This library is licensed under the MIT license.
+         *
+         * @throws NonInvertableError
          */
         Mat4 inverse() const;
         

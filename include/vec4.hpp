@@ -8,19 +8,49 @@
 
 namespace NM {
     
+    /**
+     * Represent a vector in homogenous coordinates
+     */
     struct Vec4 {
+        /**
+         * Get the height of this vector, considered as a matrix
+         */
         constexpr static int height = 4;
+        /**
+         * Get the width of this vector, considered as a matrix
+         */
         constexpr static int width = 1;
-
+        /**
+         * What type do we use for the buffer?
+         */
         using BuffType = FloatType[4];
+        /**
+         * The actual buffer for the member variables
+         */
         BuffType buff;
         
+        /**
+         * Default copy constructor
+         */
         constexpr inline Vec4(const Vec4& other) = default;
+        /**
+         * Default move constructor
+         */
         constexpr inline Vec4(Vec4&& other) = default;
+        /**
+         * Create a vector from an array of floats
+         */
         constexpr inline Vec4(const FloatType buff[4]) :
             buff{buff[0], buff[1], buff[2], buff[3]} {}
 
-        constexpr inline Vec4(FloatType x, FloatType y, FloatType z, FloatType w = 1.0) :
+        /**
+         * Create a vector with given values.
+         * W defaults to zero.
+         */
+        constexpr inline Vec4(FloatType x, 
+                              FloatType y, 
+                              FloatType z, 
+                              FloatType w = 1.0) :
             buff{x, y, z, w} {}
 
         inline FloatType& x() {

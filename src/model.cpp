@@ -5,10 +5,18 @@ namespace NM {
     Model Model::fromStream(std::istream &stream) {
         Model toRet;
         std::string line;
+        bool topComment = true;
         while(std::getline(stream, line)) {
             std::istringstream lineStream(line);
             std::string header;
             lineStream >> header;
+            if(header == "#" && topComment) {
+                toRet.topCommentBlock.push_back(line);
+                continue;
+            }
+            else {
+                topComment = false;
+            }
             if(header == "v" || header == "vn") {
                 Vec4 vec{0, 0, 0};
                 lineStream >> vec;
@@ -27,12 +35,15 @@ namespace NM {
             else {
                 continue;
             }
-            
         }
+        toRet.topCommentBlock.emplace_back("# Modified and transformed");
         return toRet;
     }
     
     void Model::writeObj(std::ostream &stream) const {
+        for(const auto &comment: topCommentBlock) {
+            stream << comment << std::endl;
+        }
         for(const auto &vec: points) {
             stream << "v ";
             for(int i = 0; i < 4; ++i) {

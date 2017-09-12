@@ -3,7 +3,7 @@
 
 namespace NM {
     namespace Transform {
-        Mat4 rotateZ(double angle) {
+        Mat4 rotateZ(double angle) noexcept {
             return {
                 std::cos(angle), -std::sin(angle), 0, 0,
                 std::sin(angle), std::cos(angle), 0, 0,
