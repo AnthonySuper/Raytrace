@@ -1,7 +1,7 @@
 CXX := g++
 OBJDIR := ./obj
 SRCDIR := ./src
-TESTDIR := ./test_srcs
+TESTDIR := ./test
 CXXFLAGS := -Iinclude -std=c++14 -Wall -Ofast -ffast-math -march=native -funroll-loops -flto
 LDFLAGS := -pthread
 SOURCES := $(wildcard $(SRCDIR)/*.cpp)
@@ -25,11 +25,11 @@ $(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(TESTTARGET): $(TESTOBJS) $(OBJECTS) test.cpp
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -Itest_srcs $^ -o $@
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -Ilib $^ -o $@
 
 $(TESTOBJS): $(OBJDIR)/%.o : $(TESTDIR)/%.cpp
 	@mkdir -p $(OBJDIR)
-	$(CXX) $(CXXFLAGS) -Itest_srcs -c $< -o $@
+	$(CXX) $(CXXFLAGS) -Ilib -c $< -o $@
 
 clean:
 	rm -rf obj
