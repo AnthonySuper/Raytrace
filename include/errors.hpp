@@ -20,4 +20,9 @@ namespace NM {
         InvalidFilenameError();
         InvalidFilenameError(std::string fname);
     };
+    
+    class InvalidIntersectionError : std::runtime_error {
+    public:
+        InvalidIntersectionError();
+    };
 }
