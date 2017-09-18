@@ -6,6 +6,7 @@
 #include <errors.hpp>
 #include <mat4.hpp>
 #include <vec4.hpp>
+#include <ray.hpp>
 
 namespace NM {
     /**
@@ -33,6 +34,8 @@ namespace NM {
         };
         
         using FaceDescriptor = std::array<FaceElement, 3>;
+        
+        using FaceList = std::vector<FaceDescriptor>;
 
         static Model fromStream(std::istream& stream);
         Model(const Model&) = default;
@@ -47,7 +50,7 @@ namespace NM {
     private:
         PointVector points;
         PointVector normals;
-        std::vector<FaceDescriptor> faces;
+        FaceList faces;
         std::vector<std::string> topCommentBlock;
         
         friend std::ostream& operator<<(std::ostream&, const Model&);

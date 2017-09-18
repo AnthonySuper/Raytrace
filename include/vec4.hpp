@@ -28,6 +28,8 @@ namespace NM {
          * The actual buffer for the member variables
          */
         BuffType buff;
+
+        constexpr inline Vec4() : buff{0, 0, 0, 1} {}
         
         /**
          * Default copy constructor
@@ -109,7 +111,8 @@ namespace NM {
 
         inline constexpr Vec4 normalized() const {
             if(w() == 1.0) return *this;
-            if(w() == 0) throw std::overflow_error("Normalize with w=0");
+            if(w() == 0)
+                throw std::overflow_error("Normalize with w=0");
             auto w = this->w();
             return {x() / w, y() / w, z() / w, 1.0};
         }
@@ -157,7 +160,6 @@ namespace NM {
             buff[0] += other[0];
             buff[1] += other[1];
             buff[2] += other[2];
-            buff[3] += other[3];
             return *this;
         }
 
@@ -165,7 +167,6 @@ namespace NM {
             buff[0] -= other[0];
             buff[1] -= other[1];
             buff[2] -= other[2];
-            buff[3] -= other[3];
             return *this;
         }
         
@@ -193,7 +194,6 @@ namespace NM {
             buff[0] *= o;
             buff[1] *= o;
             buff[2] *= o;
-            buff[3] *= o;
             return *this;
         }
 
@@ -202,7 +202,6 @@ namespace NM {
                 buff[0] + other[0],
                 buff[1] + other[1],
                 buff[2] + other[2],
-                buff[3] + other[3]
             };
         }
 
@@ -210,8 +209,7 @@ namespace NM {
             return {
                 buff[0] - other[0],
                 buff[1] - other[1],
-                buff[2] - other[2],
-                buff[3] - other[3]
+                buff[2] - other[2]
             };
         }
 
@@ -223,7 +221,6 @@ namespace NM {
                 buff[0] * obj,
                 buff[1] * obj,
                 buff[2] * obj,
-                buff[3] * obj
             };
         }
 
@@ -237,7 +234,6 @@ namespace NM {
             in * other[0],
             in * other[1],
             in * other[2],
-            in * other[3]
         };
     }
 

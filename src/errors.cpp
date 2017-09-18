@@ -23,6 +23,11 @@ namespace NM {
     InvalidFilenameError::InvalidFilenameError(std::string fname) :
     std::runtime_error("Filename `" + fname + "` not found") {}
     
+    InvalidIntersectionError::InvalidIntersectionError() :
+    std::runtime_error("Tried to perform an invalid operation on a non-existant intersection")
+    {}
+    
+    
     
     
 }
