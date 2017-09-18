@@ -6,7 +6,7 @@ namespace NM {
     struct Ray {
         Vec4 position;
         Vec4 direction;
-        constexpr inline Ray(const Vec4& pos, const Vec4& dir) : 
+        inline Ray(const Vec4& pos, const Vec4& dir) : 
             position(pos), direction(dir.toUnit()) {}
     };
     

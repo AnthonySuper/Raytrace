@@ -194,7 +194,6 @@ namespace NM {
             buff[0] *= o;
             buff[1] *= o;
             buff[2] *= o;
-            buff[3] *= o;
             return *this;
         }
 
@@ -222,7 +221,6 @@ namespace NM {
                 buff[0] * obj,
                 buff[1] * obj,
                 buff[2] * obj,
-                buff[3] * obj
             };
         }
 
@@ -236,7 +234,6 @@ namespace NM {
             in * other[0],
             in * other[1],
             in * other[2],
-            in * other[3]
         };
     }
 

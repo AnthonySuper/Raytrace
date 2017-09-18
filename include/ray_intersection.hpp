@@ -43,7 +43,7 @@ namespace NM {
             return _surfaceNormal;
         }
         
-        inline constexpr FloatType distance(const Vec4& p) const {
+        inline FloatType distance(const Vec4& p) const {
             checkValid();
             return (_point - p).magnitude();
         }

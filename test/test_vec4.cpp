@@ -37,13 +37,13 @@ TEST_CASE("Test operator ==") {
 TEST_CASE("Test operator +=") {
     Vec4 a(1, 1, 1);
     a += a;
-    Vec4 expect{2, 2, 2, 2};
+    Vec4 expect{2, 2, 2, 1};
     REQUIRE(a == expect);
 }
 
 TEST_CASE("Test operator -=") {
     Vec4 a(1, 1, 1);
-    Vec4 res(0, 0, 0, 0);
+    Vec4 res(0, 0, 0, 1);
     a -= a;
     REQUIRE(a == res);
 }
@@ -52,27 +52,27 @@ TEST_CASE("Test operator *= with int") {
     int i = 2;
     Vec4 a(1, 1, 1);
     a *= 2;
-    Vec4 exp(2, 2, 2, 2);
+    Vec4 exp(2, 2, 2, 1);
     REQUIRE(a == exp);
 }
 
 TEST_CASE("Test operator +") {
     Vec4 a(1, 1, 1);
     Vec4 b(1, 2, 1);
-    Vec4 res{2, 3, 2, 2};
+    Vec4 res{2, 3, 2, 1};
     REQUIRE((a + b) == res);
 }
 
 TEST_CASE("Test operator -") {
     Vec4 a(1, 1, 1);
     Vec4 b(1, 2, 1);
-    Vec4 res{0, 1, 0, 0};
+    Vec4 res{0, 1, 0, 1};
     REQUIRE((b - a) == res);
 }
 
 TEST_CASE("Test operator *") {
     Vec4 a(1, 2, 1);
-    Vec4 res(2, 4, 2, 2);
+    Vec4 res(2, 4, 2, 1);
     REQUIRE((a * 2) == res);
     REQUIRE((a * 2.0) == res);
     REQUIRE((2.0 * a) == res);
