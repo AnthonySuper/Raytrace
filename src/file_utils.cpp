@@ -3,7 +3,7 @@
 namespace NM {
     namespace FileUtils {
         void mkdir_p(const char *path) {
-#if defined(unix) || defined(__APPLE__)
+#if defined(unix) || defined(__APPLE__) || defined(__linux) || defined(linux)
             mkdir(path, S_IRWXU);
 #else
             throw std::runtime_error("mkdir_p not supported on this OS");
