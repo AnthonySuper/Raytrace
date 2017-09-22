@@ -6,9 +6,9 @@
 namespace NM {
     class RayIntersection {
     private:
-        const bool intersecting;
-        const Vec4 _point;
-        const Vec4 _surfaceNormal;
+        bool intersecting;
+        Vec4 _point;
+        Vec4 _surfaceNormal;
     public:
         inline constexpr RayIntersection() :
         intersecting(false), _point{} {}
@@ -18,6 +18,8 @@ namespace NM {
         intersecting(true),
         _point{intersectionPoint},
         _surfaceNormal{sn} {}
+        
+        RayIntersection& operator=(const RayIntersection&) = default;
         
         inline constexpr operator bool() const {
             return intersecting;

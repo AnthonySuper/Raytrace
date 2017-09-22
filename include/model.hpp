@@ -7,6 +7,7 @@
 #include <mat4.hpp>
 #include <vec4.hpp>
 #include <ray.hpp>
+#include <triangle.hpp>
 
 namespace NM {
     /**
@@ -47,6 +48,45 @@ namespace NM {
          */
         void writeObj(std::ostream& stream) const;
         
+        inline const PointVector& getPoints() const {
+            return points;
+        }
+        
+        inline const size_t triangleCount() const {
+            return faces.size();
+        }
+        
+        inline Vec4 vertexAt(size_type i) const {
+            if(i == 0) {
+                throw std::out_of_range("Triangles are one-indexed like OBJ files");
+            }
+            if(i > triangleCount()) {
+                throw std::out_of_range("Index too high!");
+            }
+            if(i < -triangleCount()) {
+                throw std::out_of_range("Index too low");
+            }
+            auto norm = (i - 1);
+            if(norm < 0) {
+                return points[points.size() + norm];
+            }
+            else {
+                return points[norm];
+            }
+        }
+        
+        inline size_t facesSize() const { return faces.size(); }
+        
+        inline Triangle faceAt(size_t face) const {
+            auto& t = faces.at(face);
+            return {
+                vertexAt(t[0].coordIdx),
+                vertexAt(t[1].coordIdx),
+                vertexAt(t[2].coordIdx)
+            };
+        }
+        
+        
     private:
         PointVector points;
         PointVector normals;
@@ -56,6 +96,8 @@ namespace NM {
         friend std::ostream& operator<<(std::ostream&, const Model&);
         friend Model operator*(const Mat4& mat, const Model&);
     };
+    
+
     
     std::istream& operator>>(std::istream&, Model::FaceElement&);
     

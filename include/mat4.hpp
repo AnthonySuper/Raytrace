@@ -148,7 +148,7 @@ namespace NM {
         /**
          * @brief Apply a transformation to a vector.
          */
-        inline constexpr Vec4 operator()(const Vec4& in) noexcept {
+        inline constexpr Vec4 operator()(const Vec4& in) const noexcept {
             return (*this) * in;
         }
         

@@ -15,7 +15,10 @@ set(PROJECT_SRCS
   src/ray.cpp
   src/scene.cpp
   src/camera.cpp
+  src/transformed_model.cpp
   src/ray_intersection.cpp
+  src/sphere.cpp
+  src/triangle.cpp
   src/image.cpp)
 
 set(PROJECT_INCLUDES
@@ -31,13 +34,18 @@ set(PROJECT_INCLUDES
   include/scene.hpp
   include/file_utils.hpp
   include/ray_intersection.hpp
+  include/triangle.hpp
+  include/sphere.hpp
+  include/transformed_model.hpp
   include/image.hpp)
 
 set(PROJECT_TEST_SRCS
   test/test_vec4.cpp
   test/test_mat4.cpp
   test/test_transforms.cpp
-  test/test_image.cpp)
+  test/test_image.cpp
+  test/test_triangle.cpp
+  test/test_sphere.cpp)
 
 add_test(unit_tests COMMAND ./catch_test)
 

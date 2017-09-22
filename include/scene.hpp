@@ -1,13 +1,13 @@
 #pragma once
 
-#include <model.hpp>
+#include <transformed_model.hpp>
 
 namespace NM {
     class Scene {
     public:
-        void addModel(const Model&);
-        void addModel(Model&&);
+        void addModel(const TransformedModel &);
+        void addModel(TransformedModel&&);
     private:
-        std::vector<Model> models;
+        std::vector<TransformedModel> models;
     };
 }
