@@ -6,7 +6,7 @@
 namespace NM {
     struct Triangle {
         Vec4 a, b, c, normal;
-        inline constexpr Triangle(const Vec4& _a, const Vec4& _b, const Vec4& _c) :
+        inline Triangle(const Vec4& _a, const Vec4& _b, const Vec4& _c) :
         a(_a), b(_b), c(_c), normal((a - b).cross(c - b))
         {}
         inline Triangle& apply(const Mat4 &mat) {
