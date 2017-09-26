@@ -9,7 +9,7 @@ namespace NM {
         inline constexpr Triangle(const Vec4& _a, const Vec4& _b, const Vec4& _c) :
         a(_a), b(_b), c(_c), normal((a - b).cross(c - b))
         {}
-        inline constexpr Triangle& apply(const Mat4 &mat) {
+        inline Triangle& apply(const Mat4 &mat) {
             a = mat(a);
             b = mat(b);
             c = mat(c);
@@ -18,7 +18,7 @@ namespace NM {
             return *this;
         }
         
-        inline constexpr void calcNormal() {
+        inline void calcNormal() {
             normal = (a - b).cross(c - b);
         }
         /**
