@@ -67,7 +67,7 @@ namespace NM {
     RayIntersection TransformedModel::checkIntersection(const NM::Ray &ray) const {
         auto r = boundingSphere.checkIntersection(ray);
         if(! r) {
-            return r;
+            return {};
         }
         RayIntersection current;
         FloatType dist = 0;
@@ -94,6 +94,9 @@ namespace NM {
         };
     }
     
+    std::ostream& operator<<(std::ostream& os, const TransformedModel &m) {
+        return os << "{TransformedModel: " << m.getTransform() << ", " << m.getModel() << std::endl;
+    }
    
     
 }

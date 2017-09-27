@@ -224,9 +224,9 @@ namespace NM {
                                                 Vec4>::type
         operator *(const T& obj) const {
             return {
-                buff[0] * obj,
-                buff[1] * obj,
-                buff[2] * obj,
+                buff[0] * static_cast<FloatType>(obj),
+                buff[1] * static_cast<FloatType>(obj),
+                buff[2] * static_cast<FloatType>(obj),
             };
         }
 
@@ -235,7 +235,8 @@ namespace NM {
     template<typename T>
     inline constexpr typename std::enable_if<std::is_arithmetic<T>::value,
                                             Vec4>::type
-    operator *(T in, const Vec4 other) {
+    operator *(T _in, const Vec4 other) {
+        FloatType in = static_cast<FloatType>(_in);
         return {
             in * other[0],
             in * other[1],

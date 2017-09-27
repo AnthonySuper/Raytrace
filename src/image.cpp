@@ -9,64 +9,31 @@ namespace NM {
     }
 
     Vec4 Image::at(size_t h, size_t w) const {
-        return pixels.at((h * height) + w);
+        return pixels.at((h * width) + w);
     }
-
-    Image::RowSlice Image::at(size_t h) {
-        return {this, h};
-    }
-
-    Image::ConstRowSlice Image::at(size_t h) const {
-        return {this, h};
-    }
-
-    Image::RowSlice::RowSlice(Image* img, size_t h) :
-        img(img), h(h) {
-            if(h > img->height) throw std::out_of_range("Height too large");
+    
+    void Image::writePPM(std::ostream & os, size_t colorDepth) const {
+        // write header
+        os << "P3" << std::endl;
+        // write size
+        os << width << " " << height << std::endl;
+        // Write color depth
+        os << colorDepth << std::endl;
+        for(int i = 0; i < height; ++i) {
+            for(int j = 0; j < width; ++j) {
+                auto v = at(i, j);
+                int r = v.r();
+                int g = v.g();
+                int b = v.b();
+                if(r > colorDepth || g > colorDepth || b > colorDepth) {
+                    throw std::out_of_range("Number greater than color depth");
+                }
+                if(r < 0 || g < 0 || b < 0) {
+                    throw std::out_of_range("Number less than zero!");
+                }
+                os << r << " " << g << " " << b << " ";
+            }
+            os << std::endl;
         }
-
-    Image::PixelList::iterator Image::RowSlice::begin() {
-        return img->begin() + (h * img->height);
-    }
-
-    Image::PixelList::iterator Image::RowSlice::end() {
-        return begin() + img->width;
-    }
-
-    size_t Image::RowSlice::size() const {
-        return img->width;
-    }
-
-    Image::ConstRowSlice::ConstRowSlice(const Image * const i, size_t h) :
-        img(i), h(h) {
-            if(h > i->height) throw std::out_of_range("Height too large");
-        }
-
-    Image::PixelList::const_iterator Image::ConstRowSlice::begin() const {
-        return img->begin() + (h * img->height);
-    }
-
-    Image::PixelList::const_iterator Image::ConstRowSlice::end() const {
-        return begin() + (h * img->height);
-    }
-
-    size_t Image::ConstRowSlice::size() const {
-        return img->width;
-    }
-
-    std::vector<Image::RowSlice> Image::rows() {
-        std::vector<RowSlice> toRet;
-        for(size_t i = 0; i < height; ++i) {
-            toRet.emplace_back(this, i);
-        }
-        return toRet;
-    }
-
-    std::vector<Image::ConstRowSlice> Image::rows() const {
-        std::vector<ConstRowSlice> toRet;
-        for(size_t i = 0; i < height; ++i) {
-            toRet.emplace_back(this, i);
-        }
-        return toRet;
     }
 };

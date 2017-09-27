@@ -10,7 +10,7 @@ TEST_CASE("Mat4 is the right size") {
 }
 
 TEST_CASE("Mat4 constructs with arrays") {
-    double row[] = {0.0, 1.0, 0.0, 0.0};
+    FloatType row[] = {0.0, 1.0, 0.0, 0.0};
     Mat4 mat{row, row, row, row};
     REQUIRE(mat[0][1] == 1.0);
     REQUIRE(mat[0][2] == 0.0);

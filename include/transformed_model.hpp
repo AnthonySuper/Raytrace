@@ -3,6 +3,7 @@
 #include <model.hpp>
 #include <sphere.hpp>
 #include <cmath>
+#include <ostream>
 
 namespace NM {
     class TransformedModel {
@@ -16,10 +17,10 @@ namespace NM {
         RayIntersection checkIntersection(const Ray& ray) const;
     private:
         std::shared_ptr<Model> model;
-        const Mat4 transform;
+        Mat4 transform;
         Sphere boundingSphere;
     };
     
     TransformedModel operator*(const Mat4&, TransformedModel&);
-    
+    std::ostream& operator<<(std::ostream&, const TransformedModel&);
 }

@@ -53,7 +53,7 @@ namespace NM {
         }
         
         inline const size_t triangleCount() const {
-            return faces.size();
+            return points.size();
         }
         
         inline Vec4 vertexAt(size_type i) const {
@@ -63,7 +63,7 @@ namespace NM {
             if(i > triangleCount()) {
                 throw std::out_of_range("Index too high!");
             }
-            if(i < -triangleCount()) {
+            if(i < 0 && -i > triangleCount()) {
                 throw std::out_of_range("Index too low");
             }
             auto norm = (i - 1);
@@ -86,7 +86,6 @@ namespace NM {
             };
         }
         
-        
     private:
         PointVector points;
         PointVector normals;
@@ -96,8 +95,6 @@ namespace NM {
         friend std::ostream& operator<<(std::ostream&, const Model&);
         friend Model operator*(const Mat4& mat, const Model&);
     };
-    
-
     
     std::istream& operator>>(std::istream&, Model::FaceElement&);
     

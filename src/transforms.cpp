@@ -3,7 +3,7 @@
 
 namespace NM {
     namespace Transform {
-        Mat4 rotateZ(double angle) noexcept {
+        Mat4 rotateZ(FloatType angle) noexcept {
             return {
                 std::cos(angle), -std::sin(angle), 0, 0,
                 std::sin(angle), std::cos(angle), 0, 0,
@@ -12,7 +12,7 @@ namespace NM {
             };
         }
         
-        Mat4 axisAngle(Vec4 axis, double angle) {
+        Mat4 axisAngle(Vec4 axis, FloatType angle) {
             Vec4 w = axis.toUnit();
             Vec4 tmp = axis;
             if(tmp[0] != 1.0) tmp[0] = 1.0;

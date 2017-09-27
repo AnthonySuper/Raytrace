@@ -1,15 +1,6 @@
 #include <driver.hpp>
 
 namespace NM {
-    static std::string getBasename(std::string in) {
-        std::regex pattern("(.+)\\.",
-                           std::regex_constants::extended);
-        std::smatch m;
-        if(! std::regex_search(in, m, pattern)) {
-            throw InvalidFilenameError(in);
-        }
-        return m[1].str();
-    }
     
     Driver Driver::fromFile(std::string fname) {
         std::ifstream fstream(fname);
@@ -22,6 +13,12 @@ namespace NM {
         return driver;
     }
     
+    void readSpaceVec(std::istream& is, Vec4& v) {
+        is >> v.x();
+        is >> v.y();
+        is >> v.z();
+    }
+    
     std::istream& operator>>(std::istream& is, Driver& driver) {
         std::string line;
         while(std::getline(is, line)) {
@@ -29,28 +26,35 @@ namespace NM {
             std::string header;
             lineStream >> header;
             if(header == "model") {
-                FloatType x, y, z, angle, scale, tx, ty, tz;
-                std::string fname;
-                lineStream >> x;
-                lineStream >> y;
-                lineStream >> z;
-                lineStream >> angle;
-                lineStream >> scale;
-                lineStream >> tx;
-                lineStream >> ty;
-                lineStream >> tz;
-                lineStream >> fname;
-                if(lineStream.fail()) {
-                    throw ParseError("Could not parse driver file");
-                }
-                angle = degToRad(angle);
-                Driver::DriverModel toPush;
-                toPush.transform = Transform::axisAngle({x, y, z}, angle) *
-                Transform::scale(scale) *
-                Transform::translate({tx, ty, tz});
-                toPush.fname = fname;
-                toPush.model = driver.readModelFile(fname);
-                driver.addModel(toPush);
+                driver.parseModel(lineStream);
+            }
+            else if(header == "eye") {
+                readSpaceVec(lineStream, driver.eye);
+            }
+            else if(header == "look") {
+                readSpaceVec(lineStream, driver.look);
+            }
+            else if(header == "up") {
+                readSpaceVec(lineStream, driver.up);
+            }
+            else if(header == "d") {
+                lineStream >> driver.focalLength;
+            }
+            else if(header == "bounds") {
+                lineStream >> driver.vertBounds[0];
+                lineStream >> driver.horzBounds[0];
+                lineStream >> driver.vertBounds[1];
+                lineStream >> driver.horzBounds[1];
+            }
+            else if(header == "res") {
+                lineStream >> driver.resX;
+                lineStream >> driver.resY;
+            }
+            else if(header == "sphere") {
+                // do nothing!
+            }
+            else if(header == "") {
+                // do nothing!
             }
             else {
                 throw ParseError(
@@ -60,6 +64,37 @@ namespace NM {
             }
         }
         return is;
+    }
+    
+    void Driver::parseModel(std::istream &lineStream) {
+        FloatType x, y, z, angle, scale, tx, ty, tz;
+        std::string fname;
+        lineStream >> x;
+        lineStream >> y;
+        lineStream >> z;
+        lineStream >> angle;
+        lineStream >> scale;
+        lineStream >> tx;
+        lineStream >> ty;
+        lineStream >> tz;
+        lineStream >> fname;
+        if(lineStream.fail()) {
+            throw ParseError("Could not parse driver file");
+        }
+        angle = degToRad(angle);
+        auto t = Transform::axisAngle({x, y, z}, angle) *
+        Transform::scale(scale) *
+        Transform::translate({tx, ty, tz});
+        auto r = readModelFile(fname);
+        addModel({r, t});
+    }
+    
+    Scene Driver::toScene() {
+        Scene ret;
+        for(auto& model: models) {
+            ret.addModel(model);
+        }
+        return ret;
     }
     
     std::shared_ptr<Model> Driver::readModelFile(std::string fname) {
@@ -77,74 +112,12 @@ namespace NM {
         }
     }
     
-    std::string Driver::getOutName(std::vector<DriverModel>::iterator itr) {
-        int count = 0;
-        for(auto it = models.begin(); it < itr; ++it) {
-            if(it->fname == itr->fname) {
-                count++;
-            }
-        }
-        auto basename = getBasename(itr->fname);
-        std::string countStr;
-        if(count > 9) {
-            countStr = std::to_string(count);
-        }
-        else {
-            countStr = "0" + std::to_string(count);
-        }
-        return directoryName() + "/" + basename + "_mw" + countStr + ".obj";
+    Camera Driver::getCamera() {
+        return Camera{eye, look, focalLength, vertBounds, horzBounds, up};
     }
     
-    void Driver::addModel(NM::Driver::DriverModel model) {
+    void Driver::addModel(TransformedModel model) {
         models.push_back(model);
     }
     
-    void Driver::makeDirectory() {
-        auto name = directoryName();
-        FileUtils::mkdir_p(name.c_str());
-    }
-    
-    void Driver::writeOut() {
-        makeDirectory();
-        for(auto itr = models.begin(); itr < models.end(); ++itr) {
-            std::string outname = getOutName(itr);
-            std::ofstream outStr(outname);
-            if(! outStr) {
-                throw std::runtime_error(std::string("Couldn't open file ") +
-                                         outname);
-            }
-            itr->transformed().writeObj(outStr);
-            outStr.close();
-        }
-    }
-    
-    std::string Driver::directoryName() {
-        return getBasename(driverName);
-    }
-    
-    std::ostream& operator<<(std::ostream& os, const Driver& driver) {
-        os << "[";
-        int i = 0;
-        for(const auto &model: driver.models) {
-            os << model;
-            i++;
-            if(i != driver.models.size()) {
-                os << ", ";
-            }
-        }
-        return os << "}";
-    }
-    
-    Model Driver::DriverModel::transformed() {
-        if(! model) {
-            throw std::runtime_error("Null model!");
-        }
-        return transform * (*model);
-    }
-    
-    std::ostream& operator<<(std::ostream& os, const Driver::DriverModel & dr) {
-        return os << "{" << dr.model <<
-            ",\"" << dr.fname << "\","
-            << dr.transform << "}";
-    }
 }

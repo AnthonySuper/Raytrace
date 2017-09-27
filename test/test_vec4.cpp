@@ -5,7 +5,7 @@
 using namespace NM;
 
 TEST_CASE("Vec4 is the right size") {
-    static_assert(sizeof(Vec4) == (4 * sizeof(double)),
+    static_assert(sizeof(Vec4) == (4 * sizeof(FloatType)),
             "Vector is incorrect size");
 }
 

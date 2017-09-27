@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.2)
-
+set(CMAKE_BUILD_TYPE release)
 project(raytrace)
 
 enable_testing()
@@ -73,4 +73,4 @@ set(CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set_property(TARGET catch_test PROPERTY CXX_STANDARD 14)
 set_property(TARGET raytrace PROPERTY CXX_STANDARD 14)
-set(CMAKE_CXX_FLAGS "-std=c++1z")
+set(CMAKE_CXX_FLAGS "-std=c++1z -ffast-math")

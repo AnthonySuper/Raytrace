@@ -46,10 +46,10 @@ namespace NM {
         } {}
         
         // could probably be done with templates, oh well...
-        inline constexpr Mat4(double a0, double a1, double a2, double a3,
-                double b0, double b1, double b2, double b3,
-                double c0, double c1, double c2, double c3,
-                double d0, double d1, double d2, double d3) :
+        inline constexpr Mat4(FloatType a0, FloatType a1, FloatType a2, FloatType a3,
+                FloatType b0, FloatType b1, FloatType b2, FloatType b3,
+                FloatType c0, FloatType c1, FloatType c2, FloatType c3,
+                FloatType d0, FloatType d1, FloatType d2, FloatType d3) :
         data{{a0, a1, a2, a3},
             {b0, b1, b2, b3},
             {c0, c1, c2, c3},
@@ -71,7 +71,7 @@ namespace NM {
             return Vec4(data[i]);
         }
 
-        constexpr double at(int i, int j) const noexcept {
+        constexpr FloatType at(int i, int j) const noexcept {
             return data[i][j];
         }
 
@@ -100,7 +100,7 @@ namespace NM {
             Mat4 buff;
             for(int i = 0; i < 4; ++i) {
                 for(int j = 0; j < 4; ++j) {
-                    double tmp = 0;
+                    FloatType tmp = 0;
                     for(int k = 0; k < 4; ++k) {
                         tmp += data[i][k] * other[k][j];
                     }
@@ -118,7 +118,7 @@ namespace NM {
         inline constexpr Vec4 operator*(const Vec4& other) const noexcept {
             Vec4 d{0, 0, 0};
             for(int i = 0; i < 4; ++i) {
-                double tmp = 0;
+                FloatType tmp = 0;
                 for(int k = 0; k < 4; ++k) {
                     tmp += data[i][k] * other[k];
                 }

@@ -35,7 +35,7 @@ namespace NM {
         /**
          * @brief create a transformation that sclaes by a constant.
          */
-        inline constexpr Mat4 scale(const double by) {
+        inline constexpr Mat4 scale(const FloatType by) {
             return {
                 by, 0, 0, 0,
                 0, by, 0, 0,
@@ -47,12 +47,12 @@ namespace NM {
         /**
          * @brief create a transformation which rotates around an axis
          */
-        Mat4 axisAngle(Vec4 axis, double angle);
+        Mat4 axisAngle(Vec4 axis, FloatType angle);
         
         /**
          * @brief Rotate around Z by some degres
          * @param angle the angle to rotate by in degrees
          */
-        Mat4 rotateZ(double angle) noexcept;
+        Mat4 rotateZ(FloatType angle) noexcept;
     }
 }
