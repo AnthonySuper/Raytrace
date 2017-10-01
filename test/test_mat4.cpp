@@ -74,10 +74,16 @@ TEST_CASE("Mat4 identity inverse works with a random matrix") {
         -0.0, -0.0, -0.1666666666666666, 0.166666666666666666,
         0.666666666666, -1.3333333333333333, -1.05555555555555, 0.0555555555555555
     };
-    REQUIRE(
-        (example * example.inverse()).truncedZeros().toString() ==
-            Mat4::id().toString()
-    );
-    REQUIRE(example.inverse().toString() == expected.toString());
+    Mat4 res = example * example.inverse();
+    for(int i = 0; i < 4; ++i) {
+        for(int j = 0; j < 4; ++j) {
+            if(i == j) {
+                REQUIRE(res[i][j] == Approx(1.0));
+            }
+            else {
+                REQUIRE(res[i][j] == Approx(0.0));
+            }
+        }
+    }
     
 }

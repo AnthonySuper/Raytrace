@@ -30,8 +30,20 @@ namespace NM {
     }
     
     Ray Camera::getRay(size_t height, size_t width, size_t i, size_t j) {
-        float px = i/(width-1.0)*(horizontalBounds[1] - horizontalBounds[0]) + horizontalBounds[0];
-        float py = j/(height-1.0)*(verticalBounds[1] - verticalBounds[0]) + verticalBounds[0];
+        float px;
+        if(i == 0) {
+            px = horizontalBounds[0];
+        }
+        else {
+            px = i/(width-1.0)*(horizontalBounds[1] - horizontalBounds[0]) + horizontalBounds[0];
+        }
+        float py;
+        if(j == 0) {
+            py = verticalBounds[0];
+        }
+        else {
+            py = j/(height-1.0)*(verticalBounds[1] - verticalBounds[0]) + verticalBounds[0];
+        }
         Vec4 pt = pos + (near * w) + (px * u) + (py * v);
         Vec4 dir = (pt - pos);
         return {pt, dir};

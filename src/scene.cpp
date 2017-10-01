@@ -47,7 +47,7 @@ namespace NM {
                 for(int i = 0; i < termLength; i++) {
                     std::cout << (i < toWrite ? "=" : " ");
                 }
-                std::cout << "] (" << (percent*10) << "%)";
+                std::cout << "] (" << (percent*100) << "%)";
                 std::cout.flush();
                 std::this_thread::sleep_for(std::chrono::nanoseconds(100000000));
             }

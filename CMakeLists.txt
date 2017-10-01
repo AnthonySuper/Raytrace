@@ -45,7 +45,8 @@ set(PROJECT_TEST_SRCS
   test/test_transforms.cpp
   test/test_image.cpp
   test/test_triangle.cpp
-  test/test_sphere.cpp)
+  test/test_sphere.cpp
+  test/test_camera.cpp)
 
 add_test(unit_tests COMMAND ./catch_test)
 

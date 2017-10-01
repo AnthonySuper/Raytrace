@@ -113,7 +113,7 @@ namespace NM {
     }
     
     Camera Driver::getCamera() {
-        return Camera{eye, look, focalLength, vertBounds, horzBounds, up};
+        return Camera{eye, look, -focalLength, vertBounds, horzBounds, up};
     }
     
     void Driver::addModel(TransformedModel model) {

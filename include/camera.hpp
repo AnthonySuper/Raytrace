@@ -16,7 +16,7 @@ namespace NM {
                FloatType near,
                FloatType horizBounds[2],
                FloatType vertBounds[2],
-               Vec4 up = {0, 1, 0});
+               Vec4 up = {0, 0, 1});
         
         std::vector<Ray> getRays(size_t height, size_t width);
         
