@@ -7,6 +7,7 @@
 #include <mat4.hpp>
 #include <vec4.hpp>
 #include <ray.hpp>
+#include <triangle.hpp>
 #include <iostream>
 
 namespace NM {
@@ -48,6 +49,17 @@ namespace NM {
          */
         void writeObj(std::ostream& stream) const;
         void debugCompare(const Model&, std::ostream& output = std::cout);
+        inline const PointVector& getPoints() const {
+            return points;
+        }
+        
+        Triangle faceAt(size_t idx) const;
+        
+        inline size_t facesSize() const {
+            return faces.size();
+        }
+        
+        Vec4 pointAtObjCoord(ssize_t idx) const;
         
     private:
         PointVector points;

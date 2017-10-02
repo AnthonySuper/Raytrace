@@ -150,4 +150,29 @@ namespace NM {
             }
         }
     }
+    
+    Triangle Model::faceAt(size_t idx) const {
+        FaceDescriptor fd = faces.at(idx);
+        return {
+            pointAtObjCoord(fd[0].coordIdx),
+            pointAtObjCoord(fd[1].coordIdx),
+            pointAtObjCoord(fd[2].coordIdx)
+        };
+    }
+    
+    Vec4 Model::pointAtObjCoord(ssize_t idx) const {
+        if(idx == 0) {
+            throw std::range_error("Index 0 not allowed!");
+        }
+        if(idx < 0) {
+            idx = faces.size() + idx;
+            if(idx < 0) {
+                throw std::range_error("Value is too negative");
+            }
+            return points.at(idx);
+        }
+        else {
+            return points.at(idx - 1);
+        }
+    }
 }

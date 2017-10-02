@@ -148,7 +148,16 @@ namespace NM {
         /**
          * @brief Apply a transformation to a vector.
          */
-        inline constexpr Vec4 operator()(const Vec4& in) noexcept {
+        inline constexpr Vec4 operator()(const Vec4& in) const noexcept {
+            return (*this) * in;
+        }
+        
+        inline constexpr Mat4 operator()(const Mat4& in) const {
+            return (*this) * in;
+        }
+        
+        template<typename T>
+        inline T apply(const T& in) const {
             return (*this) * in;
         }
         

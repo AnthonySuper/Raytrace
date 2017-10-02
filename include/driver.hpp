@@ -11,6 +11,8 @@
 #include <globals.hpp>
 #include <transforms.hpp>
 #include <file_utils.hpp>
+#include <transformed_model.hpp>
+#include <camera.hpp>
 
 namespace NM {
     class Driver {
@@ -53,20 +55,36 @@ namespace NM {
         
         void writeOut();
         
+        CameraAperature getCameraAperature() const;
+        
+        CameraAxis getCameraAxis() const;
+        
+        Camera getCamera() const;
+        
+        std::tuple<size_t, size_t> getResolution();
+        
+        std::string basename();
+        
     private:
+        Vec4 eye;
+        Vec4 look;
+        Vec4 up;
+        Vec4 bounds;
+        FloatType dist;
+        size_t resX, resY;
         std::string driverName;
-        void addModel(DriverModel model);
         friend std::istream& operator>>(std::istream&, Driver& driver);
         friend std::ostream& operator<<(std::ostream& os, const Driver& driver);
         std::unordered_map<std::string, std::shared_ptr<Model>> modelDict;
-        std::vector<DriverModel> models;
-        void makeDirectory();
-        std::string directoryName();
+        std::vector<TransformedModel> models;
+        std::vector<Sphere> spheres;
     };
     
     std::istream& operator>>(std::istream&, Driver&);
     
     std::istream& operator>>(std::istream&, Driver::DriverTransform&);
+    
+
     
     std::ostream& operator<<(std::ostream&, const Driver&);
     

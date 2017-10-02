@@ -178,7 +178,7 @@ namespace NM {
             };
         }
         
-        inline Vec4 cross(const Vec4& other) {
+        inline Vec4 cross(const Vec4& other) const  {
             auto u = normalized();
             auto v = other.normalized();
             return {
@@ -228,6 +228,12 @@ namespace NM {
                 buff[1] * obj,
                 buff[2] * obj,
             };
+        }
+        
+        inline constexpr FloatType dot(const Vec4& other) const {
+            return buff[0] * other[0] +
+            buff[1] * other[1] +
+            buff[2] * other[2];
         }
 
     };

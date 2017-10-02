@@ -6,18 +6,24 @@
 namespace NM {
     class RayIntersection {
     private:
-        const bool intersecting;
-        const Vec4 _point;
-        const Vec4 _surfaceNormal;
+        bool intersecting;
+        Vec4 _point;
+        Vec4 _surfaceNormal;
+        FloatType dist;
     public:
         inline constexpr RayIntersection() :
-        intersecting(false), _point{} {}
+        intersecting(false), _point{}, dist(-1) {}
         
-        inline constexpr RayIntersection(const Vec4& intersectionPoint,
-                                         const Vec4& sn) :
+        inline RayIntersection(const Vec4& intersectionPoint,
+                               const Vec4& sn,
+                               const Ray& ray) :
         intersecting(true),
         _point{intersectionPoint},
-        _surfaceNormal{sn} {}
+        _surfaceNormal{sn},
+        dist{(intersectionPoint - ray.position).magnitude()}
+        {}
+        
+        RayIntersection& operator=(const RayIntersection&) = default;
         
         inline constexpr operator bool() const {
             return intersecting;
@@ -43,6 +49,15 @@ namespace NM {
             return _surfaceNormal;
         }
         
+        inline FloatType getDistance() {
+            checkValid();
+            return dist;
+        }
+        
+        inline FloatType getDistanceOrNegative() {
+            return dist;
+        }
+        
         inline FloatType distance(const Vec4& p) const {
             checkValid();
             return (_point - p).magnitude();
@@ -53,6 +68,8 @@ namespace NM {
                 throw InvalidIntersectionError();
             }
         }
+        
+        void compareExchange(const RayIntersection & other);
         
     };
 }

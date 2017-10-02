@@ -7,24 +7,47 @@
 
 namespace NM {
     
-    class Camera {
+    class CameraAxis {
     public:
-        Camera(Vec4 point, Vec4 lookAt, FloatType near, Vec4 up = {0, 1, 0});
-        
-        std::vector<Ray> getRays(size_t height, size_t width);
-        
-        Ray getRay(size_t height, size_t width, size_t i, size_t j);
-        
+        CameraAxis(Vec4 point,
+               Vec4 lookAt,
+               Vec4 up = {0, 0, 1});
+
+        inline Vec4 getPos() const { return pos; }
+        inline Vec4 getUp() const { return up; }
+        inline Vec4 getW() const { return w; }
+        inline Vec4 getV() const { return v; }
+        inline Vec4 getU() const { return u; }
     private:
         Vec4 pos;
         Vec4 up;
         Vec4 w;
         Vec4 v;
         Vec4 u;
-        FloatType near;
-        friend std::ostream& operator<<(std::ostream&, const Camera&);
+        friend std::ostream& operator<<(std::ostream&, const CameraAxis&);
         
     };
     
+    struct CameraAperature {
+        FloatType distance;
+        FloatType left;
+        FloatType right;
+        FloatType up;
+        FloatType down;
+        CameraAperature() = default;
+    };
+    
+    class Camera {
+    public:
+        Camera(const CameraAxis &, const CameraAperature&);
+        inline CameraAxis getAxis() const { return axis; }
+        inline CameraAperature getAperature() const { return aperature; }
+    private:
+        CameraAxis axis;
+        CameraAperature aperature;
+    };
+    
+    std::ostream& operator<<(std::ostream&, const CameraAxis&);
+    std::ostream& operator<<(std::ostream&, const CameraAperature&);
     std::ostream& operator<<(std::ostream&, const Camera&);
 }

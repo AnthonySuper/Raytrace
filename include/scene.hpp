@@ -1,13 +1,18 @@
 #pragma once
 
 #include <model.hpp>
+#include <transformed_model.hpp>
 
 namespace NM {
     class Scene {
     public:
-        void addModel(const Model&);
-        void addModel(Model&&);
+        void addObject(const TransformedModel&);
+        void addObject(TransformedModel&&);
+        void addObject(const Sphere &);
+        RayIntersection trace(const Ray& in) const;
+        
     private:
-        std::vector<Model> models;
+        std::vector<TransformedModel> models;
+        std::vector<Sphere> spheres;
     };
 }

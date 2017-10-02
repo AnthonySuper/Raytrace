@@ -3,7 +3,6 @@
 #include <transforms.hpp>
 #include <catch.hpp>
 
-
 using namespace NM;
 
 TEST_CASE("Scaling by identity", "[scaling]") {

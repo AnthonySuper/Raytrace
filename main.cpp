@@ -13,7 +13,7 @@ int main(int argc, char** argv) {
     }
     try {
         NM::Driver d = NM::Driver::fromFile(argv[1]);
-        d.writeOut();
+        
     }
     catch(std::exception &e) {
         cerr << "Got error: " << e.what() << endl;

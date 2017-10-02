@@ -11,6 +11,19 @@ namespace NM {
         return m[1].str();
     }
     
+    static void readVec(std::istream& is, Vec4& out) {
+        is >> out.x();
+        is >> out.y();
+        is >> out.z();
+    }
+    
+    static void readVec4(std::istream& is, Vec4& out) {
+        is >> out.x();
+        is >> out.y();
+        is >> out.z();
+        is >> out.w();
+    }
+    
     Driver Driver::fromFile(std::string fname) {
         std::ifstream fstream(fname);
         if(! fstream) {
@@ -30,17 +43,37 @@ namespace NM {
             lineStream >> header;
             if(header == "model") {
                 std::string fname;
-                lineStream >> fname;
                 Driver::DriverTransform dt;
                 lineStream >> dt;
-                if(lineStream.bad()) {
-                    throw ParseError("Could not parse driver file");
-                }
-                Driver::DriverModel toPush;
-                toPush.transform = dt.toMatrix();
-                toPush.fname = fname;
-                toPush.model = driver.readModelFile(fname);
-                driver.addModel(toPush);
+                lineStream >> fname;
+                auto transform = dt.toMatrix();
+                auto model = driver.readModelFile(fname);
+                driver.models.emplace_back(model, transform);
+            }
+            else if(header == "eye") {
+                readVec(lineStream, driver.eye);
+            }
+            else if(header == "look") {
+                readVec(lineStream, driver.look);
+            }
+            else if(header == "up") {
+                readVec(lineStream, driver.up);
+            }
+            else if(header == "d") {
+                lineStream >> driver.dist;
+            }
+            else if(header == "bounds") {
+                readVec4(lineStream, driver.bounds);
+            }
+            else if(header == "res") {
+                lineStream >> driver.resX;
+                lineStream >> driver.resY;
+            }
+            else if(header.length() == 0) {
+                continue;
+            }
+            else if(header.length() > 0 && header.at(0) == '#') {
+                continue;
             }
             else {
                 throw ParseError(
@@ -56,6 +89,7 @@ namespace NM {
         auto itr = modelDict.find(fname);
         if(itr == modelDict.end()) {
             std::ifstream readStream(fname);
+
             auto read = std::make_shared<Model>(Model::fromStream(readStream));
             modelDict.emplace(fname,
                               read);
@@ -67,48 +101,7 @@ namespace NM {
         }
     }
     
-    std::string Driver::getOutName(std::vector<DriverModel>::iterator itr) {
-        int count = 0;
-        for(auto it = models.begin(); it < itr; ++it) {
-            if(it->fname == itr->fname) {
-                count++;
-            }
-        }
-        auto basename = getBasename(itr->fname);
-        std::string countStr;
-        if(count > 9) {
-            countStr = std::to_string(count);
-        }
-        else {
-            countStr = "0" + std::to_string(count);
-        }
-        return directoryName() + "/" + basename + "_mw" + countStr + ".obj";
-    }
-    
-    void Driver::addModel(NM::Driver::DriverModel model) {
-        models.push_back(model);
-    }
-    
-    void Driver::makeDirectory() {
-        auto name = directoryName();
-        FileUtils::mkdir_p(name.c_str());
-    }
-    
-    void Driver::writeOut() {
-        makeDirectory();
-        for(auto itr = models.begin(); itr < models.end(); ++itr) {
-            std::string outname = getOutName(itr);
-            std::ofstream outStr(outname);
-            if(! outStr) {
-                throw std::runtime_error(std::string("Couldn't open file ") +
-                                         outname);
-            }
-            itr->transformed().writeObj(outStr);
-            outStr.close();
-        }
-    }
-    
-    std::string Driver::directoryName() {
+    std::string Driver::basename() {
         return getBasename(driverName);
     }
     
@@ -138,6 +131,31 @@ namespace NM {
             << dr.transform << "}";
     }
     
+    CameraAperature Driver::getCameraAperature() const {
+        return {
+            dist,
+            bounds.x(),
+            bounds.y(),
+            bounds.z(),
+            bounds.w()
+        };
+    }
+    
+    CameraAxis Driver::getCameraAxis() const {
+        return {
+            eye,
+            look,
+            up
+        };
+    }
+    
+    Camera Driver::getCamera() const {
+        return {
+            getCameraAxis(),
+            getCameraAperature()
+        };
+    }
+    
     std::istream& operator>>(std::istream& is, Driver::DriverTransform &trans) {
         FloatType rx, ry, rz, angle, scale, tx, ty, tz;
         is >> rx;
@@ -155,4 +173,6 @@ namespace NM {
         trans.scale = scale;
         return is;
     }
+    
+    
 }

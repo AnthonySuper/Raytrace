@@ -26,7 +26,6 @@ TEST_CASE("Drive::DriverTransform string reading") {
     }
 }
 
-
 TEST_CASE("DriverTransform matrix reading") {
     NM::Driver::DriverTransform dt;
     dt.scale = 1.0;
