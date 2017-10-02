@@ -212,6 +212,12 @@ namespace NM {
                 buff[2] - other[2]
             };
         }
+        
+        constexpr inline bool fuzzyEquals(const Vec4& other) const {
+            return fuzzyCompare(buff[0], other[0]) &&
+            fuzzyCompare(buff[1], other[1]) &&
+            fuzzyCompare(buff[2], other[2]);
+        }
 
         template<typename T>
         inline constexpr typename std::enable_if<std::is_arithmetic<T>::value, 

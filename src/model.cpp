@@ -136,6 +136,18 @@ namespace NM {
         }
         return toRet;
     }
-    
-    
+
+    void Model::debugCompare(const Model& other, std::ostream& os) {
+        if(other.points.size() != points.size()) {
+            os << "Size mismatch, BAD BAD BAD";
+            throw std::runtime_error("Not allowed");
+        }
+        for(size_t i = 0; i < other.points.size(); ++i) {
+            auto& op = points.at(i);
+            auto& tp = other.points.at(i);
+            if(! tp.fuzzyEquals(op)) {
+                os << "ERROR, LINE " << i << ": Exp " << op << ", got " << tp << std::endl;
+            }
+        }
+    }
 }

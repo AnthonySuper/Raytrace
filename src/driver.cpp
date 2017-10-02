@@ -29,25 +29,15 @@ namespace NM {
             std::string header;
             lineStream >> header;
             if(header == "model") {
-                FloatType x, y, z, angle, scale, tx, ty, tz;
                 std::string fname;
-                lineStream >> x;
-                lineStream >> y;
-                lineStream >> z;
-                lineStream >> angle;
-                lineStream >> scale;
-                lineStream >> tx;
-                lineStream >> ty;
-                lineStream >> tz;
                 lineStream >> fname;
-                if(lineStream.fail()) {
+                Driver::DriverTransform dt;
+                lineStream >> dt;
+                if(lineStream.bad()) {
                     throw ParseError("Could not parse driver file");
                 }
-                angle = degToRad(angle);
                 Driver::DriverModel toPush;
-                toPush.transform = Transform::axisAngle({x, y, z}, angle) *
-                Transform::scale(scale) *
-                Transform::translate({tx, ty, tz});
+                toPush.transform = dt.toMatrix();
                 toPush.fname = fname;
                 toPush.model = driver.readModelFile(fname);
                 driver.addModel(toPush);
@@ -146,5 +136,23 @@ namespace NM {
         return os << "{" << dr.model <<
             ",\"" << dr.fname << "\","
             << dr.transform << "}";
+    }
+    
+    std::istream& operator>>(std::istream& is, Driver::DriverTransform &trans) {
+        FloatType rx, ry, rz, angle, scale, tx, ty, tz;
+        is >> rx;
+        is >> ry;
+        is >> rz;
+        is >> angle;
+        is >> scale;
+        is >> tx;
+        is >> ty;
+        is >> tz;
+        FloatType radAngle = NM::degToRad(angle);
+        trans.axis = {rx, ry, rz};
+        trans.angle = radAngle;
+        trans.translate = {tx, ty, tz};
+        trans.scale = scale;
+        return is;
     }
 }

@@ -12,4 +12,13 @@ namespace NM {
     inline FloatType degToRad(FloatType deg) {
         return deg * (M_PI) / 180.0;
     }
+    
+    inline constexpr FloatType constexprAbs(FloatType f) {
+        if(f < 0) return (0 - f);
+        return f;
+    }
+    
+    inline constexpr bool fuzzyCompare(FloatType a, FloatType b, FloatType epsilon = 0.0001) {
+        return constexprAbs(a - b) < epsilon;
+    }
 }

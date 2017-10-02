@@ -22,6 +22,29 @@ namespace NM {
             Model transformed();
         };
         
+        struct DriverTransform {
+            Vec4 axis;
+            FloatType angle;
+            FloatType scale;
+            Vec4 translate;
+            
+            inline Mat4 translationMatrix() const {
+                return Transform::translate(translate);
+            }
+            
+            inline Mat4 scaleMatrix() const {
+                return Transform::scale(scale);
+            }
+            
+            inline Mat4 rotationMatrix() const {
+                return Transform::axisAngle(axis, angle);
+            }
+            
+            inline Mat4 toMatrix() const {
+                return translationMatrix() * scaleMatrix() * rotationMatrix();
+            }
+        };
+        
         std::shared_ptr<Model> readModelFile(std::string fname);
         
         std::string getOutName(std::vector<DriverModel>::iterator itr);
@@ -43,8 +66,11 @@ namespace NM {
     
     std::istream& operator>>(std::istream&, Driver&);
     
+    std::istream& operator>>(std::istream&, Driver::DriverTransform&);
+    
     std::ostream& operator<<(std::ostream&, const Driver&);
     
     std::ostream& operator<<(std::ostream&, const Driver::DriverModel &);
+
     
 }

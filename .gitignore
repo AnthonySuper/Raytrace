@@ -4,3 +4,6 @@ docs/
 obj/
 /.vs
 raytrace
+modeltoworld
+outputtest/*
+model_compare

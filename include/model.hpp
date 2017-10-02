@@ -7,6 +7,7 @@
 #include <mat4.hpp>
 #include <vec4.hpp>
 #include <ray.hpp>
+#include <iostream>
 
 namespace NM {
     /**
@@ -46,6 +47,7 @@ namespace NM {
          * This will include commenst, normals, and all other components.
          */
         void writeObj(std::ostream& stream) const;
+        void debugCompare(const Model&, std::ostream& output = std::cout);
         
     private:
         PointVector points;
