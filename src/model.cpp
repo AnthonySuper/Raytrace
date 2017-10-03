@@ -69,7 +69,7 @@ namespace NM {
     std::istream& operator>>(std::istream& is, Model::FaceElement& fe) {
         Model::FaceElement::ElmType c = 0, t = 0, n = 0;
         is >> c;
-        if(is.fail() || c == 0) {
+        if(is.bad() || c == 0) {
             throw ParseError("Couldn't parse texture coordinate");
         }
         char ch = is.peek();

@@ -96,11 +96,11 @@ namespace NM {
         auto itr = modelDict.find(fname);
         if(itr == modelDict.end()) {
             std::ifstream readStream(fname);
-
-            auto read = std::make_shared<Model>(Model::fromStream(readStream));
-            modelDict.emplace(fname,
-                              read);
-            readStream.close();
+                auto read = std::make_shared<Model>(Model::fromStream(readStream));
+                modelDict.emplace(fname,
+                                  read);
+                readStream.close();
+            
             return read;
         }
         else {
