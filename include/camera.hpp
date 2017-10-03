@@ -7,8 +7,17 @@
 
 namespace NM {
     
+    /**
+     * @brief Represent an axis system for a camrea.
+     */
     class CameraAxis {
     public:
+        /**
+         * Create a new axis.
+         * @param point the location of the camera
+         * @param lookAt what the camera is focused on
+         * @param up the direction that is considered "up" in the world
+         */
         CameraAxis(Vec4 point,
                Vec4 lookAt,
                Vec4 up = {0, 0, 1});
@@ -28,6 +37,11 @@ namespace NM {
         
     };
     
+    /**
+     * @brief The aperature of a camera.
+     *
+     * The Aperature Information for a camera, including its distance and bounds.
+     */
     struct CameraAperature {
         FloatType distance;
         FloatType left;
@@ -39,6 +53,12 @@ namespace NM {
         FloatType getHeightBound(size_t, size_t) const;
     };
     
+    /**
+     * @brief Represents a camrea and everything about it.
+     *
+     * Cameras have an axis (position and orientation in space), and
+     * an aperature.
+     */
     class Camera {
     public:
         Camera(const CameraAxis &, const CameraAperature&);

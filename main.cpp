@@ -12,12 +12,10 @@ int main(int argc, char** argv) {
         cerr << "No input!" << endl;
         return -1;
     }
-
     NM::Driver d = NM::Driver::fromFile(argv[1]);
     NM::Scene s = d.getScene();
     auto res = d.getResolution();
     NM::Image img(std::get<0>(res), std::get<1>(res));
-    NM::Camera cam = d.getCamera();
     s.render(img, d.getCamera());
     std::ofstream of("img.ppm");
     img.writePPM(of);
