@@ -23,4 +23,55 @@ namespace NM {
         }
         return toRet;
     }
+    
+    void Scene::render(NM::Image &img, const NM::Camera &camera) const {
+        const auto& rays = camera.getRays(img.height, img.width);
+        size_t raysSize = rays.size();
+        std::vector<FloatType> dists;
+        dists.resize(raysSize);
+        std::atomic_size_t idx(0);
+        std::vector<std::thread> workThreads;
+        for(int i = 0; i < std::thread::hardware_concurrency(); ++i) {
+            workThreads.emplace_back([&]() {
+                while(true) {
+                    size_t ourIdx = idx++;
+                    if(ourIdx >= raysSize) return;
+                    auto ourRay = rays[ourIdx];
+                    RayIntersection it = trace(ourRay);
+                    dists[ourIdx] = it.getDistanceOrNegative();
+                }
+            });
+        }
+        for(auto& t: workThreads) {
+            t.join();
+        }
+        double tmax = 0;
+        double tmin = std::numeric_limits<FloatType>::max();
+        for(FloatType d: dists) {
+            if(d < 0) continue;
+            tmax = std::max(tmax, d);
+            tmin = std::min(tmin, d);
+        }
+
+        for(size_t i = 0; i < raysSize; ++i) {
+            FloatType t = dists.at(i);
+            if(t < 0) {
+                img.getPixels().at(i) = {
+                    239,
+                    239,
+                    239
+                };
+                continue;
+            }
+            FloatType ratio = 2 * (t - tmin) / (tmax - tmin);
+            FloatType r = std::max(0.0, 255 * (1 - ratio));
+            FloatType b = std::max(0.0, 255 *(ratio - 1));
+            FloatType g = 255 - (b + r);
+            img.getPixels().at(i) = {
+                r,
+                g,
+                b
+            };
+        }
+    }
 }

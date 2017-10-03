@@ -69,6 +69,13 @@ namespace NM {
                 lineStream >> driver.resX;
                 lineStream >> driver.resY;
             }
+            else if(header == "sphere") {
+                Vec4 pos;
+                readVec(lineStream, pos);
+                FloatType rad;
+                lineStream >> rad;
+                driver.spheres.emplace_back(rad, pos);
+            }
             else if(header.length() == 0) {
                 continue;
             }
@@ -135,8 +142,8 @@ namespace NM {
         return {
             dist,
             bounds.x(),
-            bounds.y(),
             bounds.z(),
+            bounds.y(),
             bounds.w()
         };
     }
@@ -156,6 +163,21 @@ namespace NM {
         };
     }
     
+    Scene Driver::getScene() const {
+        Scene s;
+        for(auto& m : models) {
+            s.addObject(m);
+        }
+        for(auto& sp: spheres) {
+            s.addObject(sp);
+        }
+        return s;
+    }
+    
+    std::tuple<size_t, size_t> Driver::getResolution() {
+        return std::make_tuple(resX, resY);
+    }
+    
     std::istream& operator>>(std::istream& is, Driver::DriverTransform &trans) {
         FloatType rx, ry, rz, angle, scale, tx, ty, tz;
         is >> rx;
@@ -173,6 +195,7 @@ namespace NM {
         trans.scale = scale;
         return is;
     }
+    
     
     
 }

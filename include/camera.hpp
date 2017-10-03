@@ -13,11 +13,11 @@ namespace NM {
                Vec4 lookAt,
                Vec4 up = {0, 0, 1});
 
-        inline Vec4 getPos() const { return pos; }
-        inline Vec4 getUp() const { return up; }
-        inline Vec4 getW() const { return w; }
-        inline Vec4 getV() const { return v; }
-        inline Vec4 getU() const { return u; }
+        inline const Vec4& getPos() const { return pos; }
+        inline const Vec4& getUp() const { return up; }
+        inline const Vec4& getW() const { return w; }
+        inline const Vec4& getV() const { return v; }
+        inline const Vec4& getU() const { return u; }
     private:
         Vec4 pos;
         Vec4 up;
@@ -35,6 +35,8 @@ namespace NM {
         FloatType up;
         FloatType down;
         CameraAperature() = default;
+        FloatType getWidthBound(size_t, size_t) const;
+        FloatType getHeightBound(size_t, size_t) const;
     };
     
     class Camera {
@@ -42,6 +44,8 @@ namespace NM {
         Camera(const CameraAxis &, const CameraAperature&);
         inline CameraAxis getAxis() const { return axis; }
         inline CameraAperature getAperature() const { return aperature; }
+        Ray getRay(size_t i, size_t j, size_t height, size_t width) const;
+        std::vector<Ray> getRays(size_t height, size_t width) const;
     private:
         CameraAxis axis;
         CameraAperature aperature;

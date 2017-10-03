@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 
+
 int main(int argc, char** argv) {
     using std::cerr;
     using std::cout;
@@ -11,13 +12,14 @@ int main(int argc, char** argv) {
         cerr << "No input!" << endl;
         return -1;
     }
-    try {
-        NM::Driver d = NM::Driver::fromFile(argv[1]);
-        
-    }
-    catch(std::exception &e) {
-        cerr << "Got error: " << e.what() << endl;
-        return -1;
-    }
+
+    NM::Driver d = NM::Driver::fromFile(argv[1]);
+    NM::Scene s = d.getScene();
+    auto res = d.getResolution();
+    NM::Image img(std::get<0>(res), std::get<1>(res));
+    NM::Camera cam = d.getCamera();
+    s.render(img, d.getCamera());
+    std::ofstream of("img.ppm");
+    img.writePPM(of);
     return 0;
 }

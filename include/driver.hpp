@@ -13,6 +13,7 @@
 #include <file_utils.hpp>
 #include <transformed_model.hpp>
 #include <camera.hpp>
+#include <scene.hpp>
 
 namespace NM {
     class Driver {
@@ -64,6 +65,8 @@ namespace NM {
         std::tuple<size_t, size_t> getResolution();
         
         std::string basename();
+        
+        Scene getScene() const;
         
     private:
         Vec4 eye;

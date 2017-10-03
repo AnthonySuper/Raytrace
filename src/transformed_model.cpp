@@ -8,6 +8,8 @@ namespace NM {
      but not directly copied.
      */
     static Sphere getBound(Model *model, Mat4& transform) {
+        return {0, {0, 0, 0}};
+        /*
         using std::max;
         if(model == nullptr) {
             throw std::runtime_error("Null model while generating bounding sphere");
@@ -58,6 +60,7 @@ namespace NM {
             }
         }
         return {radius, center};
+         */
     }
     
     TransformedModel::TransformedModel(std::shared_ptr<Model> modelPtr,
@@ -72,24 +75,17 @@ namespace NM {
     }
     
     RayIntersection TransformedModel::checkIntersection(const NM::Ray &ray) const {
+        /*
         auto r = boundingSphere.checkIntersection(ray);
         if(! r) {
             return {};
         }
+         */
         RayIntersection current;
-        FloatType dist = 0;
         for(int i = 0; i < model->facesSize(); ++i) {
             Triangle t = model->faceAt(i);
             t.apply(transform);
-            auto test = t.checkIntersection(ray);
-            if(! test) {
-                continue;
-            }
-            FloatType d = (test.point() - ray.position).magnitude();
-            if(d > dist) {
-                d = dist;
-                current = test;
-            }
+            current.compareExchange(t.checkIntersection(ray));
         }
         return current;
     }

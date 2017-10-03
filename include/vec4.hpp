@@ -179,8 +179,8 @@ namespace NM {
         }
         
         inline Vec4 cross(const Vec4& other) const  {
-            auto u = normalized();
-            auto v = other.normalized();
+            auto u = *this;
+            auto v = other;
             return {
                 u[1]*v[2] - u[2]*v[1],
                 u[2]*v[0] - u[0]*v[2],

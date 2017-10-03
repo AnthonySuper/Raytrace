@@ -6,6 +6,7 @@ namespace NM {
         // get c parameter
         auto cVec = (position - ray.position);
         auto vMag = cVec.dot(ray.direction);
+        if(vMag < 0) return {}; // intersects *behind* ray!
         auto vMagSquared = vMag * vMag;
         auto cMag = cVec.magnitude();
         cMag *= cMag; // And also this
