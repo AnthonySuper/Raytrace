@@ -22,7 +22,9 @@ namespace NM {
         return f;
     }
     
-    inline constexpr bool fuzzyCompare(FloatType a, FloatType b, FloatType epsilon = 0.0001) {
+    inline constexpr bool fuzzyCompare(FloatType a,
+                                       FloatType b,
+                                       FloatType epsilon = 0.0001) {
         return constexprAbs(a - b) < epsilon;
     }
 }

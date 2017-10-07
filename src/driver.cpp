@@ -66,8 +66,8 @@ namespace NM {
                 readVec4(lineStream, driver.bounds);
             }
             else if(header == "res") {
-                lineStream >> driver.resX;
                 lineStream >> driver.resY;
+                lineStream >> driver.resX;
             }
             else if(header == "sphere") {
                 Vec4 pos;
