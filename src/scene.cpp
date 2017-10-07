@@ -33,7 +33,7 @@ namespace NM {
         dists.resize(raysSize);
         std::atomic_size_t idx(0);
         std::vector<std::thread> workThreads;
-        for(int i = 0; i < 1; ++i) {
+        for(int i = 0; i < std::thread::hardware_concurrency(); ++i) {
             workThreads.emplace_back([&]() {
                 while(true) {
                     size_t ourIdx = idx++;
