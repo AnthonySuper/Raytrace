@@ -1,4 +1,5 @@
 #include <image.hpp>
+#include <iostream>
 
 namespace NM {
     Image::Image(size_t height, size_t width) :
@@ -15,25 +16,29 @@ namespace NM {
     Image::PixelList& Image::getPixels() {
         return pixels;
     }
-    
+
     void Image::writePPM(std::ostream& os) {
+        std::cout << "WritePPM" << std::endl;
         os << "P3" << std::endl;
         os << width << " " << height << std::endl;
         os << 255 << std::endl;
-       ;
-        for(int i = 0; i < height; ++i) {
-            for(int j = 0; j < width; ++j) {
-                auto v = at(i, j);
-                if(v.r() > 255 || v.g() > 255 || v.b() > 255) {
-                    os << "0 0 0 ";
-                    continue;
-                }
-                for(int i = 0; i < 3; ++i) {
-                    os << static_cast<int>(v[i]);
-                    os << " ";
-                }
+        int alongRow = 0;
+        for(const auto& v: pixels) {
+            if(v.r() > 255 || v.g() > 255 || v.b() > 255) {
+                os << "0 0 0";
             }
-            os << std::endl;
+            else for(int k = 0; k < 3; ++k) {
+                os << static_cast<int>(v[k]);
+                if(k != 2) 
+                    os << " ";
+            }
+            if(++alongRow % width) {
+                os << " ";
+            }
+            else {
+                os << std::endl;
+            }
         }
+
     }
 };

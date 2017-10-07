@@ -1,4 +1,5 @@
 #include <triangle.hpp>
+#include <iostream>
 
 namespace NM {
     
@@ -12,7 +13,7 @@ namespace NM {
         }
         FloatType invDet = (1.0 / det);
         Vec4 toVert = ray.position - a;
-        FloatType u = invDet * (toVert.dot(pvec));
+        FloatType u = (toVert.dot(pvec)) * invDet;
         if(u < 0.0 || u > 1.0) {
             return {};
         }

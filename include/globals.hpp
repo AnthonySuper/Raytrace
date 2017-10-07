@@ -6,7 +6,7 @@ namespace NM {
 	using FloatType = double;
     
     struct Constants {
-        constexpr static FloatType epsilon = 0.001;
+        constexpr static FloatType epsilon = 0.00000001;
     };
     
     inline FloatType inverseSqrt(FloatType in) {

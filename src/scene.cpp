@@ -1,4 +1,5 @@
 #include <scene.hpp>
+#include <chrono>
 
 namespace NM {
     void Scene::addObject(const NM::TransformedModel & tm) {
@@ -25,6 +26,7 @@ namespace NM {
     }
     
     void Scene::render(NM::Image &img, const NM::Camera &camera) const {
+        using namespace std::chrono_literals;
         const auto& rays = camera.getRays(img.height, img.width);
         size_t raysSize = rays.size();
         std::vector<FloatType> dists;
@@ -41,6 +43,17 @@ namespace NM {
                     dists[ourIdx] = it.getDistanceOrNegative();
                 }
             });
+        }
+        std::cout << std::endl;
+        std::cout.precision(3);
+        std::cout << std::fixed;
+        while(true) {
+            double ratio = idx / static_cast<double>(raysSize);     
+            std::cout << (ratio * 100) << "% done...";
+            std::cout << std::endl;
+            if(idx >= raysSize) break;
+            std::this_thread::sleep_for(1s);
+
         }
         for(auto& t: workThreads) {
             t.join();

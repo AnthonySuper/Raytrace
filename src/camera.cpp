@@ -27,7 +27,6 @@ namespace NM {
     }
     
     FloatType CameraAperature::getWidthBound(size_t i, size_t total) const {
-        
         return getRatio(i, total)*(right - left) + left;
     }
     

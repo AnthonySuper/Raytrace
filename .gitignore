@@ -7,3 +7,4 @@ raytrace
 modeltoworld
 outputtest/*
 model_compare
+clbuild/

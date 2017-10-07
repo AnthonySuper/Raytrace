@@ -66,10 +66,13 @@ source_group(sources FILES ${PROJECT_SRCS})
 
 source_group(test_sources FILES ${PROJECT_TEST_SRCS})
 
-
 add_executable(raytrace main.cpp
   ${PROJECT_SRCS}
   ${PROJECT_INCLUDES})
+
+target_link_libraries(raytrace pthread)
+target_link_libraries(catch_test pthread)
+target_link_libraries(model_compare pthread)
 
 target_include_directories(catch_test PUBLIC include/)
 target_include_directories(catch_test PUBLIC lib/)
