@@ -27,11 +27,11 @@ namespace NM {
     }
     
     FloatType CameraAperature::getWidthBound(size_t i, size_t total) const {
-        return getRatio(i, total)*(right - left) + left;
+        return getRatio(i, total)*(left - right) + right;
     }
     
     FloatType CameraAperature::getHeightBound(size_t j, size_t total) const {
-        return getRatio(j, total)*(up - down) + down;
+        return getRatio(j, total)*(down - up) + up;
     }
     
     Camera::Camera(const CameraAxis & _axis,
@@ -54,8 +54,9 @@ namespace NM {
     }
     
     Ray Camera::getRay(size_t i, size_t j, size_t height, size_t width) const {
-        FloatType px = aperature.getWidthBound(i, width);
-        FloatType py = aperature.getHeightBound(j, height);
+        FloatType px = aperature.getHeightBound(i, height);
+        FloatType py = aperature.getWidthBound(j, width);
+      
         Vec4 rayPt = axis.getPos() +
         (-aperature.distance * axis.getW()) +
         (px * axis.getV()) +
@@ -66,8 +67,8 @@ namespace NM {
     
     std::vector<Ray> Camera::getRays(size_t height, size_t width) const {
         std::vector<Ray> toRet;
-        for(size_t i = 0; i < width; ++i) {
-            for(size_t j = 0; j < height; ++j) {
+        for(size_t i = 0; i < height; ++i) {
+            for(size_t j = 0; j < width; ++j) {
                 toRet.emplace_back(getRay(i, j, height, width));
             }
         }

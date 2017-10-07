@@ -2,6 +2,7 @@
 #include <driver.hpp>
 #include <iostream>
 #include <fstream>
+#include <unordered_set>
 
 int main(int argc, char** argv) {
     using std::cerr;
@@ -13,10 +14,11 @@ int main(int argc, char** argv) {
     }
     NM::Driver d = NM::Driver::fromFile(argv[1]);
     NM::Scene s = d.getScene();
+    auto cam = d.getCamera();
     auto res = d.getResolution();
     NM::Image img(std::get<0>(res), std::get<1>(res));
     s.render(img, d.getCamera());
-    std::ofstream of("img.ppm");
+    std::ofstream of(d.basename() + ".ppm");
     img.writePPM(of);
     return 0;
 }

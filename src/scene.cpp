@@ -27,13 +27,13 @@ namespace NM {
     
     void Scene::render(NM::Image &img, const NM::Camera &camera) const {
         using namespace std::chrono_literals;
-        const auto& rays = camera.getRays(img.height, img.width);
+        const auto rays = camera.getRays(img.height, img.width);
         size_t raysSize = rays.size();
         std::vector<FloatType> dists;
         dists.resize(raysSize);
         std::atomic_size_t idx(0);
         std::vector<std::thread> workThreads;
-        for(int i = 0; i < std::thread::hardware_concurrency(); ++i) {
+        for(int i = 0; i < 1; ++i) {
             workThreads.emplace_back([&]() {
                 while(true) {
                     size_t ourIdx = idx++;

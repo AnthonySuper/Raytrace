@@ -11,4 +11,5 @@ namespace NM {
     };
     
     std::ostream& operator<<(std::ostream&, const Ray&);
+    bool operator==(const Ray&, const Ray&) noexcept;
 }

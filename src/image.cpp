@@ -20,8 +20,8 @@ namespace NM {
     void Image::writePPM(std::ostream& os) {
         std::cout << "WritePPM" << std::endl;
         os << "P3" << std::endl;
-        os << width << " " << height << std::endl;
-        os << 255 << std::endl;
+        os << width << " " << height << " 255" << std::endl;
+        
         int alongRow = 0;
         for(const auto& v: pixels) {
             if(v.r() > 255 || v.g() > 255 || v.b() > 255) {
