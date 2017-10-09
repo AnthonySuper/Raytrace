@@ -14,7 +14,6 @@ int main(int argc, char** argv) {
     }
     NM::Driver d = NM::Driver::fromFile(argv[1]);
     NM::Scene s = d.getScene();
-    auto cam = d.getCamera();
     auto res = d.getResolution();
     NM::Image img(std::get<0>(res), std::get<1>(res));
     s.render(img, d.getCamera());
