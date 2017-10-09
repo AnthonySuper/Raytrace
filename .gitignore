@@ -8,3 +8,4 @@ modeltoworld
 outputtest/*
 model_compare
 clbuild/
+raytracer

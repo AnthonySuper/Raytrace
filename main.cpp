@@ -17,7 +17,7 @@ int main(int argc, char** argv) {
     auto res = d.getResolution();
     NM::Image img(std::get<0>(res), std::get<1>(res));
     s.render(img, d.getCamera());
-    std::ofstream of(d.basename() + ".ppm");
+    std::ofstream of(argv[2]);
     img.writePPM(of);
     return 0;
 }

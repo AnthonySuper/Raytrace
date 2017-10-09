@@ -1,27 +1,41 @@
-# Modeltoworld
+# Raytracer
 
-Model2world is a simple program that performs model-to-world translations on .obj files.
-It is intended to be the basis for an eventual raytracer.
+This is a program which does "raytracing" (in the sense that it throws rays into a scene and gets their depth values).
+It then maps these depth values into a nice color.
 
 
 ## Compilation
-You can compile this program with `make`.
-Be sure to run `make` with **no arguments** as the makefile also builds unit tests, the code for which is not included in distributions.
-This process make take some time due to the level of optimization enabled (which is fairly high).
+Unpack the tar.
+Then, run this command.
 
-It should output an executable called `modeltoworld`.
+```bash
+make
+```
 
-Note: the makefile used is identical to one I used in another class.
+You will need a C++ compiler that supports C++14, which all the CS lab machines have.
+Note that this will compile with `-Ofast -march=native -flto`, so the speed of compilation will be rather slow.
+Sorry.
 
-## Usage
-
-Run `./modeltoworld DRIVER` where `DRIVER` is a Driverfile in the specified format.
-All models to load should be in the current working directory of modeltoworld.
-The program will then create a new directory equal to the basename of the driverfile (the filename minus the extension) and output transformed models in this directory with the given naming scheme.
-This is very fast for all test files, but may be horrendously slow for extremely large object files.
-
-## Errata
-This program does not currently support MS Windows.
-It will (maybe) do so in the future.
+If you have troubles, try running `make clean` first.
 
 
+## Running
+
+Run this command:
+
+```bash
+./raytracer DRIVERFILE OUTFILE
+```
+
+Where `DRIVERFILE` is a path to a Driver File, as specified in the assignment.
+This code will output how much progress it's made every second or so, as a percentage.
+It will then create PPM-formatted image in `OUTFILE`.
+
+## Notes
+- I talked to Dr. Beveridge in his office hours about a numerical stability issue my code runs into on the test driver #2.
+  Weirdly, this issue only pops up on my machine, and not the CS machines!
+  I suspect this is due to a compiler difference.
+  However, he did want me to mention this in my README, in case there was some problem.
+- This program will chew up 100% of the CPU time as it runs in paralell with enough threads to keep every core busy.
+  If the entire machine grinds to a halt while running it on a complex scene, this is probably why.
+- On extremely large images (somewhere around the tens of thousand of pixels wide or tall) this code may not work.
