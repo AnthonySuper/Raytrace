@@ -9,7 +9,11 @@ namespace NM {
         while(! is.eof()) {
             std::string lineHeader;
             is >> lineHeader;
-            if(lineHeader == "newmtl") {
+            if(lineHeader == "#") {
+                std::string comment;
+                std::getline(is, comment);
+            }
+            else if(lineHeader == "newmtl") {
                 parseNewMaterial();
             }
             else if(lineHeader == "Ka") {
@@ -29,6 +33,9 @@ namespace NM {
             }
             else if(lineHeader == "Ks") {
                 readSpecularExponent();
+            }
+            else {
+                is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             }
         }
         flushMaterial();

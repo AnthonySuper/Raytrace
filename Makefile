@@ -9,7 +9,7 @@ OBJECTS := $(SOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
 TESTSRCS := $(wildcard $(TESTDIR)/*.cpp)
 TESTOBJS := $(TESTSRCS:$(TESTDIR)/%.cpp=$(OBJDIR)/%.o)
 TESTTARGET := catch_test
-TARGET := raytracer
+TARGET := raytracer2
 
 $(TARGET): main.cpp $(OBJECTS)
 	@mkdir -p $(OBJDIR)

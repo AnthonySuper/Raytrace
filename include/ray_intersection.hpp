@@ -11,11 +11,17 @@ namespace NM {
         Vec4 _point;
         Vec4 _surfaceNormal;
         FloatType dist;
+        Ray _originalRay;
         
     public:
         Material material;
-        inline constexpr RayIntersection() :
-        intersecting(false), _point{}, dist(-1), material{} {}
+        inline RayIntersection() :
+        intersecting(false),
+        _point{},
+        dist(-1),
+        _originalRay{{}, {1, 0, 0}},
+        material{}
+        {}
         
         inline RayIntersection(const Vec4& intersectionPoint,
                                const Vec4& sn,
@@ -25,12 +31,12 @@ namespace NM {
         _point{intersectionPoint},
         _surfaceNormal{sn},
         dist{(intersectionPoint - ray.position).magnitude()},
+        _originalRay{ray},
         material{mat}
         {}
         
         RayIntersection& operator=(const RayIntersection&) = default;
         
-     
         inline constexpr operator bool() const {
             return intersecting;
         }
@@ -48,6 +54,14 @@ namespace NM {
         inline constexpr Vec4 point() {
             checkValid();
             return _point;
+        }
+        
+        inline const Ray& originalRay() const {
+            return _originalRay;
+        }
+        
+        inline Ray originalRay() {
+            return _originalRay;
         }
         
         inline constexpr Vec4 surfaceNormal() {
@@ -76,16 +90,32 @@ namespace NM {
         }
         
         inline bool compareExchange(const RayIntersection & other) {
-            if(! intersecting) {
-                *this = other;
+            if(! shouldExchange(other)) return false;
+            *this = other;
+            return true;
+        }
+        
+        inline bool compareExchangeNoMaterialOrRay(const RayIntersection& other) {
+            if(! shouldExchange(other)) return false;
+            assignNoMaterialOrRay(other);
+            return true;
+        }
+        
+        inline void assignNoMaterialOrRay(const RayIntersection& other) {
+            intersecting = other.intersecting;
+            _point = other._point;
+            _surfaceNormal = other._surfaceNormal;
+            dist = other.dist;
+        }
+        
+        inline bool shouldExchange(const RayIntersection & other) {
+            if(! intersecting && other) {
                 return true;
             }
             if(! other) {
-                // we're intersecting, they're not
                 return false;
             }
             if(other.dist < dist) {
-                *this = other;
                 return true;
             }
             return false;

@@ -14,7 +14,7 @@ namespace NM {
     Ray operator*(const Mat4& m, const Ray& r) {
         return {
             m * r.position,
-            (m * r.direction).toUnit()
+            (m.normalTransform(r.direction))
         };
     }
 }

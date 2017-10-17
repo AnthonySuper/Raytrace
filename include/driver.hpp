@@ -81,6 +81,8 @@ namespace NM {
         std::unordered_map<std::string, std::shared_ptr<Model>> modelDict;
         std::vector<TransformedDrawable> models;
         std::vector<Sphere> spheres;
+        std::vector<Light> lights;
+        Vec4 ambient;
     };
     
     std::istream& operator>>(std::istream&, Driver&);

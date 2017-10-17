@@ -48,7 +48,7 @@ namespace NM {
            FaceDescriptor() = default;
            inline FaceDescriptor(std::array<FaceElement, 3> el,
                                  std::unique_ptr<std::string> && e) :
-           materialPtr{std::forward<typeof(e)>(e)}, elements{el} {}
+           materialPtr{std::forward<decltype(e)>(e)}, elements{el} {}
            
         };
         
@@ -89,7 +89,7 @@ namespace NM {
         std::vector<std::string> topCommentBlock;
         MaterialLibrary materials;
         Triangle faceToTriangle(const FaceDescriptor&) const;
-        void swapMaterial(const FaceDescriptor&, Material&) const;
+        bool swapMaterial(const FaceDescriptor&, Material&) const;
         
         friend std::ostream& operator<<(std::ostream&, const Model&);
         

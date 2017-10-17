@@ -235,6 +235,14 @@ namespace NM {
             buff[1] * other[1] +
             buff[2] * other[2];
         }
+        
+        inline constexpr Vec4 pairwiseProduct(const Vec4& other) const {
+            return {
+                buff[0] * other[0],
+                buff[1] * other[1],
+                buff[2] * other[2]
+            };
+        }
 
     };
 

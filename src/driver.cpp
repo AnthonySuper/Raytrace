@@ -38,6 +38,7 @@ namespace NM {
     std::istream& operator>>(std::istream& is, Driver& driver) {
         std::string line;
         while(std::getline(is, line)) {
+            std::cout << line << std::endl;
             std::istringstream lineStream(line);
             std::string header;
             lineStream >> header;
@@ -74,7 +75,23 @@ namespace NM {
                 readVec(lineStream, pos);
                 FloatType rad;
                 lineStream >> rad;
-                driver.spheres.emplace_back(rad, pos);
+                Material mat;
+                readVec(lineStream, mat.ambient);
+                readVec(lineStream, mat.diffuse);
+                readVec(lineStream, mat.specular);
+                // TODO: Actually read Attunation coefficients
+                mat.specularExpon = 10;
+                driver.spheres.emplace_back(rad, pos, mat);
+            }
+            else if(header == "light") {
+                Vec4 color;
+                Vec4 pos;
+                readVec4(lineStream, color);
+                readVec(lineStream, pos);
+                driver.lights.emplace_back(color, pos);
+            }
+            else if(header == "ambient") {
+                readVec(lineStream, driver.ambient);
             }
             else if(header.length() == 0) {
                 continue;
@@ -171,6 +188,10 @@ namespace NM {
         for(auto& sp: spheres) {
             s.addObject(sp);
         }
+        for(auto& l: lights) {
+            s.addObject(l);
+        }
+        s.ambient = ambient;
         return s;
     }
     

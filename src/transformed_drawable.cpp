@@ -18,6 +18,7 @@ namespace NM {
     TransformedDrawable::checkIntersection(const NM::Ray &ray) const {
         Ray transformed = (inverseTransform * ray);
         RayIntersection intersect = drawable->checkIntersection(transformed);
+        if(! intersect) return intersect;
         // Move the intersection point into world space
         Vec4 newPoint = transform * intersect.point();
         // Move the normal into world space as well

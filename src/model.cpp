@@ -6,9 +6,10 @@ namespace NM {
         Model toRet;
         std::string line;
         std::shared_ptr<std::string> lastMaterial = nullptr;
+        std::string header;
         while(std::getline(stream, line)) {
             std::istringstream lineStream(line);
-            std::string header;
+            header.clear();
             lineStream >> header;
             if(header == "v" || header == "vn") {
                 Vec4 vec{0, 0, 0};
@@ -162,25 +163,30 @@ namespace NM {
     RayIntersection Model::checkIntersection(const NM::Ray & r) const {
         Material useMaterial;
         RayIntersection toRet;
-        for(size_t i = 0; i < faces.size(); ++i) {
-            const auto& face = faces.at(i);
-            swapMaterial(face, useMaterial);
+        bool reassignMaterial = false;
+        for(const auto& face: faces) {
+            reassignMaterial = reassignMaterial || swapMaterial(face,
+                                                               useMaterial);
             Triangle tri = faceToTriangle(face);
-            if(toRet.compareExchange(tri.checkIntersection(r))) {
+            RayIntersection changed = tri.checkIntersection(r);
+            if(toRet.compareExchangeNoMaterialOrRay(changed) &&
+               reassignMaterial) {
                 toRet.material = useMaterial;
+                reassignMaterial = false;
             }
         }
         return toRet;
     }
     
-    void Model::swapMaterial(const FaceDescriptor & fd, Material &mat) const {
-        if(! fd.materialPtr) return;
-        try {
-            mat = materials.at(*fd.materialPtr);
+    bool Model::swapMaterial(const FaceDescriptor & fd, Material &mat) const {
+        if(! fd.materialPtr) return false;
+        auto fs = materials.find(*fd.materialPtr);
+        if(fs != materials.end()) {
+            mat = fs->second;
+            return true;
         }
-        catch(std::out_of_range& r) {
-            return;
-        }
+        return false;
+       
     }
     
     Triangle Model::faceAt(size_t idx) const {

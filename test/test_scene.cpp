@@ -13,12 +13,12 @@ TEST_CASE("With a two-sphere scene") {
     
     SECTION("With a ray that misses returns a miss") {
         Ray r{{0, 0, 0}, {1, 0, 0}};
-        REQUIRE(! s.trace(r));
+        REQUIRE(! s.traceIntersection(r));
     }
     
     SECTION("With a ray that hits") {
         Ray r{{0, 0, 0}, {0, 0, 1}};
-        auto res = s.trace(r);
+        auto res = s.traceIntersection(r);
         SECTION("It hits") {
             REQUIRE(res.operator bool());
         }

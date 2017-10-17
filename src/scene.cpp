@@ -6,15 +6,19 @@ namespace NM {
         drawables.emplace_back(tm);
     }
     
-    void Scene::addObject(NM::TransformedDrawable && tm) {
-        drawables.emplace_back(tm);
+    void Scene::addObject(TransformedDrawable && tm) {
+        drawables.emplace_back(std::forward<TransformedDrawable>(tm));
     }
     
     void Scene::addObject(const NM::Sphere & s) {
         spheres.emplace_back(s);
     }
     
-    RayIntersection Scene::trace(const Ray& in) const {
+    void Scene::addObject(const Light& l) {
+        lights.emplace_back(l);
+    }
+    
+    RayIntersection Scene::traceIntersection(const Ray& in) const {
         RayIntersection toRet;
         for(const auto &s: drawables) {
             toRet.compareExchange(s.checkIntersection(in));
@@ -25,12 +29,36 @@ namespace NM {
         return toRet;
     }
     
+    Vec4 Scene::colorize(const RayIntersection &ri) const {
+        if(! ri) return {};
+        const Material& mtl = ri.material;
+        Vec4 color = ambient.pairwiseProduct(mtl.ambient);
+        
+        for(auto& light : lights) {
+            Vec4 toLight = (light.position - ri.point()).toUnit();
+            FloatType dotProduct = ri.surfaceNormal().dot(toLight);
+            if(dotProduct > 0.0) {
+                Vec4 diff = mtl.diffuse.pairwiseProduct(light.color);
+                color += (dotProduct * diff);
+                
+                Vec4 toC = (ri.originalRay().position -
+                            ri.point()).toUnit();
+                FloatType twice = (2 * ri.surfaceNormal().dot(toLight));
+                Vec4 spr = (twice * ri.surfaceNormal()) - toLight;
+                FloatType expon = std::pow(toC.dot(spr), mtl.specularExpon);
+                Vec4 modSpec = mtl.specular.pairwiseProduct(light.color);
+                color += (modSpec * expon);
+                
+            }
+        }
+        return color;
+    }
+    
     void Scene::render(NM::Image &img, const NM::Camera &camera) const {
         using namespace std::chrono_literals;
         const auto rays = camera.getRays(img.height, img.width);
         size_t raysSize = rays.size();
-        std::vector<FloatType> dists;
-        dists.resize(raysSize);
+        auto& pixels = img.getPixels();
         std::atomic_size_t idx(0);
         std::vector<std::thread> workThreads;
         for(int i = 0; i < std::thread::hardware_concurrency(); ++i) {
@@ -39,52 +67,31 @@ namespace NM {
                     size_t ourIdx = idx++;
                     if(ourIdx >= raysSize) return;
                     auto ourRay = rays[ourIdx];
-                    RayIntersection it = trace(ourRay);
-                    dists[ourIdx] = it.getDistanceOrNegative();
+                    RayIntersection it = traceIntersection(ourRay);
+                    pixels.at(ourIdx) = colorize(it);
                 }
             });
-        }
-        std::cout << std::endl;
-        std::cout.precision(3);
-        std::cout << std::fixed;
-        while(true) {
-            double ratio = idx / static_cast<double>(raysSize);     
-            std::cout << (ratio * 100) << "% done...";
-            std::cout << std::endl;
-            if(idx >= raysSize) break;
-            std::this_thread::sleep_for(1s);
-
         }
         for(auto& t: workThreads) {
             t.join();
         }
-        double tmax = 0;
-        double tmin = std::numeric_limits<FloatType>::max();
-        for(FloatType d: dists) {
-            if(d < 0) continue;
-            tmax = std::max(tmax, d);
-            tmin = std::min(tmin, d);
+    }
+    
+    std::ostream& operator<<(std::ostream& os, const Scene& s) {
+        using std::endl;
+        os << "Scene:" << endl;
+        os << "\t Lights:" << endl;
+        for(auto& l : s.lights) {
+            os << "\t\t" << l << endl;
         }
-
-        for(size_t i = 0; i < raysSize; ++i) {
-            FloatType t = dists.at(i);
-            if(t < 0) {
-                img.getPixels().at(i) = {
-                    239,
-                    239,
-                    239
-                };
-                continue;
-            }
-            FloatType ratio = 2 * (t - tmin) / (tmax - tmin);
-            FloatType r = std::max(0.0, 255 * (1 - ratio));
-            FloatType b = std::max(0.0, 255 *(ratio - 1));
-            FloatType g = 255 - (b + r);
-            img.getPixels().at(i) = {
-                r,
-                g,
-                b
-            };
+        os << "\t Drawables:" << endl;
+        for(auto& d: s.drawables) {
+            os << "\t\t" << d << endl;
         }
+        os << "\t Spheres:" << endl;
+        for(auto& sp : s.spheres) {
+            os << "\t\t" << sp << endl;
+        }
+        return os;
     }
 }

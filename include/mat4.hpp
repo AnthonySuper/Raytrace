@@ -118,8 +118,21 @@ namespace NM {
         inline constexpr Vec4 operator*(const Vec4& other) const noexcept {
             Vec4 d{0, 0, 0};
             for(int i = 0; i < 4; ++i) {
-                double tmp = 0;
+                FloatType tmp = 0;
                 for(int k = 0; k < 4; ++k) {
+                    tmp += data[i][k] * other[k];
+                }
+                d[i] = tmp;
+            }
+            return d;
+        }
+        
+        inline constexpr Vec4 normalTransform(const Vec4& other) const noexcept {
+            Vec4 d{};
+            for(int i = 0; i < 4; ++i) {
+                FloatType tmp = 0;
+                for(int k = 0; k < 4; ++k) {
+                    if(i < 3 && k == 3) continue;
                     tmp += data[i][k] * other[k];
                 }
                 d[i] = tmp;

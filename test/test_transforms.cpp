@@ -82,3 +82,18 @@ TEST_CASE("P1 failures for Driver04", "[transform]") {
     SECTION("Vertex 2") {
     }
 }
+
+TEST_CASE("TransformNormal does nothing with just translation works") {
+    Mat4 translate = Transform::translate({1, 10, 0});
+    Vec4 test{1, 2, 1};
+    REQUIRE(translate.normalTransform(test) == test);
+}
+
+TEST_CASE("TransformNormal only rotates with rotation + translation") {
+    Mat4 justRotate = Transform::axisAngle({1, 0, 0}, 90);
+    
+    Mat4 transform = Transform::translate({100, 100, 0}) * justRotate;
+    Vec4 test{1, 2, 10};
+    REQUIRE(transform.normalTransform(test) == justRotate(test));
+    
+}

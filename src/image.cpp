@@ -24,11 +24,13 @@ namespace NM {
         
         int alongRow = 0;
         for(const auto& v: pixels) {
-            if(v.r() > 255 || v.g() > 255 || v.b() > 255) {
-                os << "0 0 0";
-            }
-            else for(int k = 0; k < 3; ++k) {
-                os << static_cast<int>(v[k]);
+            for(int k = 0; k < 3; ++k) {
+                int res = std::min(255,
+                               std::max(0, static_cast<int>(255 * v[k])));
+                if(res > 0) {
+                    
+                }
+                os << res << std::endl;
                 if(k != 2) 
                     os << " ";
             }
