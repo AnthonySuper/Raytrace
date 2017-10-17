@@ -2,6 +2,7 @@
 
 #include <ray.hpp>
 #include <errors.hpp>
+#include <material.hpp>
 
 namespace NM {
     class RayIntersection {
@@ -10,21 +11,26 @@ namespace NM {
         Vec4 _point;
         Vec4 _surfaceNormal;
         FloatType dist;
+        
     public:
+        Material material;
         inline constexpr RayIntersection() :
-        intersecting(false), _point{}, dist(-1) {}
+        intersecting(false), _point{}, dist(-1), material{} {}
         
         inline RayIntersection(const Vec4& intersectionPoint,
                                const Vec4& sn,
-                               const Ray& ray) :
+                               const Ray& ray,
+                               const Material& mat = {}) :
         intersecting(true),
         _point{intersectionPoint},
         _surfaceNormal{sn},
-        dist{(intersectionPoint - ray.position).magnitude()}
+        dist{(intersectionPoint - ray.position).magnitude()},
+        material{mat}
         {}
         
         RayIntersection& operator=(const RayIntersection&) = default;
         
+     
         inline constexpr operator bool() const {
             return intersecting;
         }
@@ -69,7 +75,21 @@ namespace NM {
             }
         }
         
-        void compareExchange(const RayIntersection & other);
+        inline bool compareExchange(const RayIntersection & other) {
+            if(! intersecting) {
+                *this = other;
+                return true;
+            }
+            if(! other) {
+                // we're intersecting, they're not
+                return false;
+            }
+            if(other.dist < dist) {
+                *this = other;
+                return true;
+            }
+            return false;
+        }
         
     };
 }

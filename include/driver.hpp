@@ -11,7 +11,7 @@
 #include <globals.hpp>
 #include <transforms.hpp>
 #include <file_utils.hpp>
-#include <transformed_model.hpp>
+#include <transformed_drawable.hpp>
 #include <camera.hpp>
 #include <scene.hpp>
 
@@ -79,7 +79,7 @@ namespace NM {
         friend std::istream& operator>>(std::istream&, Driver& driver);
         friend std::ostream& operator<<(std::ostream& os, const Driver& driver);
         std::unordered_map<std::string, std::shared_ptr<Model>> modelDict;
-        std::vector<TransformedModel> models;
+        std::vector<TransformedDrawable> models;
         std::vector<Sphere> spheres;
     };
     

@@ -2,12 +2,12 @@
 #include <chrono>
 
 namespace NM {
-    void Scene::addObject(const NM::TransformedModel & tm) {
-        models.emplace_back(tm);
+    void Scene::addObject(const NM::TransformedDrawable & tm) {
+        drawables.emplace_back(tm);
     }
     
-    void Scene::addObject(NM::TransformedModel && tm) {
-        models.emplace_back(tm);
+    void Scene::addObject(NM::TransformedDrawable && tm) {
+        drawables.emplace_back(tm);
     }
     
     void Scene::addObject(const NM::Sphere & s) {
@@ -16,7 +16,7 @@ namespace NM {
     
     RayIntersection Scene::trace(const Ray& in) const {
         RayIntersection toRet;
-        for(const auto &s: models) {
+        for(const auto &s: drawables) {
             toRet.compareExchange(s.checkIntersection(in));
         }
         for(const auto &s: spheres) {

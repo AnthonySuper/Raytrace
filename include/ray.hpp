@@ -1,6 +1,7 @@
 #pragma once
 #include <ostream>
 #include <vec4.hpp>
+#include <mat4.hpp>
 
 namespace NM {
     struct Ray {
@@ -12,4 +13,5 @@ namespace NM {
     
     std::ostream& operator<<(std::ostream&, const Ray&);
     bool operator==(const Ray&, const Ray&) noexcept;
+    Ray operator*(const Mat4&, const Ray&);
 }

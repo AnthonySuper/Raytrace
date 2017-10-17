@@ -10,4 +10,11 @@ namespace NM {
         return lhs.direction == rhs.direction &&
         lhs.position == rhs.position;
     }
+    
+    Ray operator*(const Mat4& m, const Ray& r) {
+        return {
+            m * r.position,
+            (m * r.direction).toUnit()
+        };
+    }
 }

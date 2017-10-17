@@ -17,9 +17,11 @@ set(PROJECT_SRCS
   src/camera.cpp
   src/ray_intersection.cpp
   src/image.cpp
-  src/transformed_model.cpp
+  src/transformed_drawable.cpp
   src/sphere.cpp
-  src/triangle.cpp)
+  src/triangle.cpp
+  src/material.cpp
+  src/wavefront_material_parser.cpp)
 
 set(PROJECT_INCLUDES
   include/vec4.hpp
@@ -35,9 +37,12 @@ set(PROJECT_INCLUDES
   include/file_utils.hpp
   include/ray_intersection.hpp
   include/image.hpp
-  include/transformed_model.hpp
+  include/transformed_drawable.hpp
   include/sphere.hpp
-  include/triangle.hpp)
+  include/triangle.hpp
+  include/material.hpp
+  include/wavefront_material_parser.hpp
+  include/drawable.hpp)
 
 set(PROJECT_TEST_SRCS
   test/test_vec4.cpp
@@ -47,7 +52,8 @@ set(PROJECT_TEST_SRCS
   test/test_driver.cpp
   test/test_triangle.cpp
   test/test_scene.cpp
-  test/test_sphere.cpp)
+  test/test_sphere.cpp
+  test/test_material_parser.cpp)
 
 add_test(unit_tests COMMAND ./catch_test)
 

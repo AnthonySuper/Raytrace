@@ -5,18 +5,11 @@ namespace NM {
     Model Model::fromStream(std::istream &stream) {
         Model toRet;
         std::string line;
-        bool topComment = true;
+        std::shared_ptr<std::string> lastMaterial = nullptr;
         while(std::getline(stream, line)) {
             std::istringstream lineStream(line);
             std::string header;
             lineStream >> header;
-            if(header == "#" && topComment) {
-                toRet.topCommentBlock.push_back(line);
-                continue;
-            }
-            else {
-                topComment = false;
-            }
             if(header == "v" || header == "vn") {
                 Vec4 vec{0, 0, 0};
                 lineStream >> vec;
@@ -29,21 +22,32 @@ namespace NM {
             }
             else if(header == "f") {
                 Model::FaceDescriptor fe;
+                if(lastMaterial) {
+                    fe.materialPtr = std::move(lastMaterial);
+                    lastMaterial = nullptr;
+                }
                 lineStream >> fe;
-                toRet.faces.push_back(fe);
+                toRet.faces.emplace_back(fe);
+            }
+            else if(header == "usemtl") {
+                lastMaterial = std::make_shared<std::string>();
+                lineStream >> *lastMaterial;
+            }
+            else if(header == "mtllib") {
+                std::string fname;
+                lineStream >> fname;
+                std::ifstream ifs(fname);
+                WavefrontMaterialParser parser(ifs);
+                toRet.materials = *parser.parse();
             }
             else {
                 continue;
             }
         }
-        toRet.topCommentBlock.emplace_back("# Modified and transformed");
         return toRet;
     }
     
     void Model::writeObj(std::ostream &stream) const {
-        for(const auto &comment: topCommentBlock) {
-            stream << comment << std::endl;
-        }
         for(const auto &vec: points) {
             stream << "v ";
             for(int i = 0; i < 4; ++i) {
@@ -53,7 +57,10 @@ namespace NM {
         }
         for(const auto &face: faces) {
             stream << "f ";
-            for(const auto& desc: face) {
+            if(face.materialPtr) {
+                stream << "usemtl " << *face.materialPtr << std::endl;
+            }
+            for(const auto& desc: face.elements) {
                 stream << desc.coordIdx;
                 if(desc.texIdx || desc.normIdx) {
                     stream << "/";
@@ -84,6 +91,7 @@ namespace NM {
                 is >> t;
                 ch = is.peek();
                 if(ch == '/') {
+                    is.get();
                     is >> n;
                 }
             }
@@ -95,9 +103,9 @@ namespace NM {
     }
     
     std::istream& operator>>(std::istream& is, Model::FaceDescriptor& fd) {
-        is >> fd[0];
-        is >> fd[1];
-        is >> fd[2];
+        is >> fd.elements[0];
+        is >> fd.elements[1];
+        is >> fd.elements[2];
         return is;
     }
     
@@ -111,7 +119,7 @@ namespace NM {
     std::ostream& operator<<(std::ostream& os, const Model::FaceDescriptor& fd) {
         os << "{";
         for(int i = 0; i < 3; ++i) {
-            os << fd[i];
+            os << fd.elements[i];
             if(i != 2) os << ",";
         }
         return os << "}";
@@ -151,16 +159,46 @@ namespace NM {
         }
     }
     
+    RayIntersection Model::checkIntersection(const NM::Ray & r) const {
+        Material useMaterial;
+        RayIntersection toRet;
+        for(size_t i = 0; i < faces.size(); ++i) {
+            const auto& face = faces.at(i);
+            swapMaterial(face, useMaterial);
+            Triangle tri = faceToTriangle(face);
+            if(toRet.compareExchange(tri.checkIntersection(r))) {
+                toRet.material = useMaterial;
+            }
+        }
+        return toRet;
+    }
+    
+    void Model::swapMaterial(const FaceDescriptor & fd, Material &mat) const {
+        if(! fd.materialPtr) return;
+        try {
+            mat = materials.at(*fd.materialPtr);
+        }
+        catch(std::out_of_range& r) {
+            return;
+        }
+    }
+    
     Triangle Model::faceAt(size_t idx) const {
-        FaceDescriptor fd = faces.at(idx);
+        const FaceDescriptor &fd = faces.at(idx);
+        return faceToTriangle(fd);
+    }
+    
+    Triangle Model::faceToTriangle(const NM::Model::FaceDescriptor &fd) const {
         return {
-            pointAtObjCoord(fd[0].coordIdx),
-            pointAtObjCoord(fd[1].coordIdx),
-            pointAtObjCoord(fd[2].coordIdx)
+            pointAtObjCoord(fd.elements[0].coordIdx),
+            pointAtObjCoord(fd.elements[1].coordIdx),
+            pointAtObjCoord(fd.elements[2].coordIdx)
         };
     }
     
     Vec4 Model::pointAtObjCoord(ssize_t idx) const {
+        return points[idx - 1];
+        /*
         if(idx == 0) {
             throw std::range_error("Index 0 not allowed!");
         }
@@ -169,10 +207,11 @@ namespace NM {
             if(idx < 0) {
                 throw std::range_error("Value is too negative");
             }
-            return points.at(idx);
+            return points[idx];
         }
         else {
-            return points.at(idx - 1);
+            return points[idx - 1];
         }
+         */
     }
 }
