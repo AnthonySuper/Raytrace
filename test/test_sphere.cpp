@@ -26,3 +26,22 @@ TEST_CASE("Basic ray with a sphere behind it") {
     auto inter = s.checkIntersection(r);
     REQUIRE(inter == false);
 }
+
+TEST_CASE("Surface normals") {
+    Sphere s(1, {0, 0, 0});
+    
+    SECTION("With an easy direct hit") {
+        auto inter = s.checkIntersection({
+            {2, 0, 0}, {-1, 0, 0}
+        });
+        Vec4 exp = Vec4{1, 0, 0}.toUnit();
+        REQUIRE(inter.surfaceNormal() == exp);
+    }
+    SECTION("With a hit from above") {
+        auto inter = s.checkIntersection({
+            {0, 2, 0}, {0, -1, 0}
+        });
+        Vec4 exp = Vec4{0, 1, 0}.toUnit();
+        REQUIRE(inter.surfaceNormal() == exp);
+    }
+}

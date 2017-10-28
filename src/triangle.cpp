@@ -3,8 +3,6 @@
 
 namespace NM {
     
-   
-    
     bool Triangle::operator==(const NM::Triangle &rhs) const {
         return a == rhs.a &&
         b == rhs.b &&

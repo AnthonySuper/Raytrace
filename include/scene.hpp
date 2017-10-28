@@ -26,6 +26,7 @@ namespace NM {
         std::vector<Sphere> spheres;
         std::vector<Light> lights;
         friend std::ostream& operator<<(std::ostream&, const Scene&);
+        size_t getConcurrency() const;
     };
     
     std::ostream& operator<<(std::ostream&, const Scene&);

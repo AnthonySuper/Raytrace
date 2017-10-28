@@ -7,6 +7,7 @@
 #include <string>
 #include <memory>
 #include <sstream>
+#include <map>
 
 namespace NM {
     struct Material {
@@ -26,12 +27,17 @@ namespace NM {
         Vec4 ambient;
         Vec4 diffuse;
         Vec4 specular;
-        FloatType specularExpon;
+        FloatType specularExpon = 16;
         FloatType dissolve;
         IlluminationMode illum;
+        
+        
     };
 
-    using MaterialLibrary = std::unordered_map<std::string, Material>;
+    using MaterialLibrary = std::map<
+        std::string,
+        std::shared_ptr<Material>
+    >;
     
     
 }

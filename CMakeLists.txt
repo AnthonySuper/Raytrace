@@ -63,11 +63,6 @@ add_executable(catch_test test/main.cpp
   ${PROJECT_SRCS}
   ${PROJECT_TEST_SRCS}
   ${PROJECT_INCLUDES})
-
-add_executable(model_compare model_compare.cpp
-  ${PROJECT_SRCS}
-  ${PROJECT_INCLUDES})
-
 source_group(includes FILES ${PROJECT_INCLUDES})
 
 source_group(sources FILES ${PROJECT_SRCS})
@@ -80,12 +75,10 @@ add_executable(raytrace main.cpp
 
 target_link_libraries(raytrace pthread)
 target_link_libraries(catch_test pthread)
-target_link_libraries(model_compare pthread)
 
 target_include_directories(catch_test PUBLIC include/)
 target_include_directories(catch_test PUBLIC lib/)
 target_include_directories(raytrace PUBLIC include/)
-target_include_directories(model_compare PUBLIC include/)
 
 set(CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

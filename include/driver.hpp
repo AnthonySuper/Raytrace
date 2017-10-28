@@ -22,7 +22,6 @@ namespace NM {
             std::shared_ptr<Model> model;
             std::string fname;
             Mat4 transform;
-            Model transformed();
         };
         
         struct DriverTransform {

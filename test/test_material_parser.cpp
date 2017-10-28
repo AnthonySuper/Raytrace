@@ -26,7 +26,9 @@ TEST_CASE("Reading one material") {
         }
         
         SECTION("It has the right properties") {
-            auto f = lib->at("None");
+            auto ptr = lib->at("None");
+            REQUIRE(ptr != nullptr);
+            auto f = *ptr;
             NM::Vec4 zero{0, 0, 0};
             NM::Vec4 others{0.8, 0.8, 0.8};
             REQUIRE(f.ambient == zero);

@@ -56,6 +56,11 @@ namespace NM {
             return _point;
         }
         
+        inline constexpr void assignNormal(const Vec4& normal) {
+            checkValid();
+            _surfaceNormal = normal;
+        }
+        
         inline const Ray& originalRay() const {
             return _originalRay;
         }

@@ -24,37 +24,72 @@ namespace NM {
      * Meh.
      */
     class Model : public Drawable {
-    public:
-        /**
-         * What type do we use to list out all the verticies?
-         */
-        using PointVector = std::vector<Vec4>;
+        public:
+        static Model fromStream(std::istream&);
+        
+        struct WavefrontParser {
+            
+            static Model fromStream(std::istream&);
+            
+            Model toModel();
+            
+            using PointVector = std::vector<Vec4>;
+            
+            using size_type = ssize_t;
+            
+            struct FaceElement {
+                size_type coordIdx;
+                size_type texIdx;
+                size_type normIdx;
+                using ElmType = ssize_t;
+            };
+            struct FaceDescriptor : private std::array<FaceElement, 3> {
+                using std::array<FaceElement, 3>::operator[];
+                std::string materialName;
+            };
+            
+            using FaceList = std::vector<FaceDescriptor>;
+        private:
+            Vec4 coordinateToPoint(FaceElement::ElmType);
+            Vec4 coordinateToNormal(FaceElement::ElmType);
+            ssize_t wfToC(FaceElement::ElmType);
+            PointVector points;
+            PointVector normals;
+            FaceList faces;
+            using MtlPtr = std::shared_ptr<Material>;
+            MtlPtr getMaterial(const std::string& key);
+            MaterialLibrary materials;
+        
+        };
+        
+        friend struct WavefrontParser;
+        
+        struct Face {
+            Triangle tri;
+            Triangle normals;
+            Face() :
+            tri{{}, {}, {}},
+            normals{{}, {}, {}},
+            material{std::make_shared<Material>()} {}
+            
+            inline Face(const Triangle& coords) :
+            tri{coords},
+            normals{{},{},{}},
+            material{std::make_shared<Material>()} {}
+            
+            inline Face(const Triangle& coords, const Triangle& norms) :
+            tri{coords},
+            normals{norms},
+            material{std::make_shared<Material>()} {}
+            
+            inline Face(const Triangle& coords, const Triangle& norms,
+                        const std::shared_ptr<Material> material) :
+            tri{coords}, normals{norms}, material{material} {}
+            
+            Vec4 calcNormal(const RayIntersection& ray) const;
+            std::shared_ptr<Material> material;
+        };
        
-        using size_type = ssize_t;
-
-        struct FaceElement {
-            size_type coordIdx;
-            size_type texIdx;
-            size_type normIdx;
-            using ElmType = size_type;
-        };
-        
-       struct FaceDescriptor {
-           std::shared_ptr<std::string> materialPtr;
-           std::array<FaceElement, 3> elements;
-           FaceDescriptor(const FaceDescriptor&) = default;
-           FaceDescriptor(FaceDescriptor&&) = default;
-           FaceDescriptor& operator=(FaceDescriptor&&) = default;
-           FaceDescriptor() = default;
-           inline FaceDescriptor(std::array<FaceElement, 3> el,
-                                 std::unique_ptr<std::string> && e) :
-           materialPtr{std::forward<decltype(e)>(e)}, elements{el} {}
-           
-        };
-        
-        using FaceList = std::vector<FaceDescriptor>;
-
-        static Model fromStream(std::istream& stream);
         Model(const Model&) = default;
         Model(Model&&) = default;
         Model() = default;
@@ -64,17 +99,8 @@ namespace NM {
          */
         void writeObj(std::ostream& stream) const;
         
-        void debugCompare(const Model&, std::ostream& output = std::cout);
-        
-        inline const PointVector& getPoints() const {
-            return points;
-        }
-        
         Triangle faceAt(size_t idx) const;
         
-        inline size_t facesSize() const {
-            return faces.size();
-        }
         
         Vec4 pointAtObjCoord(ssize_t idx) const;
 
@@ -83,27 +109,22 @@ namespace NM {
         virtual ~Model() override = default;
         
     private:
-        PointVector points;
-        PointVector normals;
-        FaceList faces;
-        std::vector<std::string> topCommentBlock;
-        MaterialLibrary materials;
-        Triangle faceToTriangle(const FaceDescriptor&) const;
-        bool swapMaterial(const FaceDescriptor&, Material&) const;
-        
+        std::vector<Face> faces;
         friend std::ostream& operator<<(std::ostream&, const Model&);
         
-        friend Model operator*(const Mat4& mat, const Model&);
     };
     
-    std::istream& operator>>(std::istream&, Model::FaceElement&);
     
-    std::istream& operator>>(std::istream&, Model::FaceDescriptor&);
     
-    std::ostream& operator<<(std::ostream&, const Model::FaceElement&);
+    std::istream& operator>>(std::istream&, Model::WavefrontParser::FaceElement&);
     
-    std::ostream& operator<<(std::ostream&, const Model::FaceDescriptor&);
+    std::istream& operator>>(std::istream&, Model::WavefrontParser::FaceDescriptor&);
+    
+    std::ostream& operator<<(std::ostream&,
+                             const Model::WavefrontParser::FaceElement&);
+    
+    std::ostream& operator<<(std::ostream&,
+                             const Model::WavefrontParser::FaceDescriptor&);
     
     std::ostream& operator<<(std::ostream&, const Model&);
-    Model operator*(const Mat4& mat, const Model&);
 }

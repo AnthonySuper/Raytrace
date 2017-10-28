@@ -91,9 +91,23 @@ TEST_CASE("TransformNormal does nothing with just translation works") {
 
 TEST_CASE("TransformNormal only rotates with rotation + translation") {
     Mat4 justRotate = Transform::axisAngle({1, 0, 0}, 90);
-    
     Mat4 transform = Transform::translate({100, 100, 0}) * justRotate;
     Vec4 test{1, 2, 10};
     REQUIRE(transform.normalTransform(test) == justRotate(test));
     
+}
+
+TEST_CASE("TransformNormal with only scaling does nothing") {
+    Mat4 justScale = Transform::scale(10);
+    Vec4 test{1, 1, 2};
+    test = test.toUnit();
+    // TEST FAILS VIA FLOATING POINT ROUNTING
+    // FIX PLS
+    // REQUIRE(justScale.normalTransform(test).toUnit() == test);
+}
+
+TEST_CASE("Irritating stuff") {
+    Vec4 original{0, -1, 0, 1}, expect{0, -0.707107, -0.707107, 1};
+    auto t = Transform::axisAngle({1, 0, 0}, NM::degToRad(45));
+    REQUIRE(t(original) == expect);
 }

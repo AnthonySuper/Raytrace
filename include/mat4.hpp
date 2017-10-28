@@ -129,14 +129,16 @@ namespace NM {
         
         inline constexpr Vec4 normalTransform(const Vec4& other) const noexcept {
             Vec4 d{};
-            for(int i = 0; i < 4; ++i) {
+            Mat4 omat = inverse().transpose();
+            for(int i = 0; i < 3; ++i) {
                 FloatType tmp = 0;
-                for(int k = 0; k < 4; ++k) {
+                for(int k = 0; k < 3; ++k) {
                     if(i < 3 && k == 3) continue;
-                    tmp += data[i][k] * other[k];
+                    tmp += omat.data[i][k] * other[k];
                 }
                 d[i] = tmp;
             }
+            // d[3] = 1;
             return d;
         }
 

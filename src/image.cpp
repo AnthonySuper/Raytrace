@@ -30,7 +30,7 @@ namespace NM {
                 if(res > 0) {
                     
                 }
-                os << res << std::endl;
+                os << res;
                 if(k != 2) 
                     os << " ";
             }

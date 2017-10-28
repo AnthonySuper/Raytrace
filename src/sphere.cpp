@@ -15,7 +15,7 @@ namespace NM {
             return {}; // none found
         }
         auto q = ray.position + (vMag - sqrt(result))*ray.direction;
-        return {q, (position - q).toUnit(), ray, material};
+        return {q, (q - position).toUnit(), ray, material};
     }
     
     std::ostream& operator<<(std::ostream& os, const Sphere& s) {

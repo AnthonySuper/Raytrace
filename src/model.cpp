@@ -2,11 +2,11 @@
 
 namespace NM {
     
-    Model Model::fromStream(std::istream &stream) {
-        Model toRet;
+    Model Model::WavefrontParser::fromStream(std::istream &stream) {
+        WavefrontParser toRet;
         std::string line;
-        std::shared_ptr<std::string> lastMaterial = nullptr;
         std::string header;
+        std::string lastMaterial;
         while(std::getline(stream, line)) {
             std::istringstream lineStream(line);
             header.clear();
@@ -22,60 +22,87 @@ namespace NM {
                 }
             }
             else if(header == "f") {
-                Model::FaceDescriptor fe;
-                if(lastMaterial) {
-                    fe.materialPtr = std::move(lastMaterial);
-                    lastMaterial = nullptr;
-                }
+                FaceDescriptor fe;
                 lineStream >> fe;
+                fe.materialName = lastMaterial;
                 toRet.faces.emplace_back(fe);
             }
             else if(header == "usemtl") {
-                lastMaterial = std::make_shared<std::string>();
-                lineStream >> *lastMaterial;
+                lineStream >> lastMaterial;
             }
             else if(header == "mtllib") {
                 std::string fname;
                 lineStream >> fname;
                 std::ifstream ifs(fname);
                 WavefrontMaterialParser parser(ifs);
-                toRet.materials = *parser.parse();
+                toRet.materials = *(parser.parse());
             }
             else {
                 continue;
             }
         }
-        return toRet;
+        return toRet.toModel();
     }
     
-    void Model::writeObj(std::ostream &stream) const {
-        for(const auto &vec: points) {
-            stream << "v ";
-            for(int i = 0; i < 4; ++i) {
-                stream << vec[i] << " ";
+    Model Model::WavefrontParser::toModel() {
+        Model toReturn;
+        for(auto &fd : faces) {
+            Triangle points{
+                coordinateToPoint(fd[0].coordIdx),
+                coordinateToPoint(fd[1].coordIdx),
+                coordinateToPoint(fd[2].coordIdx)
+            };
+            auto mtl = getMaterial(fd.materialName);
+            /**
+             TODO:
+             FIX THE FACK THE NORMALS CAN BE FUCKED
+             CLEAN UP THIS CODE IN GENERLA YOU GODDAMN TROGLEDYTE
+             */
+            if(fd[0].normIdx != 0) {
+                Triangle normals {
+                    coordinateToNormal(fd[0].normIdx),
+                    coordinateToNormal(fd[1].normIdx),
+                    coordinateToNormal(fd[2].normIdx)
+                };
+                
+                toReturn.faces.emplace_back(points, normals, mtl);
             }
-            stream << "\n";
+            else {
+                toReturn.faces.emplace_back(points,
+                                            Triangle{{}, {}, {}},
+                                            mtl);
+            }
         }
-        for(const auto &face: faces) {
-            stream << "f ";
-            if(face.materialPtr) {
-                stream << "usemtl " << *face.materialPtr << std::endl;
-            }
-            for(const auto& desc: face.elements) {
-                stream << desc.coordIdx;
-                if(desc.texIdx || desc.normIdx) {
-                    stream << "/";
-                }
-                if(desc.texIdx) stream << desc.texIdx;
-                if(desc.normIdx) stream << "/" << desc.normIdx;
-                stream << " ";
-            }
-            stream << "\n";
+        return toReturn;
+    }
+    
+    
+    ssize_t Model::WavefrontParser::wfToC(FaceElement::ElmType e) {
+        return (e - 1);
+    }
+    
+    Vec4 Model::WavefrontParser::coordinateToPoint(FaceElement::ElmType e) {
+        return points.at(wfToC(e));
+    }
+    
+    Vec4 Model::WavefrontParser::coordinateToNormal(FaceElement::ElmType e) {
+        return normals.at(wfToC(e));
+    }
+    
+    Model::WavefrontParser::MtlPtr
+    Model::WavefrontParser::getMaterial(const std::string& key) {
+        auto f = materials.find(key);
+        auto itr = f != materials.end() ? f : materials.begin();
+        if(itr == materials.end()) {
+            return std::make_shared<Material>();
+        }
+        else {
+            return (*itr).second;
         }
     }
     
-    std::istream& operator>>(std::istream& is, Model::FaceElement& fe) {
-        Model::FaceElement::ElmType c = 0, t = 0, n = 0;
+    std::istream& operator>>(std::istream& is, Model::WavefrontParser::FaceElement& fe) {
+        Model::WavefrontParser::FaceElement::ElmType c = 0, t = 0, n = 0;
         is >> c;
         if(is.bad() || c == 0) {
             throw ParseError("Couldn't parse texture coordinate");
@@ -103,121 +130,74 @@ namespace NM {
         return is;
     }
     
-    std::istream& operator>>(std::istream& is, Model::FaceDescriptor& fd) {
-        is >> fd.elements[0];
-        is >> fd.elements[1];
-        is >> fd.elements[2];
+    Model Model::fromStream(std::istream &is) {
+        return WavefrontParser::fromStream(is);
+    }
+    
+    std::istream& operator>>(std::istream& is, Model::WavefrontParser::FaceDescriptor& fd) {
+        is >> fd[0];
+        is >> fd[1];
+        is >> fd[2];
         return is;
     }
     
-    std::ostream& operator<<(std::ostream& os, const Model::FaceElement& fe) {
+    std::ostream& operator<<(std::ostream& os, const Model::WavefrontParser::FaceElement& fe) {
         return os << "[" <<
             fe.coordIdx << ","
             << fe.texIdx << ","
             << fe.normIdx << "]";
     }
     
-    std::ostream& operator<<(std::ostream& os, const Model::FaceDescriptor& fd) {
+    std::ostream& operator<<(std::ostream& os, const Model::WavefrontParser::FaceDescriptor& fd) {
         os << "{";
         for(int i = 0; i < 3; ++i) {
-            os << fd.elements[i];
+            os << fd[i];
             if(i != 2) os << ",";
         }
         return os << "}";
     }
     
     std::ostream& operator<<(std::ostream& os, const Model& m) {
-        os << "{\nModel:\n  Verticies (" << m.faces.size() << "):\n";
-        for(const auto &v: m.points) {
-            os << "\t" << v << "\n";
-        }
-        os << "  FaceDescriptors (" << m.faces.size() << "):\n";
-        for(const auto&v : m.faces) {
-            os << "\t" << v << "\n";
-        }
-        return os << "}";
-    }
-    
-    Model operator*(const Mat4& mat, const Model& model) {
-        Model toRet = model;
-        for(auto & point: toRet.points) {
-            point = (mat * point);
-        }
-        return toRet;
-    }
-
-    void Model::debugCompare(const Model& other, std::ostream& os) {
-        if(other.points.size() != points.size()) {
-            os << "Size mismatch, BAD BAD BAD";
-            throw std::runtime_error("Not allowed");
-        }
-        for(size_t i = 0; i < other.points.size(); ++i) {
-            auto& op = points.at(i);
-            auto& tp = other.points.at(i);
-            if(! tp.fuzzyEquals(op)) {
-                os << "ERROR, LINE " << i << ": Exp " << op << ", got " << tp << std::endl;
-            }
-        }
+        return os << "{Model}";
     }
     
     RayIntersection Model::checkIntersection(const NM::Ray & r) const {
         Material useMaterial;
         RayIntersection toRet;
-        bool reassignMaterial = false;
-        for(const auto& face: faces) {
-            reassignMaterial = reassignMaterial || swapMaterial(face,
-                                                               useMaterial);
-            Triangle tri = faceToTriangle(face);
-            RayIntersection changed = tri.checkIntersection(r);
-            if(toRet.compareExchangeNoMaterialOrRay(changed) &&
-               reassignMaterial) {
-                toRet.material = useMaterial;
-                reassignMaterial = false;
+        Material *mtl = nullptr;
+        ssize_t intersectedIdx = -1;
+        for(size_t i = 0; i < faces.size(); ++i) {
+            auto& face = faces[i];
+            const auto& tr = face.tri;
+            const auto res = tr.checkIntersection(r);
+            if(toRet.compareExchange(res)) {
+                mtl = face.material.get();
+                intersectedIdx = i;
+            }
+            if(mtl == nullptr) {
+                mtl = face.material.get();
             }
         }
+        if(! toRet) return toRet;
+        auto& intersectedFace = faces.at(intersectedIdx);
+        toRet.material = *mtl;
+        toRet.assignNormal(intersectedFace.calcNormal(toRet));
         return toRet;
     }
     
-    bool Model::swapMaterial(const FaceDescriptor & fd, Material &mat) const {
-        if(! fd.materialPtr) return false;
-        auto fs = materials.find(*fd.materialPtr);
-        if(fs != materials.end()) {
-            mat = fs->second;
-            return true;
+    Vec4 Model::Face::calcNormal(const NM::RayIntersection &ri) const {
+        //return (normals.a + normals.b + normals.c).toUnit();
+        Vec4 baycentric;
+        // Checking again is pretty cheap
+        if(! tri.checkIntersection(ri.originalRay(), &baycentric)) {
+            throw std::runtime_error("Why am I calculating the normal for a fake intersection?");
         }
-        return false;
-       
+        Vec4 norm = normals.a * baycentric[0] + normals.b * baycentric[1] + normals.c * baycentric[2];
+        if(norm.dot(ri.point()) < 0) {
+            return -norm.toUnit();
+        }
+        return norm.toUnit();
+        
     }
     
-    Triangle Model::faceAt(size_t idx) const {
-        const FaceDescriptor &fd = faces.at(idx);
-        return faceToTriangle(fd);
-    }
-    
-    Triangle Model::faceToTriangle(const NM::Model::FaceDescriptor &fd) const {
-        return {
-            pointAtObjCoord(fd.elements[0].coordIdx),
-            pointAtObjCoord(fd.elements[1].coordIdx),
-            pointAtObjCoord(fd.elements[2].coordIdx)
-        };
-    }
-    
-    Vec4 Model::pointAtObjCoord(ssize_t idx) const {
-        return points[idx - 1];
-        /*
-        if(idx == 0) {
-            throw std::range_error("Index 0 not allowed!");
-        }
-        if(idx < 0) {
-            idx = faces.size() + idx;
-            if(idx < 0) {
-                throw std::range_error("Value is too negative");
-            }
-            return points[idx];
-        }
-        else {
-            return points[idx - 1];
-        }
-         */
-    }
 }

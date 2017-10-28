@@ -36,8 +36,13 @@ namespace NM {
          This algorithm essentially uses some geometry to move the triangle
          to the origin of the ray, then algebriac trickery to do
          Cramer's rule must faster than normally possible.
+         
+         coordOut returns where the ray hit the triangle in baycentric coordinates.
+         coordOut[x] refers to the distance alone (ba).
+         coordOut[y] refers to the distance along (ca)
+         coordOut[z] refers to the distance along (cb)
          */
-        inline RayIntersection checkIntersection(const Ray& ray) {
+        inline RayIntersection checkIntersection(const Ray& ray, Vec4* coordOut = nullptr) const {
             Vec4 edgeA = (b - a);
             Vec4 edgeB = (c - a);
             // P = D x E2
@@ -75,6 +80,12 @@ namespace NM {
             // along the triangle. In this case, we consider no intersection to
             // have taken place.
             if(t > Constants::epsilon) {
+                if(coordOut) {
+                    Vec4 &out = *(coordOut);
+                    out[0] = u;
+                    out[1] = v;
+                    out[2] = 1.0 - u - v;
+                }
                 return {
                     ray.position + (ray.direction * t),
                     normal,

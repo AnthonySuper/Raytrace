@@ -1,4 +1,5 @@
 #include <transformed_drawable.hpp>
+#include <iostream>
 
 namespace NM {
     
@@ -22,10 +23,11 @@ namespace NM {
         // Move the intersection point into world space
         Vec4 newPoint = transform * intersect.point();
         // Move the normal into world space as well
-        Vec4 newNormal = transform * intersect.surfaceNormal();
+        Vec4 newNormal = transform.normalTransform(intersect.surfaceNormal().toUnit()).toUnit();
+        //std::cout << intersect.surfaceNormal() << "\t" << newNormal << std::endl;
         return {
             newPoint,
-            newNormal.toUnit(),
+            newNormal,
             ray,
             intersect.material
         };

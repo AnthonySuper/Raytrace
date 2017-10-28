@@ -37,10 +37,10 @@ namespace NM {
         for(auto& light : lights) {
             Vec4 toLight = (light.position - ri.point()).toUnit();
             FloatType dotProduct = ri.surfaceNormal().dot(toLight);
+            
             if(dotProduct > 0.0) {
                 Vec4 diff = mtl.diffuse.pairwiseProduct(light.color);
                 color += (dotProduct * diff);
-                
                 Vec4 toC = (ri.originalRay().position -
                             ri.point()).toUnit();
                 FloatType twice = (2 * ri.surfaceNormal().dot(toLight));
@@ -61,13 +61,16 @@ namespace NM {
         auto& pixels = img.getPixels();
         std::atomic_size_t idx(0);
         std::vector<std::thread> workThreads;
-        for(int i = 0; i < std::thread::hardware_concurrency(); ++i) {
+        for(int i = 0; i < getConcurrency(); ++i) {
             workThreads.emplace_back([&]() {
                 while(true) {
                     size_t ourIdx = idx++;
                     if(ourIdx >= raysSize) return;
                     auto ourRay = rays[ourIdx];
                     RayIntersection it = traceIntersection(ourRay);
+                    if(ourIdx > 7*16 + 8) {
+                        // break here
+                    }
                     pixels.at(ourIdx) = colorize(it);
                 }
             });
@@ -75,6 +78,11 @@ namespace NM {
         for(auto& t: workThreads) {
             t.join();
         }
+    }
+    
+    size_t Scene::getConcurrency() const {
+        return 1;
+        //std::thread::hardware_concurrency();
     }
     
     std::ostream& operator<<(std::ostream& os, const Scene& s) {

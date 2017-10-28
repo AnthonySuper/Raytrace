@@ -85,7 +85,8 @@ namespace NM {
     
     
     void WavefrontMaterialParser::flushMaterial() {
-        library->emplace(currentMatName, currentMaterial);
+        library->emplace(currentMatName,
+                         std::make_shared<Material>(currentMaterial));
         currentMatName.clear();
         currentMaterial = Material();
     }

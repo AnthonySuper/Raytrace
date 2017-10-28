@@ -80,7 +80,7 @@ namespace NM {
                 readVec(lineStream, mat.diffuse);
                 readVec(lineStream, mat.specular);
                 // TODO: Actually read Attunation coefficients
-                mat.specularExpon = 10;
+                mat.specularExpon = 16;
                 driver.spheres.emplace_back(rad, pos, mat);
             }
             else if(header == "light") {
@@ -142,13 +142,7 @@ namespace NM {
         return os << "}";
     }
     
-    Model Driver::DriverModel::transformed() {
-        if(! model) {
-            throw std::runtime_error("Null model!");
-        }
-        return transform * (*model);
-    }
-    
+ 
     std::ostream& operator<<(std::ostream& os, const Driver::DriverModel & dr) {
         return os << "{" << dr.model <<
             ",\"" << dr.fname << "\","

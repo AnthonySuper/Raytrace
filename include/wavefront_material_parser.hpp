@@ -26,6 +26,7 @@ namespace NM {
         FloatType readTruncedFloat();
         FloatType readFloat();
         void parseError(std::string msg);
+        
     };
     
 }
