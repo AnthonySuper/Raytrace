@@ -1,4 +1,5 @@
 #pragma once
+#include <limits>
 #include <vec4.hpp>
 #include <material.hpp>
 

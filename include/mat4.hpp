@@ -127,7 +127,7 @@ namespace NM {
             return d;
         }
         
-        inline constexpr Vec4 normalTransform(const Vec4& other) const noexcept {
+        inline Vec4 normalTransform(const Vec4& other) const noexcept {
             Vec4 d{};
             Mat4 omat = inverse().transpose();
             for(int i = 0; i < 3; ++i) {

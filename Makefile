@@ -2,14 +2,14 @@ CXX := g++
 OBJDIR := ./obj
 SRCDIR := ./src
 TESTDIR := ./test
-CXXFLAGS := -Iinclude -std=c++14 -Wall -Ofast -ffast-math -march=native -funroll-loops -flto
+CXXFLAGS := -Iinclude -std=c++14 -Ofast -ffast-math -march=native -funroll-loops -flto
 LDFLAGS := -pthread
 SOURCES := $(wildcard $(SRCDIR)/*.cpp)
 OBJECTS := $(SOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
 TESTSRCS := $(wildcard $(TESTDIR)/*.cpp)
 TESTOBJS := $(TESTSRCS:$(TESTDIR)/%.cpp=$(OBJDIR)/%.o)
 TESTTARGET := catch_test
-TARGET := raytracer2
+TARGET := raytracer
 
 $(TARGET): main.cpp $(OBJECTS)
 	@mkdir -p $(OBJDIR)

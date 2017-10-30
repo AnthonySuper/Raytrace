@@ -37,26 +37,26 @@ namespace NM {
         
         RayIntersection& operator=(const RayIntersection&) = default;
         
-        inline constexpr operator bool() const {
+        inline operator bool() const {
             return intersecting;
         }
         
-        inline constexpr const Vec4& point() const {
+        inline const Vec4& point() const {
             checkValid();
             return _point;
         }
         
-        inline constexpr const Vec4& surfaceNormal() const {
+        inline const Vec4& surfaceNormal() const {
             checkValid();
             return _surfaceNormal;
         }
         
-        inline constexpr Vec4 point() {
+        inline Vec4 point() {
             checkValid();
             return _point;
         }
         
-        inline constexpr void assignNormal(const Vec4& normal) {
+        inline void assignNormal(const Vec4& normal) {
             checkValid();
             _surfaceNormal = normal;
         }
@@ -69,7 +69,7 @@ namespace NM {
             return _originalRay;
         }
         
-        inline constexpr Vec4 surfaceNormal() {
+        inline  Vec4 surfaceNormal() {
             checkValid();
             return _surfaceNormal;
         }
@@ -88,7 +88,7 @@ namespace NM {
             return (_point - p).magnitude();
         }
         
-        inline constexpr void checkValid() const {
+        inline void checkValid() const {
             if(! intersecting) {
                 throw InvalidIntersectionError();
             }
