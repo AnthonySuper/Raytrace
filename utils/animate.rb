@@ -38,9 +38,11 @@ class Animation
       out_str = make_frame(n)
       IO.binwrite("tmp.txt", out_str)
       b = Time.now.to_f
-      puts `./raytrace tmp.txt #{out_title(n)}`
+      puts `./raytrace tmp.txt out/tmp.ppm`
       e = Time.now.to_f
       puts "Traced frame #{n} of #@frames in #{e - b} seconds..."
+      `convert out/tmp.ppm #{out_title(n)}`
+      `rm out/tmp.ppm`
     end
   end
 
@@ -51,7 +53,7 @@ class Animation
   end
 
   def out_title(frame)
-    "out/frame-#{frame.to_s.rjust(pad, "0")}.ppm"
+    "out/frame-#{frame.to_s.rjust(pad, "0")}.png"
   end
 
   def pad

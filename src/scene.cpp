@@ -97,8 +97,7 @@ namespace NM {
     }
     
     size_t Scene::getConcurrency() const {
-        return 1;
-        //std::thread::hardware_concurrency();
+        std::thread::hardware_concurrency();
     }
     
     std::ostream& operator<<(std::ostream& os, const Scene& s) {
