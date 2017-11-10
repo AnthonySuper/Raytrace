@@ -85,6 +85,7 @@ namespace NM {
     
     
     void WavefrontMaterialParser::flushMaterial() {
+        currentMaterial.reflectivity = 0.5;
         library->emplace(currentMatName,
                          std::make_shared<Material>(currentMaterial));
         currentMatName.clear();

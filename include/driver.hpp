@@ -67,6 +67,7 @@ namespace NM {
         
         Scene getScene() const;
         
+        unsigned int recursionLevel = 1;
     private:
         Vec4 eye;
         Vec4 look;
@@ -82,6 +83,7 @@ namespace NM {
         std::vector<Sphere> spheres;
         std::vector<Light> lights;
         Vec4 ambient;
+        
     };
     
     std::istream& operator>>(std::istream&, Driver&);

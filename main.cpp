@@ -17,6 +17,7 @@ int main(int argc, char** argv) {
     std::cout << s << std::endl;
     auto res = d.getResolution();
     NM::Image img(std::get<0>(res), std::get<1>(res));
+    s.recursionDepth = d.recursionLevel;
     s.render(img, d.getCamera());
     std::ofstream of(argv[2]);
     img.writePPM(of);

@@ -10,3 +10,7 @@ model_compare
 clbuild/
 raytracer
 raytracer2
+utils/raytrace
+utils/out/*
+*.ppm
+*.tar

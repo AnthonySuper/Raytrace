@@ -17,10 +17,12 @@ namespace NM {
         void addObject(const Sphere &);
         void addObject(const Light &);
         RayIntersection traceIntersection(const Ray& in) const;
-        Vec4 colorize(const RayIntersection& ri) const;
+        void colorize(const RayIntersection& ri,
+                      Vec4 &color,
+                      const Vec4& refAt = {1.0, 1.0, 1.0},
+                      unsigned int depth = 0) const;
         void render(Image& img, const Camera& camera) const;
-        
-        
+        unsigned int recursionDepth;
     private:
         std::vector<TransformedDrawable> drawables;
         std::vector<Sphere> spheres;

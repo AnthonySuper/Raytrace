@@ -75,12 +75,12 @@ namespace NM {
                 readVec(lineStream, pos);
                 FloatType rad;
                 lineStream >> rad;
-                Material mat;
-                readVec(lineStream, mat.ambient);
-                readVec(lineStream, mat.diffuse);
-                readVec(lineStream, mat.specular);
+                auto mat = std::make_shared<Material>();
+                readVec(lineStream, mat->ambient);
+                readVec(lineStream, mat->diffuse);
+                readVec(lineStream, mat->specular);
                 // TODO: Actually read Attunation coefficients
-                mat.specularExpon = 16;
+                mat->specularExpon = 16;
                 driver.spheres.emplace_back(rad, pos, mat);
             }
             else if(header == "light") {
@@ -92,6 +92,9 @@ namespace NM {
             }
             else if(header == "ambient") {
                 readVec(lineStream, driver.ambient);
+            }
+            else if(header == "recursionLevel") {
+                lineStream >> driver.recursionLevel;
             }
             else if(header.length() == 0) {
                 continue;

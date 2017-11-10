@@ -29,16 +29,18 @@ namespace NM {
         return toRet;
     }
     
-    Vec4 Scene::colorize(const RayIntersection &ri) const {
-        if(! ri) return {};
-        const Material& mtl = ri.material;
-        Vec4 color = ambient.pairwiseProduct(mtl.ambient);
+    void Scene::colorize(const RayIntersection &ri,
+                         Vec4& accum,
+                         const Vec4& refAt,
+                         unsigned int depth) const {
         
+        if(! ri) return;
+        const Material& mtl = ri.material ? *ri.material : Material{};
+        Vec4 color = ambient.pairwiseProduct(mtl.ambient);
         for(auto& light : lights) {
             Vec4 toLight = (light.position - ri.point()).toUnit();
             FloatType dotProduct = ri.surfaceNormal().dot(toLight);
-            
-            if(dotProduct > 0.0) {
+            if(dotProduct > 0.0 && ! traceIntersection({ri.point(), toLight})) {
                 Vec4 diff = mtl.diffuse.pairwiseProduct(light.color);
                 color += (dotProduct * diff);
                 Vec4 toC = (ri.originalRay().position -
@@ -48,10 +50,21 @@ namespace NM {
                 FloatType expon = std::pow(toC.dot(spr), mtl.specularExpon);
                 Vec4 modSpec = mtl.specular.pairwiseProduct(light.color);
                 color += (modSpec * expon);
-                
             }
         }
-        return color;
+        accum += refAt.pairwiseProduct(color) * (1.0 - mtl.reflectivity);
+        if(depth > 0) {
+            // Time to recurse
+            Vec4 toCamera = -1 * ri.originalRay().direction;
+            const Vec4& n = ri.surfaceNormal();
+            Vec4 reflect = ((2 * n.dot(toCamera)) * n) - toCamera;
+            RayIntersection ri2 = traceIntersection({ri.point(), reflect.toUnit()});
+            Vec4 newRefAt = mtl.attunation.pairwiseProduct(refAt) * mtl.reflectivity;
+            colorize(ri2,
+                     accum,
+                     newRefAt,
+                     depth - 1);
+        }
     }
     
     void Scene::render(NM::Image &img, const NM::Camera &camera) const {
@@ -71,7 +84,10 @@ namespace NM {
                     if(ourIdx > 7*16 + 8) {
                         // break here
                     }
-                    pixels.at(ourIdx) = colorize(it);
+                    colorize(it,
+                             pixels.at(ourIdx),
+                             {1, 1, 1},
+                             recursionDepth);
                 }
             });
         }

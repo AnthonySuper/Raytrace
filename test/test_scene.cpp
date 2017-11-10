@@ -8,8 +8,8 @@ using NM::Ray;
 
 TEST_CASE("With a two-sphere scene") {
     Scene s;
-    s.addObject(Sphere{0.5, {0, 0, 1}});
-    s.addObject(Sphere{0.5, {0, 0, 2}});
+    s.addObject(Sphere{0.5, {0, 0, 1}, nullptr});
+    s.addObject(Sphere{0.5, {0, 0, 2}, nullptr});
     
     SECTION("With a ray that misses returns a miss") {
         Ray r{{0, 0, 0}, {1, 0, 0}};

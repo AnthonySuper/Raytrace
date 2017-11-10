@@ -14,7 +14,7 @@ namespace NM {
         Ray _originalRay;
         
     public:
-        Material material;
+        const Material *material;
         inline RayIntersection() :
         intersecting(false),
         _point{},
@@ -26,7 +26,7 @@ namespace NM {
         inline RayIntersection(const Vec4& intersectionPoint,
                                const Vec4& sn,
                                const Ray& ray,
-                               const Material& mat = {}) :
+                               const Material* mat = nullptr) :
         intersecting(true),
         _point{intersectionPoint},
         _surfaceNormal{sn},
@@ -125,6 +125,5 @@ namespace NM {
             }
             return false;
         }
-        
     };
 }

@@ -22,7 +22,8 @@ set(PROJECT_SRCS
   src/triangle.cpp
   src/material.cpp
   src/wavefront_material_parser.cpp
-  src/light.cpp)
+  src/light.cpp
+  src/color.cpp)
 
 set(PROJECT_INCLUDES
   include/vec4.hpp
@@ -44,7 +45,8 @@ set(PROJECT_INCLUDES
   include/material.hpp
   include/wavefront_material_parser.hpp
   include/drawable.hpp
-  include/light.hpp)
+  include/light.hpp
+  include/color.hpp)
 
 set(PROJECT_TEST_SRCS
   test/test_vec4.cpp

@@ -18,8 +18,6 @@ namespace NM {
         PixelList& getPixels();
         void writePPM(std::ostream &is);
 
-        
-
     private:
         PixelList pixels;
     };

@@ -27,11 +27,11 @@ namespace NM {
         Vec4 ambient;
         Vec4 diffuse;
         Vec4 specular;
+        Vec4 attunation = {1, 1, 1};
         FloatType specularExpon = 16;
         FloatType dissolve;
         IlluminationMode illum;
-        
-        
+        FloatType reflectivity = 0.5;
     };
 
     using MaterialLibrary = std::map<

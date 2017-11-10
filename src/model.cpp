@@ -180,7 +180,7 @@ namespace NM {
         }
         if(! toRet) return toRet;
         auto& intersectedFace = faces.at(intersectedIdx);
-        toRet.material = *mtl;
+        toRet.material = mtl;
         toRet.assignNormal(intersectedFace.calcNormal(toRet));
         return toRet;
     }

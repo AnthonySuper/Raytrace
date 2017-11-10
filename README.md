@@ -1,7 +1,6 @@
 # Raytracer
 
-This is a program which does "raytracing" (in the sense that it throws rays into a scene and gets their depth values).
-It then maps these depth values into a nice color.
+This is a program which does "raytracing" (albiet non-recursively).
 
 
 ## Compilation
@@ -32,10 +31,8 @@ This code will output how much progress it's made every second or so, as a perce
 It will then create PPM-formatted image in `OUTFILE`.
 
 ## Notes
-- I talked to Dr. Beveridge in his office hours about a numerical stability issue my code runs into on the test driver #2.
-  Weirdly, this issue only pops up on my machine, and not the CS machines!
-  I suspect this is due to a compiler difference.
-  However, he did want me to mention this in my README, in case there was some problem.
 - This program will chew up 100% of the CPU time as it runs in paralell with enough threads to keep every core busy.
   If the entire machine grinds to a halt while running it on a complex scene, this is probably why.
-- On extremely large images (somewhere around the tens of thousand of pixels wide or tall) this code may not work.
+- On extremely large images (somewhere around the tens of thousand of pixels wide or tall) this code may not work due to memory issues.
+- This program assumes that we should use the only material in a .mtlib file for all faces if there is only one material in that file.
+  It will otherwise perform colorization correctly, although it will pick a random material for any faces before the first `usemtl` line.
