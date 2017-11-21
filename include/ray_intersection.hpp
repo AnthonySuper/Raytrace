@@ -95,13 +95,13 @@ namespace NM {
         }
         
         inline bool compareExchange(const RayIntersection & other) {
-            if(! shouldExchange(other)) return false;
+            if(! wouldExchange(other)) return false;
             *this = other;
             return true;
         }
         
         inline bool compareExchangeNoMaterialOrRay(const RayIntersection& other) {
-            if(! shouldExchange(other)) return false;
+            if(! wouldExchange(other)) return false;
             assignNoMaterialOrRay(other);
             return true;
         }
@@ -113,7 +113,7 @@ namespace NM {
             dist = other.dist;
         }
         
-        inline bool shouldExchange(const RayIntersection & other) {
+        inline bool wouldExchange(const RayIntersection & other) {
             if(! intersecting && other) {
                 return true;
             }

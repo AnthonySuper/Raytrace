@@ -2,6 +2,7 @@
 #include <vec4.hpp>
 #include <ray.hpp>
 #include <globals.hpp>
+#include <image.hpp>
 #include <vector>
 #include <ostream>
 
@@ -53,6 +54,23 @@ namespace NM {
         FloatType getHeightBound(size_t, size_t) const;
     };
     
+    class Camera;
+
+    struct CameraRayGenerator {
+        const Camera& rootCamera;
+        size_t height;
+        size_t width;
+
+        Ray getRayForIndex(size_t idx) const;
+        inline Ray operator[](size_t idx) const { 
+            return getRayForIndex(idx);
+        }
+        CameraRayGenerator(const Camera&, size_t height, size_t width);
+        CameraRayGenerator(const Camera&, const Image&);
+        inline size_t size() const { return height * width; }
+    };
+
+
     /**
      * @brief Represents a camrea and everything about it.
      *
@@ -66,6 +84,9 @@ namespace NM {
         inline CameraAperature getAperature() const { return aperature; }
         Ray getRay(size_t i, size_t j, size_t height, size_t width) const;
         std::vector<Ray> getRays(size_t height, size_t width) const;
+        inline CameraRayGenerator rayGeneratorFor(const Image& i) const {
+            return {*this, i};
+        }
     private:
         CameraAxis axis;
         CameraAperature aperature;

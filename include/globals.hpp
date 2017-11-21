@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cmath>
+#include <iostream>
 
 namespace NM {
 	using FloatType = double;
@@ -26,5 +27,14 @@ namespace NM {
                                        FloatType b,
                                        FloatType epsilon = 0.0001) {
         return constexprAbs(a - b) < epsilon;
+    }
+
+    inline void outputProgress(std::string tag, size_t start, size_t end) {
+        double percent = static_cast<double>(start) / end;
+        std::cout.precision(4);
+        std::cout << std::fixed;
+        std::cout << "\r" << tag << "\t" << percent << "(";
+        std::cout << start << "/" << end << ")";
+        std::cout.flush();
     }
 }

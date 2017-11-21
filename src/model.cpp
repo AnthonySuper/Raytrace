@@ -164,23 +164,19 @@ namespace NM {
     RayIntersection Model::checkIntersection(const NM::Ray & r) const {
         Material useMaterial;
         RayIntersection toRet;
-        Material *mtl = nullptr;
+
         ssize_t intersectedIdx = -1;
         for(size_t i = 0; i < faces.size(); ++i) {
             auto& face = faces[i];
             const auto& tr = face.tri;
             const auto res = tr.checkIntersection(r);
             if(toRet.compareExchange(res)) {
-                mtl = face.material.get();
                 intersectedIdx = i;
-            }
-            if(mtl == nullptr) {
-                mtl = face.material.get();
             }
         }
         if(! toRet) return toRet;
         auto& intersectedFace = faces.at(intersectedIdx);
-        toRet.material = mtl;
+        toRet.material = intersectedFace.material.get();
         toRet.assignNormal(intersectedFace.calcNormal(toRet));
         return toRet;
     }

@@ -35,8 +35,9 @@ namespace NM {
             return buff[1];
         }
         
-        inline constexpr FloatType& g()noexcept {
+        inline constexpr FloatType& g() noexcept {
             return buff[1];
+            
         }
         
         inline constexpr FloatType b() const noexcept {

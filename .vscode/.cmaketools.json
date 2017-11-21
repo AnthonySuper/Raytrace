@@ -1,0 +1,189 @@
+{
+  "variant": {
+    "label": "Debug",
+    "keywordSettings": {
+      "buildType": "debug"
+    },
+    "description": "Emit debug information without performing optimizations"
+  },
+  "activeEnvironments": [],
+  "codeModel": {
+    "configurations": [
+      {
+        "name": "Debug",
+        "projects": [
+          {
+            "buildDirectory": "/home/asuper/Prog/Raytrace/build",
+            "name": "raytrace",
+            "sourceDirectory": "/home/asuper/Prog/Raytrace",
+            "targets": [
+              {
+                "artifacts": [
+                  "/home/asuper/Prog/Raytrace/build/catch_test"
+                ],
+                "buildDirectory": "/home/asuper/Prog/Raytrace/build",
+                "fileGroups": [
+                  {
+                    "isGenerated": false,
+                    "sources": [
+                      "include/vec4.hpp",
+                      "include/mat4.hpp",
+                      "include/transforms.hpp",
+                      "include/globals.hpp",
+                      "include/model.hpp",
+                      "include/camera.hpp",
+                      "include/errors.hpp",
+                      "include/ray.hpp",
+                      "include/driver.hpp",
+                      "include/scene.hpp",
+                      "include/file_utils.hpp",
+                      "include/ray_intersection.hpp",
+                      "include/image.hpp",
+                      "include/transformed_drawable.hpp",
+                      "include/sphere.hpp",
+                      "include/triangle.hpp",
+                      "include/material.hpp",
+                      "include/wavefront_material_parser.hpp",
+                      "include/drawable.hpp",
+                      "include/light.hpp",
+                      "include/color.hpp"
+                    ]
+                  },
+                  {
+                    "compileFlags": "-std=c++1z -g   -std=gnu++14",
+                    "includePath": [
+                      {
+                        "path": "/home/asuper/Prog/Raytrace/include"
+                      },
+                      {
+                        "path": "/home/asuper/Prog/Raytrace/lib"
+                      }
+                    ],
+                    "isGenerated": false,
+                    "language": "CXX",
+                    "sources": [
+                      "test/main.cpp",
+                      "src/vec4.cpp",
+                      "src/mat4.cpp",
+                      "src/transforms.cpp",
+                      "src/model.cpp",
+                      "src/errors.cpp",
+                      "src/driver.cpp",
+                      "src/file_utils.cpp",
+                      "src/ray.cpp",
+                      "src/scene.cpp",
+                      "src/camera.cpp",
+                      "src/ray_intersection.cpp",
+                      "src/image.cpp",
+                      "src/transformed_drawable.cpp",
+                      "src/sphere.cpp",
+                      "src/triangle.cpp",
+                      "src/material.cpp",
+                      "src/wavefront_material_parser.cpp",
+                      "src/light.cpp",
+                      "src/color.cpp",
+                      "test/test_vec4.cpp",
+                      "test/test_mat4.cpp",
+                      "test/test_transforms.cpp",
+                      "test/test_image.cpp",
+                      "test/test_driver.cpp",
+                      "test/test_triangle.cpp",
+                      "test/test_scene.cpp",
+                      "test/test_sphere.cpp",
+                      "test/test_material_parser.cpp"
+                    ]
+                  }
+                ],
+                "fullName": "catch_test",
+                "linkFlags": "-rdynamic",
+                "linkLanguageFlags": "-std=c++1z -g",
+                "linkLibraries": "-lpthread",
+                "linkerLanguage": "CXX",
+                "name": "catch_test",
+                "sourceDirectory": "/home/asuper/Prog/Raytrace",
+                "type": "EXECUTABLE"
+              },
+              {
+                "artifacts": [
+                  "/home/asuper/Prog/Raytrace/build/raytrace"
+                ],
+                "buildDirectory": "/home/asuper/Prog/Raytrace/build",
+                "fileGroups": [
+                  {
+                    "isGenerated": false,
+                    "sources": [
+                      "include/vec4.hpp",
+                      "include/mat4.hpp",
+                      "include/transforms.hpp",
+                      "include/globals.hpp",
+                      "include/model.hpp",
+                      "include/camera.hpp",
+                      "include/errors.hpp",
+                      "include/ray.hpp",
+                      "include/driver.hpp",
+                      "include/scene.hpp",
+                      "include/file_utils.hpp",
+                      "include/ray_intersection.hpp",
+                      "include/image.hpp",
+                      "include/transformed_drawable.hpp",
+                      "include/sphere.hpp",
+                      "include/triangle.hpp",
+                      "include/material.hpp",
+                      "include/wavefront_material_parser.hpp",
+                      "include/drawable.hpp",
+                      "include/light.hpp",
+                      "include/color.hpp"
+                    ]
+                  },
+                  {
+                    "compileFlags": "-std=c++1z -g   -std=gnu++14",
+                    "includePath": [
+                      {
+                        "path": "/home/asuper/Prog/Raytrace/include"
+                      }
+                    ],
+                    "isGenerated": false,
+                    "language": "CXX",
+                    "sources": [
+                      "main.cpp",
+                      "src/vec4.cpp",
+                      "src/mat4.cpp",
+                      "src/transforms.cpp",
+                      "src/model.cpp",
+                      "src/errors.cpp",
+                      "src/driver.cpp",
+                      "src/file_utils.cpp",
+                      "src/ray.cpp",
+                      "src/scene.cpp",
+                      "src/camera.cpp",
+                      "src/ray_intersection.cpp",
+                      "src/image.cpp",
+                      "src/transformed_drawable.cpp",
+                      "src/sphere.cpp",
+                      "src/triangle.cpp",
+                      "src/material.cpp",
+                      "src/wavefront_material_parser.cpp",
+                      "src/light.cpp",
+                      "src/color.cpp"
+                    ]
+                  }
+                ],
+                "fullName": "raytrace",
+                "linkFlags": "-rdynamic",
+                "linkLanguageFlags": "-std=c++1z -g",
+                "linkLibraries": "-lpthread",
+                "linkerLanguage": "CXX",
+                "name": "raytrace",
+                "sourceDirectory": "/home/asuper/Prog/Raytrace",
+                "type": "EXECUTABLE"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "cookie": "0.7843392326609404",
+    "inReplyTo": "codemodel",
+    "type": "reply"
+  }
+}

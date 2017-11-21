@@ -31,7 +31,7 @@ namespace NM {
         FloatType specularExpon = 16;
         FloatType dissolve;
         IlluminationMode illum;
-        FloatType reflectivity = 0.5;
+        FloatType reflectivity = 1.0;
     };
 
     using MaterialLibrary = std::map<

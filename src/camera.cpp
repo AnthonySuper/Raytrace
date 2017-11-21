@@ -72,7 +72,19 @@ namespace NM {
                 toRet.emplace_back(getRay(i, j, height, width));
             }
         }
-           return toRet;
+        return toRet;
     }
- 
+
+    CameraRayGenerator::CameraRayGenerator(const Camera& c, size_t h, size_t w) :
+        rootCamera(c), height(height), width(width)
+        {}
+    
+    CameraRayGenerator::CameraRayGenerator(const Camera& c, const Image& im) :
+        rootCamera(c), height(im.height), width(im.width) {}
+    
+    Ray CameraRayGenerator::getRayForIndex(size_t idx) const {
+        size_t h = idx / width;
+        size_t w = idx % width;
+        return rootCamera.getRay(h, w, height, width);
+    }
 }

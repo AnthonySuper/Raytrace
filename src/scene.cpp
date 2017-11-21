@@ -1,4 +1,5 @@
 #include <scene.hpp>
+#include <globals.hpp>
 #include <chrono>
 
 namespace NM {
@@ -35,6 +36,9 @@ namespace NM {
                          unsigned int depth) const {
         
         if(! ri) return;
+        if(ri.material == nullptr) {
+            throw std::runtime_error("Not allowed!");
+        }
         const Material& mtl = ri.material ? *ri.material : Material{};
         Vec4 color = ambient.pairwiseProduct(mtl.ambient);
         for(auto& light : lights) {
@@ -69,7 +73,7 @@ namespace NM {
     
     void Scene::render(NM::Image &img, const NM::Camera &camera) const {
         using namespace std::chrono_literals;
-        const auto rays = camera.getRays(img.height, img.width);
+        const auto rays = camera.rayGeneratorFor(img);
         size_t raysSize = rays.size();
         auto& pixels = img.getPixels();
         std::atomic_size_t idx(0);
@@ -91,13 +95,25 @@ namespace NM {
                 }
             });
         }
+        std::thread progressBar([&]() {
+            while(true) {
+                size_t ourIdx = idx;
+                if(ourIdx > raysSize) return;
+                outputProgress("Tracing progress", ourIdx, raysSize);
+                std::this_thread::sleep_for(
+                    std::chrono::nanoseconds(250)
+                );
+
+            }
+        });
         for(auto& t: workThreads) {
             t.join();
         }
+        progressBar.join();
     }
     
     size_t Scene::getConcurrency() const {
-        std::thread::hardware_concurrency();
+        return std::thread::hardware_concurrency();
     }
     
     std::ostream& operator<<(std::ostream& os, const Scene& s) {
