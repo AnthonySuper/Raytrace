@@ -44,7 +44,7 @@ namespace NM {
         for(auto& light : lights) {
             Vec4 toLight = (light.position - ri.point()).toUnit();
             FloatType dotProduct = ri.surfaceNormal().dot(toLight);
-            if(dotProduct > 0.0 && ! traceIntersection({ri.point(), toLight})) {
+            if(dotProduct > 0.0 && (true || ! traceIntersection({ri.point(), toLight}))) {
                 Vec4 diff = mtl.diffuse.pairwiseProduct(light.color);
                 color += (dotProduct * diff);
                 Vec4 toC = (ri.originalRay().position -
@@ -55,7 +55,7 @@ namespace NM {
                 if(powExp > 0) {
                     FloatType expon = std::pow(powExp, mtl.specularExpon);
                     Vec4 modSpec = mtl.specular.pairwiseProduct(light.color);
-                    color += (modSpec * expon);
+                    // color += (modSpec * expon);
                 }
                 
             }
@@ -82,7 +82,8 @@ namespace NM {
         auto& pixels = img.getPixels();
         std::atomic_size_t idx(0);
         std::vector<std::thread> workThreads;
-        for(int i = 0; i < getConcurrency(); ++i) {
+        auto conc = getConcurrency();
+        for(int i = 0; i < conc; ++i) {
             workThreads.emplace_back([&]() {
                 while(true) {
                     size_t ourIdx = idx++;
@@ -92,15 +93,18 @@ namespace NM {
                     if(ourIdx > 7*16 + 8) {
                         // break here
                     }
+                    Vec4& ourPixel = pixels.at(ourIdx);
                     colorize(it,
-                             pixels.at(ourIdx),
+                             ourPixel,
                              {1, 1, 1},
                              recursionDepth);
+                    ourPixel.positiveize();  
                 }
             });
         }
+        
         std::thread progressBar([&]() {
-            while(true) {
+            while(conc != 1) {
                 size_t ourIdx = idx;
                 if(ourIdx > raysSize) return;
                 outputProgress("Tracing progress", ourIdx, raysSize);
@@ -118,7 +122,7 @@ namespace NM {
     }
     
     size_t Scene::getConcurrency() const {
-        // return 1;
+        return 1;
         return std::thread::hardware_concurrency();
     }
     

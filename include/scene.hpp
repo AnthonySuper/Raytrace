@@ -1,5 +1,4 @@
 #pragma once
-
 #include <model.hpp>
 #include <camera.hpp>
 #include <image.hpp>

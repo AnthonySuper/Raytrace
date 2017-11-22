@@ -243,6 +243,12 @@ namespace NM {
                 buff[2] * other[2]
             };
         }
+        
+        inline constexpr void positiveize() {
+            for(int i = 0; i < 3; ++i) {
+                buff[i] = std::fabs(buff[i]);
+            }
+        }
 
     };
 
@@ -256,6 +262,9 @@ namespace NM {
             in * other[2],
         };
     }
+
+
+   
 
 
     std::ostream& operator<<(std::ostream& os, NM::Vec4 const & vec);
