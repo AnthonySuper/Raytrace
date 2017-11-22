@@ -90,7 +90,8 @@
                       "test/test_triangle.cpp",
                       "test/test_scene.cpp",
                       "test/test_sphere.cpp",
-                      "test/test_material_parser.cpp"
+                      "test/test_material_parser.cpp",
+                      "test/test_camera.cpp"
                     ]
                   }
                 ],
@@ -182,7 +183,7 @@
         ]
       }
     ],
-    "cookie": "0.7843392326609404",
+    "cookie": "0.16651546804936568",
     "inReplyTo": "codemodel",
     "type": "reply"
   }

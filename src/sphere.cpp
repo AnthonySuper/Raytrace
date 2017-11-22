@@ -1,5 +1,6 @@
 #include <sphere.hpp>
 #include <iostream>
+#include <material.hpp>
 
 namespace NM {
     RayIntersection Sphere::checkIntersection(const Ray& ray) const {
@@ -19,7 +20,12 @@ namespace NM {
     }
     
     std::ostream& operator<<(std::ostream& os, const Sphere& s) {
-        os << "{Sphere: pos " << s.position << ", rad: " << s.radius << "}";
+        os << "{Sphere: pos " << s.position << ", rad: " << s.radius;
+        if(s.material) {
+            const Material& mat = *(s.material.get());
+            os << ", Material: " << mat;
+        }
+        os << "}";
         return os;
     }
 }

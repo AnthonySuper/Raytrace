@@ -30,10 +30,10 @@ namespace NM {
     }
 
     inline void outputProgress(std::string tag, size_t start, size_t end) {
-        double percent = static_cast<double>(start) / end;
+        double percent = (static_cast<double>(start) / end) * 100.0;
         std::cout.precision(4);
         std::cout << std::fixed;
-        std::cout << "\r" << tag << "\t" << percent << "(";
+        std::cout << "\r" << tag << "\t" << percent << "\t(";
         std::cout << start << "/" << end << ")";
         std::cout.flush();
     }

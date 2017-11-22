@@ -17,7 +17,11 @@ namespace NM {
         inline Sphere(FloatType r,
                                 const Vec4& p,
                                 std::shared_ptr<Material> m = nullptr) :
-        radius(r), radiusSquared(r*r), position(p), material(m) {}
+        radius(r), radiusSquared(r*r), position(p), material(m) {
+            if(m == nullptr) {
+                std::cout << "Oh boy bad sphere" << std::endl;
+            }
+        }
         
         virtual RayIntersection checkIntersection(const Ray&) const override;
     };

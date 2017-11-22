@@ -87,4 +87,12 @@ namespace NM {
         size_t w = idx % width;
         return rootCamera.getRay(h, w, height, width);
     }
+
+    std::vector<Ray> CameraRayGenerator::toVector() {
+        std::vector<Ray> toRet;
+        for(size_t i = 0; i < height * width; ++i) {
+            toRet.emplace_back(getRayForIndex(i));
+        }
+        return toRet;
+    }
 }

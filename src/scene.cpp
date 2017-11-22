@@ -49,21 +49,25 @@ namespace NM {
                 color += (dotProduct * diff);
                 Vec4 toC = (ri.originalRay().position -
                             ri.point()).toUnit();
-                FloatType twice = (2 * ri.surfaceNormal().dot(toLight));
+                FloatType twice = 2 * ri.surfaceNormal().dot(toLight);
                 Vec4 spr = (twice * ri.surfaceNormal()) - toLight;
-                FloatType expon = std::pow(toC.dot(spr), mtl.specularExpon);
-                Vec4 modSpec = mtl.specular.pairwiseProduct(light.color);
-                color += (modSpec * expon);
+                FloatType powExp = toC.dot(spr);
+                if(powExp > 0) {
+                    FloatType expon = std::pow(powExp, mtl.specularExpon);
+                    Vec4 modSpec = mtl.specular.pairwiseProduct(light.color);
+                    color += (modSpec * expon);
+                }
+                
             }
         }
-        accum += refAt.pairwiseProduct(color) * (1.0 - mtl.reflectivity);
+        accum += refAt.pairwiseProduct(color);
         if(depth > 0) {
             // Time to recurse
             Vec4 toCamera = -1 * ri.originalRay().direction;
             const Vec4& n = ri.surfaceNormal();
             Vec4 reflect = ((2 * n.dot(toCamera)) * n) - toCamera;
             RayIntersection ri2 = traceIntersection({ri.point(), reflect.toUnit()});
-            Vec4 newRefAt = mtl.attunation.pairwiseProduct(refAt) * mtl.reflectivity;
+            Vec4 newRefAt = mtl.attunation.pairwiseProduct(refAt);
             colorize(ri2,
                      accum,
                      newRefAt,
@@ -110,9 +114,11 @@ namespace NM {
             t.join();
         }
         progressBar.join();
+        std::cout << std::endl;
     }
     
     size_t Scene::getConcurrency() const {
+        // return 1;
         return std::thread::hardware_concurrency();
     }
     

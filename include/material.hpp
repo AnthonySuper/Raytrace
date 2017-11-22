@@ -31,7 +31,7 @@ namespace NM {
         FloatType specularExpon = 16;
         FloatType dissolve;
         IlluminationMode illum;
-        FloatType reflectivity = 1.0;
+        FloatType reflectivity = 0.5;
     };
 
     using MaterialLibrary = std::map<
@@ -39,5 +39,5 @@ namespace NM {
         std::shared_ptr<Material>
     >;
     
-    
+    std::ostream& operator<<(std::ostream& os, const Material&);
 }

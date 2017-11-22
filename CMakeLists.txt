@@ -57,7 +57,8 @@ set(PROJECT_TEST_SRCS
   test/test_triangle.cpp
   test/test_scene.cpp
   test/test_sphere.cpp
-  test/test_material_parser.cpp)
+  test/test_material_parser.cpp
+  test/test_camera.cpp)
 
 add_test(unit_tests ./catch_test)
 

@@ -68,6 +68,7 @@ namespace NM {
         CameraRayGenerator(const Camera&, size_t height, size_t width);
         CameraRayGenerator(const Camera&, const Image&);
         inline size_t size() const { return height * width; }
+        std::vector<Ray> toVector();
     };
 
 
