@@ -6,19 +6,19 @@ namespace NM {
     void Scene::addObject(const NM::TransformedDrawable & tm) {
         drawables.emplace_back(tm);
     }
-    
+
     void Scene::addObject(TransformedDrawable && tm) {
         drawables.emplace_back(std::forward<TransformedDrawable>(tm));
     }
-    
+
     void Scene::addObject(const NM::Sphere & s) {
         spheres.emplace_back(s);
     }
-    
+
     void Scene::addObject(const Light& l) {
         lights.emplace_back(l);
     }
-    
+
     RayIntersection Scene::traceIntersection(const Ray& in) const {
         RayIntersection toRet;
         for(const auto &s: drawables) {
@@ -29,12 +29,12 @@ namespace NM {
         }
         return toRet;
     }
-    
+
     void Scene::colorize(const RayIntersection &ri,
-                         Vec4& accum,
-                         const Vec4& refAt,
-                         unsigned int depth) const {
-        
+            Vec4& accum,
+            const Vec4& refAt,
+            unsigned int depth) const {
+
         if(! ri) return;
         if(ri.material == nullptr) {
             throw std::runtime_error("Not allowed!");
@@ -44,22 +44,25 @@ namespace NM {
         for(auto& light : lights) {
             Vec4 toLight = (light.position - ri.point()).toUnit();
             FloatType dotProduct = ri.surfaceNormal().dot(toLight);
-            if(dotProduct > 0.0 && 
-                    (true || ! traceIntersection({ri.point() + (0.1 * toLight),
-                        toLight}))) {
-                Vec4 diff = mtl.diffuse.pairwiseProduct(light.color);
-                color += dotProduct * diff;
-                Vec4 toC = (ri.originalRay().position -
-                            ri.point()).toUnit();
-                FloatType twice = 2 * ri.surfaceNormal().dot(toLight);
-                Vec4 spr = (twice * ri.surfaceNormal()) - toLight;
-                FloatType powExp = toC.dot(spr);
-                if(powExp > 0 && false) {
-                    FloatType expon = std::pow(powExp, mtl.specularExpon);
-                    Vec4 modSpec = mtl.specular.pairwiseProduct(light.color);
-                    color += (modSpec * expon);
-                }
+            if(dotProduct < 0.0) continue;
+            const auto TRACE_FACTOR = 0.1;
+            Ray newTrace{
+                ri.point() + (TRACE_FACTOR * toLight),
+                    toLight};
+            if(traceIntersection(newTrace)) continue;
+            Vec4 diff = mtl.diffuse.pairwiseProduct(light.color);
+            color += dotProduct * diff;
+            Vec4 toC = (ri.originalRay().position -
+                    ri.point()).toUnit();
+            FloatType twice = 2 * ri.surfaceNormal().dot(toLight);
+            Vec4 spr = (twice * ri.surfaceNormal()) - toLight;
+            FloatType powExp = toC.dot(spr);
+            if(powExp > 0 && false) {
+                FloatType expon = std::pow(powExp, mtl.specularExpon);
+                Vec4 modSpec = mtl.specular.pairwiseProduct(light.color);
+                color += (modSpec * expon);
             }
+
         }
         accum += refAt.pairwiseProduct(color);
         if(depth > 0) {
@@ -70,12 +73,12 @@ namespace NM {
             RayIntersection ri2 = traceIntersection({ri.point(), reflect.toUnit()});
             Vec4 newRefAt = mtl.attunation.pairwiseProduct(refAt);
             colorize(ri2,
-                     accum,
-                     newRefAt,
-                     depth - 1);
+                    accum,
+                    newRefAt,
+                    depth - 1);
         }
     }
-    
+
     void Scene::render(NM::Image &img, const NM::Camera &camera) const {
         using namespace std::chrono_literals;
         const auto rays = camera.rayGeneratorFor(img);
@@ -86,46 +89,46 @@ namespace NM {
         auto conc = getConcurrency();
         for(int i = 0; i < conc; ++i) {
             workThreads.emplace_back([&]() {
-                while(true) {
+                    while(true) {
                     size_t ourIdx = idx++;
                     if(ourIdx >= raysSize) return;
                     auto ourRay = rays[ourIdx];
                     RayIntersection it = traceIntersection(ourRay);
                     if(ourIdx > 7*16 + 8) {
-                        // break here
+                    // break here
                     }
                     Vec4& ourPixel = pixels.at(ourIdx);
                     colorize(it,
-                             ourPixel,
-                             {1, 1, 1},
-                             recursionDepth);
+                            ourPixel,
+                            {1, 1, 1},
+                            recursionDepth);
                     ourPixel.positiveize();  
-                }
-            });
+                    }
+                    });
         }
-        
+
         std::thread progressBar([&]() {
-            while(conc != 1) {
+                while(conc != 1) {
                 size_t ourIdx = idx;
                 if(ourIdx > raysSize) return;
                 outputProgress("Tracing progress", ourIdx, raysSize);
                 std::this_thread::sleep_for(
-                    std::chrono::nanoseconds(250)
-                );
+                        std::chrono::nanoseconds(250)
+                        );
 
-            }
-        });
+                }
+                });
         for(auto& t: workThreads) {
             t.join();
         }
         progressBar.join();
         std::cout << std::endl;
     }
-    
+
     size_t Scene::getConcurrency() const {
         return std::thread::hardware_concurrency();
     }
-    
+
     std::ostream& operator<<(std::ostream& os, const Scene& s) {
         using std::endl;
         os << "Scene:" << endl;

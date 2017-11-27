@@ -1,12 +1,11 @@
-eye 0 2 2 
+eye 5 -0.5 5
 look 0 0 0
 up 0 1 0
-d 0.5
+d 1
 bounds -2 -2 2 2
-res 128 128
-light 0 0 2500 1 0.9 0.9 0.9
-light 0 2500 0 1 0.9 0.9 0.9
-light 2500 0 0 1 0.9 0.9 0.9
+res 256 256
+light 0 2500 0 1 0.8 0.1 0.1
+light 0 -2500 0 1 0.1 0.1 0.8
 recursionLevel 3
-ambient 1 1 1
-model 1.0 0.0 0.0 0 4 0 0 0 dragontri.obj
+ambient 0 0 0
+model 1.0 0.0 0.0 0 3 0 0 0 dragontri.obj
