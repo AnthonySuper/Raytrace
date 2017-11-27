@@ -244,7 +244,7 @@ namespace NM {
             };
         }
         
-        inline constexpr void positiveize() {
+        inline void positiveize() {
             for(int i = 0; i < 3; ++i) {
                 buff[i] = std::fabs(buff[i]);
             }

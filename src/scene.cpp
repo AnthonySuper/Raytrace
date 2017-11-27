@@ -44,20 +44,19 @@ namespace NM {
         for(auto& light : lights) {
             Vec4 toLight = (light.position - ri.point()).toUnit();
             FloatType dotProduct = ri.surfaceNormal().dot(toLight);
-            if(dotProduct > 0.0 && (true || ! traceIntersection({ri.point(), toLight}))) {
+            if(dotProduct > 0.0 && ! traceIntersection({ri.point(), toLight})) {
                 Vec4 diff = mtl.diffuse.pairwiseProduct(light.color);
-                color += (dotProduct * diff);
+                color += dotProduct * diff;
                 Vec4 toC = (ri.originalRay().position -
                             ri.point()).toUnit();
                 FloatType twice = 2 * ri.surfaceNormal().dot(toLight);
                 Vec4 spr = (twice * ri.surfaceNormal()) - toLight;
                 FloatType powExp = toC.dot(spr);
-                if(powExp > 0) {
+                if(powExp > 0 && false) {
                     FloatType expon = std::pow(powExp, mtl.specularExpon);
                     Vec4 modSpec = mtl.specular.pairwiseProduct(light.color);
-                    // color += (modSpec * expon);
+                    color += (modSpec * expon);
                 }
-                
             }
         }
         accum += refAt.pairwiseProduct(color);

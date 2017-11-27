@@ -76,7 +76,7 @@ namespace NM {
     }
 
     CameraRayGenerator::CameraRayGenerator(const Camera& c, size_t h, size_t w) :
-        rootCamera(c), height(height), width(width)
+        rootCamera(c), height(h), width(w)
         {}
     
     CameraRayGenerator::CameraRayGenerator(const Camera& c, const Image& im) :

@@ -182,7 +182,12 @@ namespace NM {
     }
     
     Vec4 Model::Face::calcNormal(const NM::RayIntersection &ri) const {
-        //return (normals.a + normals.b + normals.c).toUnit();
+        Vec4 norm = tri.normal;
+        if(ri.originalRay().direction.cross(norm) < 0) {
+            norm = -norm;
+        }
+        return norm;
+        /*
         Vec4 baycentric;
         // Checking again is pretty cheap
         if(! tri.checkIntersection(ri.originalRay(), &baycentric)) {
@@ -193,7 +198,7 @@ namespace NM {
             return -norm.toUnit();
         }
         return norm.toUnit();
-        
+         */
     }
     
 }
