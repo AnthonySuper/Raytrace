@@ -42,14 +42,18 @@ namespace NM {
         const Material& mtl = ri.material ? *ri.material : Material{};
         Vec4 color = ambient.pairwiseProduct(mtl.ambient);
         for(auto& light : lights) {
-            Vec4 toLight = (light.position - ri.point()).toUnit();
+            Vec4 toLightLong = (light.position - ri.point());
+            
+            Vec4 toLight = toLightLong.toUnit();
             FloatType dotProduct = ri.surfaceNormal().dot(toLight);
             if(dotProduct < 0.0) continue;
             const auto TRACE_FACTOR = 0.1;
             Ray newTrace{
                 ri.point() + (TRACE_FACTOR * toLight),
                     toLight};
-            if(traceIntersection(newTrace)) continue;
+            auto shadowTest = traceIntersection(newTrace);
+            if(shadowTest &&
+               shadowTest.getDistance() > toLightLong.magnitude()) continue;
             Vec4 diff = mtl.diffuse.pairwiseProduct(light.color);
             color += dotProduct * diff;
             Vec4 toC = (ri.originalRay().position -
