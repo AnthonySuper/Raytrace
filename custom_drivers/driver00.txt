@@ -1,0 +1,15 @@
+eye 85 250 85
+look 0 0 0
+up 0 1 0
+d 200
+bounds -2 -2 2 2
+res 512 512
+recursionLevel 3
+ambient 0.1 0.1 0.1
+light 300 0 0 1 0.3 0.9 0.3
+light 0 300 0 1 0.9 0.3 0.3
+light 0 0 300 1 0.3 0.3 0.9
+light -300 0 0 1 0.9 0.9 0.3
+light 0 -300 0 1 0.9 0.3 0.9
+light 0 0 -300 1 0.3 0.9 0.9
+model 1.0 0.0 0.0 0 1 0 0 0 dragontri.obj
