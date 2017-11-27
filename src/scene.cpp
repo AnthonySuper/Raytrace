@@ -47,7 +47,7 @@ namespace NM {
             Vec4 toLight = toLightLong.toUnit();
             FloatType dotProduct = ri.surfaceNormal().dot(toLight);
             if(dotProduct < 0.0) continue;
-            const auto TRACE_FACTOR = 0.1;
+            const auto TRACE_FACTOR = 0.01;
             Ray newTrace{
                 ri.point() + (TRACE_FACTOR * toLight),
                     toLight};
