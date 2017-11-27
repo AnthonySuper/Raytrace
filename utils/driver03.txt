@@ -4,7 +4,7 @@ look 0 0 0
 up 0 1 0
 d 4
 bounds -2 -2 2 2
-res 2000 2000
+res 4000 4000
 recursionLevel 10
 ambient 0.2 0.2 0.2
 

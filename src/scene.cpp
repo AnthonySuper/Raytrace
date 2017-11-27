@@ -44,7 +44,9 @@ namespace NM {
         for(auto& light : lights) {
             Vec4 toLight = (light.position - ri.point()).toUnit();
             FloatType dotProduct = ri.surfaceNormal().dot(toLight);
-            if(dotProduct > 0.0 && ! traceIntersection({ri.point(), toLight})) {
+            if(dotProduct > 0.0 && 
+                    ! traceIntersection({ri.point() + (0.1 * toLight), 
+                        toLight})) {
                 Vec4 diff = mtl.diffuse.pairwiseProduct(light.color);
                 color += dotProduct * diff;
                 Vec4 toC = (ri.originalRay().position -
