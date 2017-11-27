@@ -23,7 +23,8 @@ set(PROJECT_SRCS
   src/material.cpp
   src/wavefront_material_parser.cpp
   src/light.cpp
-  src/color.cpp)
+  src/color.cpp
+  src/drawable.cpp)
 
 set(PROJECT_INCLUDES
   include/vec4.hpp

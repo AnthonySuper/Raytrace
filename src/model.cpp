@@ -73,6 +73,7 @@ namespace NM {
                                             mtl);
             }
         }
+        toReturn.materials = materials;
         return toReturn;
     }
     
@@ -99,6 +100,12 @@ namespace NM {
         else {
             return (*itr).second;
         }
+    }
+    
+    std::string Model::print() {
+        std::stringstream ss;
+        ss << *this;
+        return ss.str();
     }
     
     std::istream& operator>>(std::istream& is, Model::WavefrontParser::FaceElement& fe) {
@@ -158,7 +165,15 @@ namespace NM {
     }
     
     std::ostream& operator<<(std::ostream& os, const Model& m) {
-        return os << "{Model}";
+        os << "{Model ";
+        os << m.faces.size() << " faces, ";
+        os << m.materials.size() << " materials: ";
+        for(const auto& p : m.materials) {
+            os << "['" << p.first << ":\t" << *p.second << "]";
+            os << std::endl;
+        }
+        os << "}";
+        return os;
     }
     
     RayIntersection Model::checkIntersection(const NM::Ray & r) const {

@@ -41,8 +41,9 @@ namespace NM {
         };
     }
     
+    
     std::ostream& operator<<(std::ostream& os, const TransformedDrawable &m) {
-        return os << "{TransformedDrawable: " << m.getTransform() << ", " << m.getDrawablePtr() << std::endl;
+        return os << "{TransformedDrawable: " << m.getTransform() << ", " << m.getDrawablePtr()->print() << std::endl;
     }
    
     

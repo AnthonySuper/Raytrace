@@ -12,6 +12,7 @@
 #include <string>
 #include <iostream>
 #include <memory>
+#include <sstream>
 #include <fstream>
 
 namespace NM {
@@ -95,11 +96,12 @@ namespace NM {
             Model() = default;
 
             virtual RayIntersection checkIntersection(const Ray&) const override;
-
+        virtual std::string print() override;
             virtual ~Model() override = default;
 
         private:
             std::vector<Face> faces;
+            MaterialLibrary materials;
             friend std::ostream& operator<<(std::ostream&, const Model&);
 
     };
