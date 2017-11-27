@@ -61,7 +61,7 @@ namespace NM {
             FloatType twice = 2 * ri.surfaceNormal().dot(toLight);
             Vec4 spr = (twice * ri.surfaceNormal()) - toLight;
             FloatType powExp = toC.dot(spr);
-            if(powExp > 0 && false) {
+            if(powExp > 0) {
                 FloatType expon = std::pow(powExp, mtl.specularExpon);
                 Vec4 modSpec = mtl.specular.pairwiseProduct(light.color);
                 color += (modSpec * expon);
@@ -107,8 +107,7 @@ namespace NM {
                             {1, 1, 1},
                             recursionDepth);
                     ourPixel.positiveize();  
-                    }
-                    });
+                    }});
         }
 
         std::thread progressBar([&]() {

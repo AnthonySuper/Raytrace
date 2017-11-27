@@ -230,6 +230,14 @@ namespace NM {
             };
         }
         
+       Vec4 operator *(const double num) const {
+            return {
+                buff[0] * num,
+                buff[1] * num,
+                buff[2] * num
+            };
+        }
+        
         inline constexpr FloatType dot(const Vec4& other) const {
             return buff[0] * other[0] +
             buff[1] * other[1] +
