@@ -130,6 +130,7 @@ namespace NM {
     }
 
     size_t Scene::getConcurrency() const {
+        return 1;
         return std::thread::hardware_concurrency();
     }
 

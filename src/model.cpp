@@ -197,8 +197,8 @@ namespace NM {
     }
     
     Vec4 Model::Face::calcNormal(const NM::RayIntersection &ri) const {
-        Vec4 norm = tri.normal;
-        if(ri.originalRay().direction.cross(norm) < 0) {
+        Vec4 norm = (tri.a - tri.b).cross(tri.a - tri.c).toUnit();
+        if(ri.originalRay().direction.dot(norm) < 0) {
             norm = -norm;
         }
         return norm;
