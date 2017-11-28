@@ -4,50 +4,75 @@ project(raytrace)
 
 enable_testing()
 
-set(PROJECT_SRCS
-  src/vec4.cpp
-  src/mat4.cpp
-  src/transforms.cpp
-  src/model.cpp
-  src/errors.cpp
-  src/driver.cpp
-  src/file_utils.cpp
-  src/ray.cpp
-  src/scene.cpp
-  src/camera.cpp
-  src/ray_intersection.cpp
-  src/image.cpp
-  src/transformed_drawable.cpp
-  src/sphere.cpp
-  src/triangle.cpp
-  src/material.cpp
-  src/wavefront_material_parser.cpp
-  src/light.cpp
-  src/color.cpp
-  src/drawable.cpp)
+set(PROJECT_GEOMETRY_SRCS
+    src/vec4.cpp
+    src/mat4.cpp
+    src/transforms.cpp
+    src/ray_intersection.cpp
+    src/ray.cpp)
+
+set(PROJECT_DRAWABLE_SRCS
+    src/drawable.cpp
+    src/transformed_drawable.cpp
+    src/sphere.cpp
+    src/model.cpp
+    src/triangle.cpp)
+
+set(PROJECT_UTIL_SRCS
+    src/errors.cpp
+    src/file_utils.cpp
+    src/wavefront_material_parser.cpp
+    src/driver.cpp)
+
+set(PROJECT_TRACE_SRCS
+    src/camera.cpp
+    src/scene.cpp
+    src/image.cpp
+    src/material.cpp
+    src/wavefront_material_parser.cpp
+    src/light.cpp)
+
+SET(PROJECT_SRCS
+    ${PROJECT_GEOMETRY_SRCS}
+    ${PROJECT_DRAWABLE_SRCS}
+    ${PROJECT_UTIL_SRCS}
+    ${PROJECT_TRACE_SRCS})
+
+
+set(PROJECT_GEOMETRY_INCLUDES
+    include/vec4.hpp
+    include/mat4.hpp
+    include/transforms.hpp
+    include/ray.hpp
+    include/ray_intersection.hpp)
+
+SET(PROJECT_DRAWABLE_INCLUDES
+    include/drawable.hpp
+    include/model.hpp
+    include/transformed_drawable.hpp
+    include/sphere.hpp
+    include/triangle.hpp)
+
+set(PROJECT_UTIL_INCLUDES
+    include/globals.hpp
+    include/errors.hpp
+    include/file_utils.hpp
+    include/driver.hpp)
+
+set(PROJECT_TRACE_INCLUDES
+    include/camera.hpp
+    include/scene.hpp
+    include/image.hpp
+    include/material.hpp
+    include/wavefront_material_parser.hpp
+    include/light.hpp)
 
 set(PROJECT_INCLUDES
-  include/vec4.hpp
-  include/mat4.hpp
-  include/transforms.hpp
-  include/globals.hpp
-  include/model.hpp
-  include/camera.hpp
-  include/errors.hpp
-  include/ray.hpp
-  include/driver.hpp
-  include/scene.hpp
-  include/file_utils.hpp
-  include/ray_intersection.hpp
-  include/image.hpp
-  include/transformed_drawable.hpp
-  include/sphere.hpp
-  include/triangle.hpp
-  include/material.hpp
-  include/wavefront_material_parser.hpp
-  include/drawable.hpp
-  include/light.hpp
-  include/color.hpp)
+${PROJECT_GEOMETRY_INCLUDES}
+${PROJECT_DRAWABLE_INCLUDES}
+${PROJECT_UTIL_INCLUDES}
+${PROJECT_TRACE_INCLUDES})
+
 
 set(PROJECT_TEST_SRCS
   test/test_vec4.cpp
@@ -67,9 +92,18 @@ add_executable(catch_test test/main.cpp
   ${PROJECT_SRCS}
   ${PROJECT_TEST_SRCS}
   ${PROJECT_INCLUDES})
-source_group(includes FILES ${PROJECT_INCLUDES})
 
-source_group(sources FILES ${PROJECT_SRCS})
+source_group(geometry\\srcs FILES ${PROJECT_GEOMETRY_SRCS})
+source_group(geometry\\includes FILES ${PROJECT_GEOMETRY_INCLUDES})
+
+source_group(drawable\\srcs FILES ${PROJECT_DRAWABLE_SRCS})
+source_group(drawable\\includes FILES ${PROJECT_DRAWABLE_INCLUDES})
+
+source_group(util\\srcs FILES ${PROJECT_UTIL_SRCS})
+source_group(util\\includes FILES ${PROJECT_UTIL_INCLUDES})
+
+source_group(trace\\srcs FILES ${PROJECT_TRACE_SRCS})
+source_group(trace\\includes FILES ${PROJECT_TRACE_INCLUDES})
 
 source_group(test_sources FILES ${PROJECT_TEST_SRCS})
 

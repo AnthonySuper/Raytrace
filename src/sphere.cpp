@@ -19,6 +19,10 @@ namespace NM {
         return {q, (q - position).toUnit(), ray, material.get()};
     }
     
+    size_t Sphere::complexity() const {
+        return 1;
+    }
+    
     std::ostream& operator<<(std::ostream& os, const Sphere& s) {
         os << "{Sphere: pos " << s.position << ", rad: " << s.radius;
         if(s.material) {

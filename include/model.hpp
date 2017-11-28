@@ -25,99 +25,99 @@ namespace NM {
      * Meh.
      */
     class Model : public Drawable {
-        public:
-            static Model fromStream(std::istream&);
-
-            struct WavefrontParser {
-
-                static Model fromStream(std::istream&);
-
-                Model toModel();
-
-                using PointVector = std::vector<Vec4>;
-
-                using size_type = ssize_t;
-
-                struct FaceElement {
-                    size_type coordIdx;
-                    size_type texIdx;
-                    size_type normIdx;
-                    using ElmType = ssize_t;
-                };
-                struct FaceDescriptor : private std::array<FaceElement, 3> {
-                    using std::array<FaceElement, 3>::operator[];
-                    std::string materialName;
-                };
-
-                using FaceList = std::vector<FaceDescriptor>;
-                private:
-                Vec4 coordinateToPoint(FaceElement::ElmType);
-                Vec4 coordinateToNormal(FaceElement::ElmType);
-                ssize_t wfToC(FaceElement::ElmType);
-                PointVector points;
-                PointVector normals;
-                FaceList faces;
-                using MtlPtr = std::shared_ptr<Material>;
-                MtlPtr getMaterial(const std::string& key);
-                MaterialLibrary materials;
-
-            };
-
-            friend struct WavefrontParser;
-
-            struct Face {
-                Triangle tri;
-                Triangle normals;
-                Face() :
-                    tri{{}, {}, {}},
-                    normals{{}, {}, {}},
-                    material{std::make_shared<Material>()} {}
-
-                inline Face(const Triangle& coords) :
-                    tri{coords},
-                    normals{{},{},{}},
-                    material{std::make_shared<Material>()} {}
-
-                inline Face(const Triangle& coords, const Triangle& norms) :
-                    tri{coords},
-                    normals{norms},
-                    material{std::make_shared<Material>()} {}
-
-                inline Face(const Triangle& coords, const Triangle& norms,
-                        const std::shared_ptr<Material> material) :
-                    tri{coords}, normals{norms}, material{material} {}
-
-                Vec4 calcNormal(const RayIntersection& ray) const;
-                std::shared_ptr<Material> material;
-            };
-
-            Model(const Model&) = default;
-            Model(Model&&) = default;
-            Model() = default;
-
-            virtual RayIntersection checkIntersection(const Ray&) const override;
-        virtual std::string print() override;
+    public:
+        static Model fromStream(std::istream&);
         
-            virtual ~Model() override = default;
-
+        struct WavefrontParser {
+            
+            static Model fromStream(std::istream&);
+            
+            Model toModel();
+            
+            using PointVector = std::vector<Vec4>;
+            
+            using size_type = ssize_t;
+            
+            struct FaceElement {
+                size_type coordIdx;
+                size_type texIdx;
+                size_type normIdx;
+                using ElmType = ssize_t;
+            };
+            struct FaceDescriptor : private std::array<FaceElement, 3> {
+                using std::array<FaceElement, 3>::operator[];
+                std::string materialName;
+            };
+            
+            using FaceList = std::vector<FaceDescriptor>;
         private:
-            std::vector<Face> faces;
+            Vec4 coordinateToPoint(FaceElement::ElmType);
+            Vec4 coordinateToNormal(FaceElement::ElmType);
+            ssize_t wfToC(FaceElement::ElmType);
+            PointVector points;
+            PointVector normals;
+            FaceList faces;
+            using MtlPtr = std::shared_ptr<Material>;
+            MtlPtr getMaterial(const std::string& key);
             MaterialLibrary materials;
-            friend std::ostream& operator<<(std::ostream&, const Model&);
-
+            
+        };
+        
+        friend struct WavefrontParser;
+        
+        struct Face {
+            Triangle tri;
+            Triangle normals;
+            Face() :
+            tri{{}, {}, {}},
+            normals{{}, {}, {}},
+            material{std::make_shared<Material>()} {}
+            
+            inline Face(const Triangle& coords) :
+            tri{coords},
+            normals{{},{},{}},
+            material{std::make_shared<Material>()} {}
+            
+            inline Face(const Triangle& coords, const Triangle& norms) :
+            tri{coords},
+            normals{norms},
+            material{std::make_shared<Material>()} {}
+            
+            inline Face(const Triangle& coords, const Triangle& norms,
+                        const std::shared_ptr<Material> material) :
+            tri{coords}, normals{norms}, material{material} {}
+            
+            Vec4 calcNormal(const RayIntersection& ray) const;
+            std::shared_ptr<Material> material;
+        };
+        
+        Model(const Model&) = default;
+        Model(Model&&) = default;
+        Model() = default;
+        
+        virtual RayIntersection checkIntersection(const Ray&) const override final;
+        virtual std::string print() override;
+        virtual size_t complexity() const override final;
+        virtual ~Model() override = default;
+        
+    private:
+        std::vector<Face> faces;
+        MaterialLibrary materials;
+        friend std::ostream& operator<<(std::ostream&, const Model&);
+        
     };
-
-
-
+    
+    
+    
     std::istream& operator>>(std::istream&, Model::WavefrontParser::FaceElement&);
-
+    
     std::istream& operator>>(std::istream&, Model::WavefrontParser::FaceDescriptor&);
-
+    
     std::ostream& operator<<(std::ostream&,
-            const Model::WavefrontParser::FaceElement&);
-
+                             const Model::WavefrontParser::FaceElement&);
+    
     std::ostream& operator<<(std::ostream&,
-            const Model::WavefrontParser::FaceDescriptor&);
-
+                             const Model::WavefrontParser::FaceDescriptor&);
+    
     std::ostream& operator<<(std::ostream&, const Model&);
 }

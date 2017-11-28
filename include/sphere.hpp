@@ -20,7 +20,8 @@ namespace NM {
         radius(r), radiusSquared(r*r), position(p), material(m) {
         }
         
-        virtual RayIntersection checkIntersection(const Ray&) const override;
+        virtual RayIntersection checkIntersection(const Ray&) const override final;
+        virtual size_t complexity() const override final;
     };
     
     std::ostream& operator<<(std::ostream&, const Sphere&);

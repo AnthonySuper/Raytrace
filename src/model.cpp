@@ -1,7 +1,6 @@
 #include <model.hpp>
 
 namespace NM {
-    
     Model Model::WavefrontParser::fromStream(std::istream &stream) {
         WavefrontParser toRet;
         std::string line;
@@ -190,6 +189,10 @@ namespace NM {
         toRet.material = intersectedFace.material.get();
         toRet.assignNormal(intersectedFace.calcNormal(toRet));
         return toRet;
+    }
+    
+    size_t Model::complexity() const {
+        return faces.size();
     }
     
     Vec4 Model::Face::calcNormal(const NM::RayIntersection &ri) const {
