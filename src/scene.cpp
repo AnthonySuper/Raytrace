@@ -39,40 +39,41 @@ namespace NM {
         if(ri.material == nullptr) {
             throw std::runtime_error("Not allowed!");
         }
+        Vec4 toC = (ri.originalRay().position - ri.point()).toUnit();
+        Vec4 normal = ri.surfaceNormal();
         const Material& mtl = ri.material ? *ri.material : Material{};
         Vec4 color = ambient.pairwiseProduct(mtl.ambient);
         for(auto& light : lights) {
-            Vec4 toLightLong = (light.position - ri.point());
-            
-            Vec4 toLight = toLightLong.toUnit();
-            FloatType dotProduct = ri.surfaceNormal().dot(toLight);
-            if(dotProduct < 0.0) continue;
-            const auto TRACE_FACTOR = 0.01;
-            Ray newTrace{
-                ri.point() + (TRACE_FACTOR * toLight),
-                    toLight};
-            auto shadowTest = traceIntersection(newTrace);
-            if(shadowTest &&
-               shadowTest.getDistance() > toLightLong.magnitude()) continue;
+            Vec4 toLight = (light.position - ri.point());
+            Vec4 toLightUnit = toLight.toUnit();
+            FloatType dot = normal.dot(toLightUnit);
+            if(dot < 0.0) continue;
+            // Test to see if there's something in the way.
+            const auto DoubleCollideFixer = 0.01;
+            Ray lightRay{
+                ri.point() + (DoubleCollideFixer * toLightUnit),
+                toLightUnit
+            };
+            auto res = traceIntersection(lightRay);
+            // This light did nothing due to a shadow, rip in peace
+            if(res && res.getDistance() < toLight.magnitude()) continue;
             Vec4 diff = mtl.diffuse.pairwiseProduct(light.color);
-            color += dotProduct * diff;
-            Vec4 toC = (ri.originalRay().position -
-                    ri.point()).toUnit();
-            FloatType twice = 2 * ri.surfaceNormal().dot(toLight);
-            Vec4 spr = (twice * ri.surfaceNormal()) - toLight;
-            FloatType powExp = toC.dot(spr);
-            if(powExp > 0) {
-                FloatType expon = std::pow(powExp, mtl.specularExpon);
-                Vec4 modSpec = mtl.specular.pairwiseProduct(light.color);
-                color += (modSpec * expon);
-            }
-
+            color += (diff * dot);
+            FloatType twice = 2 * normal.dot(toLightUnit);
+            if(twice < 0) continue;
+            Vec4 spr = (twice * normal) - toLightUnit;
+            FloatType cspr = toC.dot(spr);
+                
+            if(cspr < 0) continue;
+            FloatType expon = std::pow(cspr, mtl.specularExpon);
+            Vec4 modSpec = mtl.specular.pairwiseProduct(light.color);
+            color += (modSpec * expon);
         }
         accum += refAt.pairwiseProduct(color);
         if(depth > 0) {
             // Time to recurse
             Vec4 toCamera = -1 * ri.originalRay().direction;
-            const Vec4& n = ri.surfaceNormal();
+            const Vec4& n = normal;
             Vec4 reflect = ((2 * n.dot(toCamera)) * n) - toCamera;
             RayIntersection ri2 = traceIntersection({ri.point(), reflect.toUnit()});
             Vec4 newRefAt = mtl.attunation.pairwiseProduct(refAt);
@@ -129,7 +130,6 @@ namespace NM {
     }
 
     size_t Scene::getConcurrency() const {
-        return 1;
         return std::thread::hardware_concurrency();
     }
 

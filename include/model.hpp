@@ -97,6 +97,7 @@ namespace NM {
 
             virtual RayIntersection checkIntersection(const Ray&) const override;
         virtual std::string print() override;
+        
             virtual ~Model() override = default;
 
         private:

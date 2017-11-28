@@ -42,7 +42,7 @@ namespace NM {
          coordOut[y] refers to the distance along (ca)
          coordOut[z] refers to the distance along (cb)
          */
-        inline RayIntersection checkIntersection(const Ray& ray, Vec4* coordOut = nullptr) const {
+        inline RayIntersection checkIntersection(const Ray& ray) const {
             Vec4 edgeA = (b - a);
             Vec4 edgeB = (c - a);
             // P = D x E2
@@ -80,12 +80,6 @@ namespace NM {
             // along the triangle. In this case, we consider no intersection to
             // have taken place.
             if(t > Constants::epsilon) {
-                if(coordOut) {
-                    Vec4 &out = *(coordOut);
-                    out[0] = u;
-                    out[1] = v;
-                    out[2] = 1.0 - u - v;
-                }
                 return {
                     ray.position + (ray.direction * t),
                     normal,

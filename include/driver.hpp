@@ -67,7 +67,7 @@ namespace NM {
         
         Scene getScene() const;
         
-        unsigned int recursionLevel = 1;
+        unsigned int recursionLevel = 0;
     private:
         Vec4 eye;
         Vec4 look;

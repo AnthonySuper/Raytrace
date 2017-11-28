@@ -198,7 +198,7 @@ namespace NM {
     
     Vec4 Model::Face::calcNormal(const NM::RayIntersection &ri) const {
         Vec4 norm = (tri.a - tri.b).cross(tri.a - tri.c).toUnit();
-        if(ri.originalRay().direction.dot(norm) < 0) {
+        if(ri.originalRay().direction.dot(norm) > 0) {
             norm = -norm;
         }
         return norm;
@@ -208,12 +208,12 @@ namespace NM {
         if(! tri.checkIntersection(ri.originalRay(), &baycentric)) {
             throw std::runtime_error("Why am I calculating the normal for a fake intersection?");
         }
-        Vec4 norm = normals.a * baycentric[0] + normals.b * baycentric[1] + normals.c * baycentric[2];
-        if(norm.dot(ri.point()) < 0) {
-            return -norm.toUnit();
-        }
+        Vec4 norm = (normals.a * baycentric[1]) + 
+            (normals.b * baycentric[1]) + 
+            (normals.c * baycentric[1]);
+        // std::cout << baycentric << "\t" << norm << std::endl;
         return norm.toUnit();
-         */
+        */
     }
     
 }

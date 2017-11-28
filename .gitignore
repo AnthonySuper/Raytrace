@@ -14,3 +14,6 @@ utils/raytrace
 utils/out/*
 *.ppm
 *.tar
+*.png
+*.tar.gz
+*.tar.lzma
