@@ -174,7 +174,6 @@ namespace NM {
     RayIntersection Model::checkIntersection(const NM::Ray & r) const {
         Material useMaterial;
         RayIntersection toRet;
-
         ssize_t intersectedIdx = -1;
         for(size_t i = 0; i < faces.size(); ++i) {
             auto& face = faces[i];
@@ -197,9 +196,9 @@ namespace NM {
     
     Vec4 Model::Face::calcNormal(const NM::RayIntersection &ri) const {
         auto bc = tri.toBarycentric(ri.point());
-        auto norm = normals.a * bc[0] +
-            normals.b * bc[1] +
-            normals.c * bc[2];
+        auto norm = normals.a * bc[2] +
+            normals.b * bc[0] +
+            normals.c * bc[1];
         return norm.toUnit();
     }
     

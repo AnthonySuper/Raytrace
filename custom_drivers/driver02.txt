@@ -7,7 +7,7 @@ res 256 256
 light 25 5 25 1 0.7.2 0.2
 light -25 5 25 1 0.7 0.2 0.2
 light 0 20 25 1 0.6 0.6 0.6
-recursionLevel 5
+recursionLevel 1
 ambient 0 0 0
 model 1.0 0.0 0.0 0 5 0 0 0 dragontri.obj
 # model 0.0 1.0 0.0 20 0.2 0 -13 0 temple.obj
