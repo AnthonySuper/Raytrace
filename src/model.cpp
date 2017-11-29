@@ -197,9 +197,10 @@ namespace NM {
     
     Vec4 Model::Face::calcNormal(const NM::RayIntersection &ri) const {
         auto bc = tri.toBarycentric(ri.point());
-        return normals.a * bc[0] +
+        auto norm = normals.a * bc[0] +
             normals.b * bc[1] +
             normals.c * bc[2];
+        return norm.toUnit();
     }
     
 }
