@@ -9,7 +9,8 @@ set(PROJECT_GEOMETRY_SRCS
     src/mat4.cpp
     src/transforms.cpp
     src/ray_intersection.cpp
-    src/ray.cpp)
+    src/ray.cpp
+    src/ray_result.cpp)
 
 set(PROJECT_DRAWABLE_SRCS
     src/drawable.cpp
@@ -44,7 +45,8 @@ set(PROJECT_GEOMETRY_INCLUDES
     include/mat4.hpp
     include/transforms.hpp
     include/ray.hpp
-    include/ray_intersection.hpp)
+    include/ray_intersection.hpp
+    include/ray_result.hpp)
 
 SET(PROJECT_DRAWABLE_INCLUDES
     include/drawable.hpp

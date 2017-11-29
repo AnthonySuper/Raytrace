@@ -90,9 +90,13 @@ namespace NM {
             // Either way, we don't care about it for purposes of raytracing.
             return {};
         }
+        
+        Vec4 toBarycentric(const Vec4& point) const;
     };
     
     Triangle operator*(const Mat4&, const Triangle&);
+    
+    
     
     std::ostream& operator<<(std::ostream&, const Triangle&);
 }

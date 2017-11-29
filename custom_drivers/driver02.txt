@@ -3,11 +3,11 @@ look 0 0 0
 up 0 1 0
 d 10
 bounds -2 -2 2 2
-res 1000 1000
+res 256 256
 light 25 5 25 1 0.7.2 0.2
 light -25 5 25 1 0.7 0.2 0.2
 light 0 20 25 1 0.6 0.6 0.6
 recursionLevel 5
 ambient 0 0 0
 model 1.0 0.0 0.0 0 5 0 0 0 dragontri.obj
-model 0.0 1.0 0.0 20 0.2 0 -13 0 temple.obj
+# model 0.0 1.0 0.0 20 0.2 0 -13 0 temple.obj
