@@ -53,11 +53,7 @@ namespace NM {
                 coordinateToPoint(fd[2].coordIdx)
             };
             auto mtl = getMaterial(fd.materialName);
-            /**
-             TODO:
-             FIX THE FACK THE NORMALS CAN BE FUCKED
-             CLEAN UP THIS CODE IN GENERLA YOU GODDAMN TROGLEDYTE
-             */
+            // TODO: Cleanup
             if(fd[0].normIdx != 0) {
                 Triangle normals {
                     coordinateToNormal(fd[0].normIdx),
