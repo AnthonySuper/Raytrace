@@ -2,6 +2,8 @@
 #include <globals.hpp>
 #include <chrono>
 
+
+
 namespace NM {
     void Scene::addObject(const NM::TransformedDrawable & tm) {
         drawables.emplace_back(tm);
@@ -18,6 +20,15 @@ namespace NM {
     void Scene::addObject(const Light& l) {
         lights.emplace_back(l);
     }
+    
+    void Scene::finalize() {
+        bonsai.reset();
+        for(auto& sphere: spheres) {
+            bonsai.add(&sphere);
+        }
+        bonsai.expandBox();
+        bonsai.partition(getConcurrency());
+    }
 
     RayIntersection Scene::traceIntersection(const Ray& in) const {
         RayIntersection toRet;
@@ -29,18 +40,19 @@ namespace NM {
         }
         return toRet;
     }
+    
+    void Scene::intersect(RayResult &r) const {
+        bonsai.intersectRecursive(r);
+    }
 
-    void Scene::colorize(const RayIntersection &ri,
+    void Scene::colorize(const RayResult &ri,
             Vec4& accum,
             const Vec4& refAt,
             unsigned int depth) const {
-
+        
         if(! ri) return;
-        if(ri.material == nullptr) {
-            throw std::runtime_error("Not allowed!");
-        }
-        Vec4 toC = (ri.originalRay().position - ri.point()).toUnit();
-        Vec4 normal = ri.surfaceNormal();
+        Vec4 toC = (ri.originalRay.position - ri.point()).toUnit();
+        Vec4 normal = ri.surfaceNormal;
         const Material& mtl = ri.material ? *ri.material : Material{};
         Vec4 color = ambient.pairwiseProduct(mtl.ambient);
         for(auto& light : lights) {
@@ -54,9 +66,10 @@ namespace NM {
                 ri.point() + (DoubleCollideFixer * toLightUnit),
                 toLightUnit
             };
-            auto res = traceIntersection(lightRay);
+            RayResult res{lightRay};
+            intersect(res);
             // This light did nothing due to a shadow, rip in peace
-            if(res && res.getDistance() < toLight.magnitude()) continue;
+            if(res && res.distance < toLight.magnitude()) continue;
             Vec4 diff = mtl.diffuse.pairwiseProduct(light.color);
             color += (diff * dot);
             FloatType twice = 2 * normal.dot(toLightUnit);
@@ -72,12 +85,13 @@ namespace NM {
         accum += refAt.pairwiseProduct(color);
         if(depth > 0) {
             // Time to recurse
-            Vec4 toCamera = -1 * ri.originalRay().direction;
+            Vec4 toCamera = -1 * ri.originalRay.direction;
             const Vec4& n = normal;
             Vec4 reflect = ((2 * n.dot(toCamera)) * n) - toCamera;
-            RayIntersection ri2 = traceIntersection({ri.point(), reflect.toUnit()});
+            RayResult r2 = {{ri.point(), reflect.toUnit()}};
+            intersect(r2);
             Vec4 newRefAt = mtl.attunation.pairwiseProduct(refAt);
-            colorize(ri2,
+            colorize(r2,
                     accum,
                     newRefAt,
                     depth - 1);
@@ -98,12 +112,10 @@ namespace NM {
                     size_t ourIdx = idx++;
                     if(ourIdx >= raysSize) return;
                     auto ourRay = rays[ourIdx];
-                    RayIntersection it = traceIntersection(ourRay);
-                    if(ourIdx > 7*16 + 8) {
-                    // break here
-                    }
+                    RayResult ourResult{ourRay};
+                    intersect(ourResult);
                     Vec4& ourPixel = pixels.at(ourIdx);
-                    colorize(it,
+                    colorize(ourResult,
                             ourPixel,
                             {1, 1, 1},
                             recursionDepth);
@@ -112,7 +124,7 @@ namespace NM {
         }
 
         std::thread progressBar([&]() {
-                while(conc != 1) {
+                while(shouldLog) {
                 size_t ourIdx = idx;
                 if(ourIdx > raysSize) return;
                 outputProgress("Tracing progress", ourIdx, raysSize);
@@ -130,7 +142,10 @@ namespace NM {
     }
 
     size_t Scene::getConcurrency() const {
-        return std::thread::hardware_concurrency();
+        if(concurrent) {
+            return std::thread::hardware_concurrency();
+        }
+        return 1;
     }
 
     std::ostream& operator<<(std::ostream& os, const Scene& s) {

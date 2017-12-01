@@ -20,6 +20,13 @@ namespace NM {
          * Get the width of this vector, considered as a matrix
          */
         constexpr static int width = 1;
+
+        enum class Axis {
+            x = 0,
+            y = 1,
+            z = 2,
+            w = 3
+        };
         /**
          * What type do we use for the buffer?
          */
@@ -107,6 +114,10 @@ namespace NM {
             return buff[i];
         }
 
+        inline constexpr FloatType& operator[](Axis a) {
+            return buff[static_cast<int>(a)];
+        }
+
         Vec4& operator=(const Vec4& other) = default;
 
         inline constexpr Vec4 normalized() const {
@@ -118,12 +129,7 @@ namespace NM {
         }
         
         inline FloatType magnitude() const {
-            const auto square = [](FloatType in) { return in * in; };
-            const auto norm = normalized();
-            const auto sum = square(norm.x()) +
-                square(norm.y()) +
-                square(norm.z());
-            return std::sqrt(sum);
+            return std::sqrt(dot(*this));
         }
         
         inline Vec4 toUnit() const {
@@ -135,6 +141,10 @@ namespace NM {
                 y() / mag,
                 z() / mag
             };
+        }
+
+        inline constexpr FloatType operator[](Axis a) const {
+            return buff[static_cast<int>(a)];
         }
 
         inline constexpr FloatType operator[](int i) const {
@@ -157,9 +167,10 @@ namespace NM {
         }
 
         inline Vec4& operator+=(const Vec4& other) {
-            buff[0] += other[0];
-            buff[1] += other[1];
-            buff[2] += other[2];
+        
+            for(int i = 0; i < 3; ++i) {
+                buff[i] += other[i];
+            }
             return *this;
         }
 
@@ -239,9 +250,11 @@ namespace NM {
         }
         
         inline constexpr FloatType dot(const Vec4& other) const {
-            return buff[0] * other[0] +
-            buff[1] * other[1] +
-            buff[2] * other[2];
+            FloatType accum = 0;
+            for(int i = 0; i < 3; ++i) {
+                accum += buff[i] * other.buff[i];
+            }
+            return accum;
         }
         
         inline constexpr Vec4 pairwiseProduct(const Vec4& other) const {
@@ -270,11 +283,24 @@ namespace NM {
             in * other[2],
         };
     }
-
-
-   
-
-
+    
+    
+    inline constexpr Vec4 pseudoMin(const Vec4 &a, const Vec4& b) {
+        return {
+            std::min(a[0], b[0]),
+            std::min(a[1], b[1]),
+            std::min(a[2], b[2])
+        };
+    }
+    
+    inline constexpr Vec4 pseudoMax(const Vec4 &a, const Vec4& b) {
+        return {
+            std::max(a[0], b[0]),
+            std::max(a[1], b[1]),
+            std::max(a[2], b[2])
+        };
+    }
+    
     std::ostream& operator<<(std::ostream& os, NM::Vec4 const & vec);
     
     std::istream& operator>>(std::istream& is, Vec4 & vec);

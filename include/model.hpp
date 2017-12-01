@@ -99,6 +99,7 @@ namespace NM {
         virtual std::string print() override;
         virtual size_t complexity() const override final;
         virtual ~Model() override = default;
+        virtual void expandToFit(Box& b) const override final;
         
     private:
         std::vector<Face> faces;
@@ -106,8 +107,6 @@ namespace NM {
         friend std::ostream& operator<<(std::ostream&, const Model&);
         
     };
-    
-    
     
     std::istream& operator>>(std::istream&, Model::WavefrontParser::FaceElement&);
     

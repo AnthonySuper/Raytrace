@@ -2,10 +2,15 @@
 
 namespace NM {
     
-    void RayResult::swapDistance(double newDist, const Material *mtlPtr) {
+    bool RayResult::swapDistance(double newDist,
+                                 const Vec4& sn,
+                                 const Material *mtlPtr) {
         if(betterDistance(newDist)) {
             distance = newDist;
             material = mtlPtr;
+            surfaceNormal = sn;
+            return true;
         }
+        return false;
     }
 }

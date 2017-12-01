@@ -6,10 +6,24 @@
 namespace NM {
     class RayResult {
     public:
+        
+        RayResult(const Ray& r) : originalRay(r), invDir{
+            1/r.direction[0],
+            1/r.direction[1],
+            1/r.direction[2]
+        } {}
+        
         /**
          * The original ray we are using to do the actual intersections
          */
         Ray originalRay;
+        
+        Vec4 invDir;
+        
+        /**
+         * The surface normal of the intersected point
+         */
+        Vec4 surfaceNormal;
         /**
          * How far away is the current "good" intersection?
          */
@@ -19,10 +33,19 @@ namespace NM {
          */
         const Material* material = nullptr;
         
-        void swapDistance(double newDist, const Material* mtlPtr);
+        bool swapDistance(double newDist, const Vec4& sn, const Material* mtlPtr);
         
         inline bool betterDistance(double newDist) const {
-            return distance < 0 || newDist < distance;
+            return distance < 0 || (newDist > 0 &&
+                                    newDist < distance);
+        }
+        
+        inline Vec4 point() const {
+            return originalRay.position + (distance * originalRay.direction);
+        }
+        
+        inline operator bool() const {
+            return distance > 0;
         }
     };
 }

@@ -3,6 +3,8 @@
 #include <cmath>
 #include <iostream>
 
+
+
 namespace NM {
 	using FloatType = double;
     

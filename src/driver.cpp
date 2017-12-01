@@ -38,7 +38,7 @@ namespace NM {
     std::istream& operator>>(std::istream& is, Driver& driver) {
         std::string line;
         while(std::getline(is, line)) {
-            std::cout << line << std::endl;
+            // std::cout << line << std::endl;
             std::istringstream lineStream(line);
             std::string header;
             lineStream >> header;

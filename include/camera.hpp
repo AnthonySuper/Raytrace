@@ -21,8 +21,8 @@ namespace NM {
          */
         CameraAxis(Vec4 point,
                Vec4 lookAt,
-               Vec4 up = {0, 0, 1});
-
+                   Vec4 up = {0, 0, 1});
+        
         inline const Vec4& getPos() const { return pos; }
         inline const Vec4& getUp() const { return up; }
         inline const Vec4& getW() const { return w; }

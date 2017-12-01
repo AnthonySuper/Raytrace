@@ -10,7 +10,8 @@ set(PROJECT_GEOMETRY_SRCS
     src/transforms.cpp
     src/ray_intersection.cpp
     src/ray.cpp
-    src/ray_result.cpp)
+    src/ray_result.cpp
+    src/box.cpp)
 
 set(PROJECT_DRAWABLE_SRCS
     src/drawable.cpp
@@ -31,7 +32,8 @@ set(PROJECT_TRACE_SRCS
     src/image.cpp
     src/material.cpp
     src/wavefront_material_parser.cpp
-    src/light.cpp)
+    src/light.cpp
+    src/bonsai_tree.cpp)
 
 SET(PROJECT_SRCS
     ${PROJECT_GEOMETRY_SRCS}
@@ -46,7 +48,8 @@ set(PROJECT_GEOMETRY_INCLUDES
     include/transforms.hpp
     include/ray.hpp
     include/ray_intersection.hpp
-    include/ray_result.hpp)
+    include/ray_result.hpp
+    include/box.hpp)
 
 SET(PROJECT_DRAWABLE_INCLUDES
     include/drawable.hpp
@@ -67,7 +70,8 @@ set(PROJECT_TRACE_INCLUDES
     include/image.hpp
     include/material.hpp
     include/wavefront_material_parser.hpp
-    include/light.hpp)
+    include/light.hpp
+    include/bonsai_tree.hpp)
 
 set(PROJECT_INCLUDES
 ${PROJECT_GEOMETRY_INCLUDES}
@@ -86,7 +90,8 @@ set(PROJECT_TEST_SRCS
   test/test_scene.cpp
   test/test_sphere.cpp
   test/test_material_parser.cpp
-  test/test_camera.cpp)
+  test/test_camera.cpp
+  test/test_box.cpp)
 
 add_test(unit_tests ./catch_test)
 

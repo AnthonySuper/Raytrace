@@ -62,7 +62,7 @@ namespace NM {
         (px * axis.getV()) +
         (py * axis.getU());
         Vec4 rayDir = (rayPt - axis.getPos()).normalized();
-        return {rayPt, rayDir};
+        return {axis.getPos(), rayDir};
     }
     
     std::vector<Ray> Camera::getRays(size_t height, size_t width) const {

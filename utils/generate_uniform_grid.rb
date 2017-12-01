@@ -23,10 +23,12 @@ def lights
   end).join("\n")
 end
 
+GRID_SIZE = 5
+
 def spheres
-  5.step(POS_MAX - 5, 5).map do |x|
-    7.step(POS_MAX - 7, 7).map do |y|
-      11.step(POS_MAX - 11, 11).map do |z|
+  GRID_SIZE.step(POS_MAX - GRID_SIZE, GRID_SIZE).map do |x|
+    GRID_SIZE.step(POS_MAX - GRID_SIZE, GRID_SIZE).map do |y|
+      GRID_SIZE.step(POS_MAX - GRID_SIZE, GRID_SIZE).map do |z|
         comps = [x, y, z]
         pos = comps.join(" ")
         color = comps.map{|x| x / 100.0 }.join(" ")

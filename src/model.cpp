@@ -190,6 +190,12 @@ namespace NM {
         return toRet;
     }
     
+    void Model::expandToFit(NM::Box &b) const {
+        for(auto& face: faces) {
+            b.expandToFit(face.tri);
+        }
+    }
+    
     size_t Model::complexity() const {
         return faces.size();
     }
