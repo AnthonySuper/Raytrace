@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 #include <globals.hpp>
 #include <drawable.hpp>
 #include <box.hpp>
