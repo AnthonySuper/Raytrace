@@ -65,14 +65,22 @@ namespace NM {
         b.expandToFit(position + directional);
     }
     
+    std::string Sphere::print() {
+        std::stringstream ss;
+        ss << *this;
+        return ss.str();
+    }
+    
     
     
     std::ostream& operator<<(std::ostream& os, const Sphere& s) {
         os << "{Sphere: pos " << s.position << ", rad: " << s.radius;
+        /*
         if(s.material) {
             const Material& mat = *(s.material.get());
             os << ", Material: " << mat;
         }
+         */
         os << "}";
         return os;
     }

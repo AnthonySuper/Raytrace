@@ -8,12 +8,22 @@
 
 namespace NM {
     struct Box {
-        Vec4 min;
-        Vec4 max;
-        Vec4 extent;
-        
+        constexpr static FloatType FloatMin = std::numeric_limits<FloatType>::lowest();
+        constexpr static FloatType  FloatMax = std::numeric_limits<FloatType>::max();
+        Vec4 min = {
+            FloatMax,
+            FloatMax,
+            FloatMax
+        };
+        Vec4 max = {
+            FloatMin,
+            FloatMin,
+            FloatMin
+        };
+
+        inline constexpr Box() = default;
         inline constexpr Box(const Vec4& _min, const Vec4& _max) :
-        min{_min}, max{_max}, extent{max - min} {}
+        min{_min}, max{_max} {}
         Box(const Triangle&);
         
         using MinMax = std::pair<FloatType, FloatType>;
@@ -28,9 +38,14 @@ namespace NM {
                                      rr.invDir);
             auto tmin = res.first;
             auto tmax = res.second;
-        
             return (rr.distance < 0 && tmax > 0) ||
                 (tmin < rr.distance && tmax > 0);
+        }
+        
+        inline FloatType intersectOrInf(const Ray& r, const Vec4& invDir) const {
+            auto t = intersectDist(r, invDir);
+            FloatType ret = t.first < 0 ? t.second : t.first;
+            return (ret < 0) ? std::numeric_limits<FloatType>::max() : ret;
         }
         
         inline MinMax intersectDist(const Ray& r, const Vec4& invDir) const {
@@ -72,5 +87,10 @@ namespace NM {
             if(tmin < 0 && tmax < 0) return {-1, -1};
             return {tmin, tmax};
         }
+        
+        FloatType surfaceArea() const;
     };
+    
+    std::ostream& operator<<(std::ostream&, const Box&);
+    
 }

@@ -27,7 +27,7 @@ namespace NM {
         /**
          * How far away is the current "good" intersection?
          */
-        double distance = -1.0;
+        FloatType distance = std::numeric_limits<FloatType>::max();
         /**
          * What is the material of the current "good" intersection?
          */
@@ -36,7 +36,7 @@ namespace NM {
         bool swapDistance(double newDist, const Vec4& sn, const Material* mtlPtr);
         
         inline bool betterDistance(double newDist) const {
-            return distance < 0 || (newDist > 0 &&
+            return (newDist > 0 &&
                                     newDist < distance);
         }
         
@@ -45,7 +45,7 @@ namespace NM {
         }
         
         inline operator bool() const {
-            return distance > 0;
+            return distance != std::numeric_limits<FloatType>::max();
         }
     };
 }

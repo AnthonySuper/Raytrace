@@ -1,10 +1,9 @@
-
 eye 10 55 55
 look 110 110 110
 up 0 1 0
 d 2.7
 bounds -2 -2 2 2
-res 4000 4000
+res 1000 1000
 recursionLevel 5
 ambient 0.2 0.2 0.2
 light 0 0 0 1 0.0 0.0 0.0

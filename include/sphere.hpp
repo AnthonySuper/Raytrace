@@ -26,6 +26,7 @@ namespace NM {
         virtual bool intersects(const Box& b) const override final;
         virtual bool intersects(RayResult&) const override final;
         virtual void expandToFit(Box& b) const override final;
+        virtual std::string print() override final;
     };
     
     std::ostream& operator<<(std::ostream&, const Sphere&);

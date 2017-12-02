@@ -5,7 +5,6 @@ namespace NM {
     BonsaiTree::BonsaiTree(const Box& b) : 
         boundingBox(b) {}
 
-
     void BonsaiTree::add(Drawable *drawable) {
         if(greater != nullptr) {
             throw std::runtime_error("Added child to completed drawable tree");
@@ -22,17 +21,6 @@ namespace NM {
                 return (aMid[ax] < bMid[ax]);
                 });
     }
-
-    static FloatType largestWidth(std::vector<Drawable*> &dr, Vec4::Axis ax) {
-        auto diff = dr[0]->midpoint()[ax] - dr[dr.size() - 1]->midpoint()[ax];
-        return std::abs(diff);
-    }
-
-    static FloatType midpointAxis(const std::vector<Drawable*> &dr, 
-            Vec4::Axis ax,
-            FloatType width) {
-        return dr[0]->midpoint()[ax] + (width / 2.0);
-    }
     
     BonsaiTree::BonsaiTree() :
     boundingBox{{0, 0, 0}, {0, 0, 0}},
@@ -47,43 +35,248 @@ namespace NM {
                 new BonsaiTree(*bt.greater)
                                                   );
             less = std::unique_ptr<BonsaiTree>(
-                new BonsaiTree(*bt.less)
-                                               );
+                new BonsaiTree(*bt.less));
         }
     }
     
 
     void BonsaiTree::partition(size_t concurrency) {
-        if(drawables.size() < 10) {
+        nodes.clear();
+        nodes.resize(1);
+        nodes[0].nodeIndex = 0;
+        nodes[0].begin = 0;
+        nodes[0].end = drawables.size();
+        nodes[0].generateBounds(drawables);
+        buildRecursive(0,
+                       drawables.size(),
+                       0,
+                       0);
+        
+        auto leaves = std::count_if(nodes.begin(), nodes.end(), [](const Node& n) {
+            return n.isLeaf;
+        });
+        std::cout << "tree has " << leaves << "leaves!" << std::endl;
+    }
+    
+    void BonsaiTree::Node::generateBounds(const ItemVector& iv) {
+        bounds = {{}, {}};
+        for(auto i = begin; i < end; ++i) {
+            iv[i]->expandToFit(bounds);
+        }
+    }
+    
+    /**
+     * Get the cost of a partition based on nodes
+     * Returns (partition_index, cost)
+     */
+    using PartitionPair = std::pair<size_t, FloatType>;
+    PartitionPair partitionOnAxis(BonsaiTree::ItemVector &iv,
+                                  Vec4::Axis av,
+                                  FloatType parentArea) {
+        int readAxis = static_cast<int>(av);
+        sortDrawablesOnAxis(iv, av);
+        // Set our bestCost to something really high initially
+        FloatType bestCost = std::numeric_limits<FloatType>::max();
+        if(readAxis == 2) {
+            auto& last = iv[iv.size() - 1];
+        }
+        size_t bestSplit = 0;
+        for(int i = 1; i < iv.size() - 1; ++i) {
+            Box leftBox;
+            Box rightBox;
+            for(int j = 0; j < iv.size(); ++j) {
+                if(j < i) {
+                    iv[j]->expandToFit(leftBox);
+                }
+                else {
+                    iv[j]->expandToFit(rightBox);
+                }
+            }
+            // Cool, now find the cost:
+            FloatType blbp = leftBox.surfaceArea() / parentArea;
+            FloatType costFL = (i * BonsaiTree::IntersectCost);
+            FloatType brbp = rightBox.surfaceArea() / parentArea;
+            FloatType costFR = (iv.size() - i) * BonsaiTree::IntersectCost;
+            FloatType cost = BonsaiTree::TraversalCost +
+            blbp*costFL + brbp*costFR;
+            if(cost < bestCost) {
+                bestSplit = i;
+                bestCost = cost;
+            }
+        }
+        if(bestSplit == 0 || bestSplit == iv.size()) {
+            throw std::runtime_error("Rip your heuristics lul");
+        }
+        return {bestSplit, bestCost};
+    }
+    
+    /**
+     * Find the best partition using the Surface Area Hueristic
+     * Fairly complicated stuff, eh
+     */
+    static ssize_t getBestPartition(BonsaiTree::ItemVector::iterator begin,
+                                   BonsaiTree::ItemVector::iterator end,
+                                   FloatType parentArea) {
+        BonsaiTree::ItemVector onX(begin, end),
+            onY(begin, end),
+            onZ(begin, end);
+        auto bestX = partitionOnAxis(onX,
+                                     Vec4::Axis::x,
+                                     parentArea);
+        auto bestY = partitionOnAxis(onY,
+                                     Vec4::Axis::y,
+                                     parentArea);
+        auto bestZ = partitionOnAxis(onZ,
+                                     Vec4::Axis::z,
+                                     parentArea);
+        auto bestCost = bestX.second;
+        auto bestPart = bestX.first;
+        BonsaiTree::ItemVector *bestSorted = &onX;
+        if(bestCost > bestY.second) {
+            bestCost = bestY.second;
+            bestPart = bestY.first;
+            bestSorted = &onY;
+        }
+        if(bestCost > bestZ.second) {
+            bestCost = bestZ.second;
+            bestPart = bestZ.first;
+            bestSorted = &onZ;
+        }
+        auto leafCost = (end - begin)*BonsaiTree::IntersectCost;
+        // If the best cost is worse than traversing everything
+        // Give up:
+        if(bestCost > leafCost) {
+            return -1;
+        }
+        std::copy(bestSorted->begin(), bestSorted->end(), begin);
+        BonsaiTree::ItemVector testVec(begin, end);
+        if(testVec != *bestSorted) {
+            throw std::runtime_error("Sort breaks bruh");
+        }
+        if(bestPart == 0 || bestPart == onX.size()) {
+            throw std::runtime_error("Null partitions must be bad");
+        }
+        return bestPart;
+    }
+    
+    void BonsaiTree::buildRecursive(ItemIdx start,
+                                    ItemIdx end,
+                                    size_t nodeIdx,
+                                    size_t depth) {
+        auto &node = nodes.at(nodeIdx);
+        node.nodeIndex = nodeIdx;
+        node.begin = start;
+        node.end = end;
+        node.generateBounds(drawables);
+        auto printSpaces = [=]() {
+            for(int i = 0; i < depth; ++i) {
+                std::cout << "  ";
+            }
+        };
+        
+        if((end - start) < 4) {
+            printSpaces();
+            std::cout << "Leaf is too small to split, ignoring... " << std::endl;
+            node.isLeaf = true;
             return;
         }
-        auto byX = drawables;
-        auto byY = drawables;
-        auto byZ = drawables;
-        sortDrawablesOnAxis(byX, Vec4::Axis::x);
-        sortDrawablesOnAxis(byY, Vec4::Axis::y);
-        sortDrawablesOnAxis(byZ, Vec4::Axis::z);
-        auto xWidth = largestWidth(byX, Vec4::Axis::x);
-        auto yWidth = largestWidth(byX, Vec4::Axis::y);
-        auto zWidth = largestWidth(byX, Vec4::Axis::z);
-        Vec4::Axis largestAxis = Vec4::Axis::x;
-        auto currentLargest = xWidth;
-        auto partitionPoint = midpointAxis(byX, Vec4::Axis::x, currentLargest);
-        if(currentLargest < yWidth) {
-            largestAxis = Vec4::Axis::y;
-            currentLargest = yWidth;
-            partitionPoint = midpointAxis(byY,
-                    Vec4::Axis::y,
-                    currentLargest);
+        printSpaces();
+        std::cout << "Splitting inside " << start << "," << end;
+        std::cout << " at depth " << depth << " and node " << node.nodeIndex;
+        std::cout << std::endl;
+        auto split = getBestPartition(drawables.begin() + start,
+                                      drawables.begin() + end,
+                                      node.bounds.surfaceArea());
+        if(split == -1 || (end - start) < 4) {
+            printSpaces();
+            std::cout << "Found a leaf at depth " << depth;
+            std::cout << ", marking and returning...";
+            std::cout << std::endl;
+            node.isLeaf = true;
+            node.begin = start;
+            node.end = start;
+            return;
         }
-        if(currentLargest < zWidth) {
-            largestAxis = Vec4::Axis::z;
-            currentLargest = zWidth;
-            partitionPoint = midpointAxis(byZ,
-                    Vec4::Axis::z,
-                    currentLargest);
+        split += start;
+        auto ri = node.rightIndex();
+        auto li = node.leftIndex();
+        printSpaces();
+        std::cout << "Should split (" << start << "," << end << ")";
+        std::cout << " at split " << split << std::endl;
+        if(nodes.size() < ri) {
+            nodes.resize(ri + 1);
         }
-        constructChildren(largestAxis, partitionPoint, concurrency);
+        printSpaces();
+        std::cout << "Generating left... (in index " << li << ")" << std::endl;
+        buildRecursive(start,
+                       split,
+                       li,
+                       depth + 1);
+
+        printSpaces();
+        std::cout << "Generating right... (in index " << ri << ")" << std::endl;
+        buildRecursive(split,
+                       end,
+                       ri,
+                       depth + 1);
+    }
+    
+    void BonsaiTree::intersectStack(NM::RayResult & r) const {
+        const auto& rr = r.originalRay;
+        const auto& iv = r.invDir;
+        using Tup = std::pair<Node, FloatType>;
+        std::vector<Tup> stack;
+        Node nextCheck = nodes[0];
+        FloatType nextDist = nextCheck.bounds.intersectOrInf(rr, iv);
+        bool keepGoing = true;
+        // Gross horrible horrific explicit stack hackery
+        // not safe for children
+        auto t = [&]() {
+            // If the current node has a bad distance,
+            // then it can *never* be the one we intersect with
+            // So basically, bail early
+            if(! r.betterDistance(nextDist)) {
+                keepGoing = false;
+                return;
+            }
+            // If it's a leaf node
+            if(nextCheck.isLeaf) {
+                checkLeaf(nextCheck, r);
+                return;
+            }
+            // Get left and right nodes
+            auto& ln = nodes[nextCheck.leftIndex()];
+            auto& rn = nodes[nextCheck.rightIndex()];
+            auto ld = ln.bounds.intersectOrInf(rr, iv);
+            auto rd = rn.bounds.intersectOrInf(rr, iv);
+            // left is closer, check it next
+            if(ld < rd) {
+                stack.push_back({rn, rd});
+                stack.push_back({ln, ld});
+            }
+            // Otherwise put right on the stack next
+            else {
+                stack.push_back({ln, ld});
+                stack.push_back({rn, rd});
+            }
+        };
+        do {
+            t();
+            if(stack.size() == 0) {
+                break;
+            }
+            // get our next element from the stack
+            auto r = stack[stack.size() - 1];
+            stack.pop_back();
+            nextCheck = r.first;
+            nextDist = r.second;
+        } while(keepGoing);
+    }
+    
+    void BonsaiTree::checkLeaf(const BonsaiTree::Node &n, RayResult &r) const {
+        for(auto i = n.begin; i < n.end; ++i) {
+            drawables[i]->intersects(r);
+        }
     }
     
     void BonsaiTree::expandBox() {
@@ -92,18 +285,32 @@ namespace NM {
         }
     }
     
-    void BonsaiTree::intersectRecursive(RayResult& r) const {
-        if(! boundingBox.intersect(r)) {
+    void BonsaiTree::intersectRecursive(RayResult& r, size_t nodeIdx, bool cr) const {
+        const Node& node = nodes.at(nodeIdx);
+        if(! node.bounds.intersect(r)) {
             return;
         }
-        if(greater) {
-            less->intersectRecursive(r);
-            greater->intersectRecursive(r);
+        if(node.isLeaf) {
+            checkLeaf(node, r);
             return;
         }
-        // has intersected
-        for(const auto& drawable: drawables) {
-           drawable->intersects(r);
+        const auto& li = node.leftIndex();
+        const auto& ri = node.rightIndex();
+        const auto& ln = nodes.at(li);
+        const auto& rn = nodes.at(ri);
+        const auto& rd = rn.bounds.intersectOrInf(r.originalRay, r.invDir);
+        const auto& ld = ln.bounds.intersectOrInf(r.originalRay, r.invDir);
+        if(ld < rd) {
+            if(ld > r.distance) return;
+            intersectRecursive(r, li, false);
+            if(! (r.distance < rd))
+                intersectRecursive(r, ri, false);
+        }
+        else {
+            if(rd > r.distance) return;
+            intersectRecursive(r, ri, false);
+            if(! (r.distance < ld))
+                intersectRecursive(r, li, false);
         }
     }
     

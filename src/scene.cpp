@@ -22,12 +22,20 @@ namespace NM {
     }
     
     void Scene::finalize() {
+        size_t i = 0;
         bonsai.reset();
         for(auto& sphere: spheres) {
             bonsai.add(&sphere);
+            ++i;
         }
         bonsai.expandBox();
         bonsai.partition(getConcurrency());
+        size_t t = 0, n = 0;
+        std::cout << "Stored " << t << " nodes in " << n << " leaves" << std::endl;
+        std::cout << "Avg. Objects per Leaf: " << static_cast<double>(t) / n << std::endl;
+        std::cout << "Total objects added is " << i;
+        std::cout << ", redundency of ";
+        std::cout << t / static_cast<double>(i) << std::endl;
     }
 
     RayIntersection Scene::traceIntersection(const Ray& in) const {

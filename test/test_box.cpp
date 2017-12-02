@@ -47,6 +47,16 @@ TEST_CASE("Box Collisions") {
     SECTION("With a ray on the point going away") {
         Ray ray{{-1, -1, -1}, {-1, 0, 0}};
         RayResult r(ray);
-        REQUIRE(box.intersect(r));
+        REQUIRE(box.intersect(r) == false);
     }
+}
+
+TEST_CASE("Box surface area in the positive") {
+    Box b{{0, 0, 0}, {1, 1, 1}};
+    REQUIRE(b.surfaceArea() == Approx(6.0));
+}
+
+TEST_CASE("Box surface area in the negative") {
+    Box b{{-1, -1, -1}, {0, 0, 0}};
+    REQUIRE(b.surfaceArea() == Approx(6.0));
 }
