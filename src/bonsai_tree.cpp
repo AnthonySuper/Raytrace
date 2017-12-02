@@ -93,12 +93,10 @@ namespace NM {
                 }
             }
             // Cool, now find the cost:
-            FloatType blbp = leftBox.surfaceArea() / parentArea;
-            FloatType costFL = (i * BonsaiTree::IntersectCost);
-            FloatType brbp = rightBox.surfaceArea() / parentArea;
-            FloatType costFR = (iv.size() - i) * BonsaiTree::IntersectCost;
+            FloatType blbp = (leftBox.surfaceArea() / parentArea) * i;
+            FloatType brbp = (rightBox.surfaceArea() / parentArea) * (iv.size() - i);
             FloatType cost = BonsaiTree::TraversalCost +
-            blbp*costFL + brbp*costFR;
+            BonsaiTree::IntersectCost * (blbp + brbp);
             if(cost < bestCost) {
                 bestSplit = i;
                 bestCost = cost;
@@ -287,7 +285,7 @@ namespace NM {
     
     void BonsaiTree::intersectRecursive(RayResult& r, size_t nodeIdx, bool cr) const {
         const Node& node = nodes.at(nodeIdx);
-        if(! node.bounds.intersect(r)) {
+        if(cr && ! node.bounds.intersect(r)) {
             return;
         }
         if(node.isLeaf) {
@@ -300,6 +298,7 @@ namespace NM {
         const auto& rn = nodes.at(ri);
         const auto& rd = rn.bounds.intersectOrInf(r.originalRay, r.invDir);
         const auto& ld = ln.bounds.intersectOrInf(r.originalRay, r.invDir);
+        if(ld > r.distance && rd > r.distance) return;
         if(ld < rd) {
             if(ld > r.distance) return;
             intersectRecursive(r, li, false);

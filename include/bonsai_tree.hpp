@@ -14,8 +14,8 @@ namespace NM {
         using T = Drawable*;
         using ItemVector = std::vector<T>;
         using ItemIdx = ItemVector::size_type;
-        static constexpr const FloatType IntersectCost =  1.0;
-        static constexpr const FloatType TraversalCost = 5.0;
+        static constexpr const FloatType IntersectCost =  1.5;
+        static constexpr const FloatType TraversalCost = 1.0;
         
     protected:
         struct Node {
