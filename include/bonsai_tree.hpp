@@ -6,6 +6,7 @@
 #include <thread>
 #include <vector>
 #include <sphere.hpp>
+#include <iomanip>
 
 namespace NM {
 
@@ -42,6 +43,9 @@ namespace NM {
         std::unique_ptr<BonsaiTree> greater;
         std::unique_ptr<BonsaiTree> less;
         BonsaiTree(const Box&);
+        mutable std::atomic<unsigned long> intersectsTested;
+        mutable std::atomic<unsigned long> intersectsSkipped;
+        
     public:
         constexpr static size_t threshold = 7;
         BonsaiTree();
@@ -59,18 +63,30 @@ namespace NM {
         inline std::vector<Drawable*>::size_type size() const {
             return drawables.size();
         }
+        
+        inline std::pair<unsigned int, unsigned int> getIntersects() const {
+            return {intersectsTested, intersectsSkipped};
+        }
+        
+        inline size_t drawableSize() const {
+            return drawables.size();
+        }
+        
+        std::string toString() const;
 
     private:
         void buildRecursive(ItemIdx start,
                             ItemIdx end,
                             size_t nodeIdx,
                             size_t depth);
-        
-        void constructChildren(Vec4::Axis partAxis,
-                               FloatType midPoint,
-                               size_t recursionLevel = 0);
         void intersectChildren(RayResult& r) const;
         
         void checkLeaf(const Node&, RayResult&) const;
+        
+        void toStringRecursive(std::ostream& ss, size_t nodeIdx, size_t depth) const;
+        
+        
     };
+    
+    std::ostream& operator<<(std::ostream&, const BonsaiTree&);
 }

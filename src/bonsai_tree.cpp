@@ -29,7 +29,8 @@ namespace NM {
     {}
     
     BonsaiTree::BonsaiTree(const BonsaiTree& bt) :
-    boundingBox(bt.boundingBox), drawables(bt.drawables) {
+    boundingBox(bt.boundingBox), drawables(bt.drawables), intersectsTested(0),
+    intersectsSkipped(0) {
         if(bt.greater) {
             greater = std::unique_ptr<BonsaiTree>(
                 new BonsaiTree(*bt.greater)
@@ -55,7 +56,9 @@ namespace NM {
         auto leaves = std::count_if(nodes.begin(), nodes.end(), [](const Node& n) {
             return n.isLeaf;
         });
-        std::cout << "tree has " << leaves << "leaves!" << std::endl;
+        std::cout << "tree has " << leaves << " leaves!" << std::endl;
+        intersectsSkipped = 0;
+        intersectsTested = 0;
     }
     
     void BonsaiTree::Node::generateBounds(const ItemVector& iv) {
@@ -161,6 +164,9 @@ namespace NM {
                                     ItemIdx end,
                                     size_t nodeIdx,
                                     size_t depth) {
+        if(nodeIdx >= nodes.size()) {
+            nodes.resize(nodeIdx + 1);
+        }
         auto &node = nodes.at(nodeIdx);
         node.nodeIndex = nodeIdx;
         node.begin = start;
@@ -171,7 +177,6 @@ namespace NM {
                 std::cout << "  ";
             }
         };
-        
         if((end - start) < 4) {
             printSpaces();
             std::cout << "Leaf is too small to split, ignoring... " << std::endl;
@@ -185,14 +190,12 @@ namespace NM {
         auto split = getBestPartition(drawables.begin() + start,
                                       drawables.begin() + end,
                                       node.bounds.surfaceArea());
-        if(split == -1 || (end - start) < 4) {
+        if(split == -1 || (end - start) < depth * 2 || (end - start) < 6) {
             printSpaces();
             std::cout << "Found a leaf at depth " << depth;
             std::cout << ", marking and returning...";
             std::cout << std::endl;
             node.isLeaf = true;
-            node.begin = start;
-            node.end = start;
             return;
         }
         split += start;
@@ -201,9 +204,6 @@ namespace NM {
         printSpaces();
         std::cout << "Should split (" << start << "," << end << ")";
         std::cout << " at split " << split << std::endl;
-        if(nodes.size() < ri) {
-            nodes.resize(ri + 1);
-        }
         printSpaces();
         std::cout << "Generating left... (in index " << li << ")" << std::endl;
         buildRecursive(start,
@@ -222,59 +222,55 @@ namespace NM {
     void BonsaiTree::intersectStack(NM::RayResult & r) const {
         const auto& rr = r.originalRay;
         const auto& iv = r.invDir;
-        using Tup = std::pair<Node, FloatType>;
+        auto distanceTo = [&](const Node* n) {
+            return n->bounds.intersectOrInf(rr, iv);
+        };
+        
+        using Tup = std::pair<const Node*, FloatType>;
         std::vector<Tup> stack;
-        Node nextCheck = nodes[0];
-        FloatType nextDist = nextCheck.bounds.intersectOrInf(rr, iv);
-        bool keepGoing = true;
-        // Gross horrible horrific explicit stack hackery
-        // not safe for children
-        auto t = [&]() {
-            // If the current node has a bad distance,
-            // then it can *never* be the one we intersect with
-            // So basically, bail early
-            if(! r.betterDistance(nextDist)) {
-                keepGoing = false;
+        stack.reserve(15);
+        const Node* node = &nodes[0];
+        FloatType dist = distanceTo(node);
+        auto loopBody = [&]() {
+            if(dist >= r.distance) {
+                intersectsSkipped.fetch_add(node->end - node->begin,
+                                            std::memory_order_relaxed);
                 return;
             }
-            // If it's a leaf node
-            if(nextCheck.isLeaf) {
-                checkLeaf(nextCheck, r);
+            if(node->isLeaf) {
+                checkLeaf(*node, r);
                 return;
             }
-            // Get left and right nodes
-            auto& ln = nodes[nextCheck.leftIndex()];
-            auto& rn = nodes[nextCheck.rightIndex()];
-            auto ld = ln.bounds.intersectOrInf(rr, iv);
-            auto rd = rn.bounds.intersectOrInf(rr, iv);
-            // left is closer, check it next
+            auto l = &nodes[node->leftIndex()];
+            auto r = &nodes[node->rightIndex()];
+            auto ld = distanceTo(l);
+            auto rd = distanceTo(r);
+            intersectsTested.fetch_add(2, std::memory_order_relaxed);
             if(ld < rd) {
-                stack.push_back({rn, rd});
-                stack.push_back({ln, ld});
+                stack.emplace_back(r, rd);
+                stack.emplace_back(l, ld);
             }
-            // Otherwise put right on the stack next
             else {
-                stack.push_back({ln, ld});
-                stack.push_back({rn, rd});
+                stack.emplace_back(l, ld);
+                stack.emplace_back(r, rd);
             }
         };
-        do {
-            t();
-            if(stack.size() == 0) {
-                break;
-            }
-            // get our next element from the stack
-            auto r = stack[stack.size() - 1];
+        while(true) {
+            loopBody();
+            if(stack.size() == 0) return;
+            auto p = stack[stack.size() - 1];
+            node = p.first;
+            dist = p.second;
             stack.pop_back();
-            nextCheck = r.first;
-            nextDist = r.second;
-        } while(keepGoing);
+        }
     }
     
     void BonsaiTree::checkLeaf(const BonsaiTree::Node &n, RayResult &r) const {
         for(auto i = n.begin; i < n.end; ++i) {
-            drawables[i]->intersects(r);
+            static_cast<Sphere*>(drawables[i])->intersects(r);
         }
+        intersectsTested.fetch_add(n.end - n.begin,
+                                   std::memory_order_relaxed);
     }
     
     void BonsaiTree::expandBox() {
@@ -284,8 +280,10 @@ namespace NM {
     }
     
     void BonsaiTree::intersectRecursive(RayResult& r, size_t nodeIdx, bool cr) const {
+        intersectsTested++;
         const Node& node = nodes.at(nodeIdx);
-        if(cr && ! node.bounds.intersect(r)) {
+        if(! node.bounds.intersect(r)) {
+            std::atomic_fetch_add(&intersectsSkipped, node.end - node.begin);
             return;
         }
         if(node.isLeaf) {
@@ -294,23 +292,9 @@ namespace NM {
         }
         const auto& li = node.leftIndex();
         const auto& ri = node.rightIndex();
-        const auto& ln = nodes.at(li);
-        const auto& rn = nodes.at(ri);
-        const auto& rd = rn.bounds.intersectOrInf(r.originalRay, r.invDir);
-        const auto& ld = ln.bounds.intersectOrInf(r.originalRay, r.invDir);
-        if(ld > r.distance && rd > r.distance) return;
-        if(ld < rd) {
-            if(ld > r.distance) return;
-            intersectRecursive(r, li, false);
-            if(! (r.distance < rd))
-                intersectRecursive(r, ri, false);
-        }
-        else {
-            if(rd > r.distance) return;
-            intersectRecursive(r, ri, false);
-            if(! (r.distance < ld))
-                intersectRecursive(r, li, false);
-        }
+        intersectRecursive(r, li, true);
+        intersectRecursive(r, ri, true);
+        
     }
     
     void BonsaiTree::reset() {
@@ -318,60 +302,6 @@ namespace NM {
         less = nullptr;
         boundingBox = {{0, 0, 0}, {0, 0, 0}};
         drawables.clear();
-    }
-    
-    void BonsaiTree::constructChildren(Vec4::Axis partAxis, 
-                                       FloatType midPoint,
-                                       size_t concurrency) {
-        auto leftMax = boundingBox.max;
-        leftMax[partAxis] = midPoint;
-        auto leftBox = Box{
-            boundingBox.min,
-            leftMax
-        };
-        auto rightMin = boundingBox.min;
-        rightMin[partAxis] = midPoint;
-        auto rightBox = Box{rightMin,
-            boundingBox.max
-        };
-        less = std::unique_ptr<BonsaiTree>(new BonsaiTree(leftBox));
-        greater = std::unique_ptr<BonsaiTree>(new BonsaiTree(rightBox));
-        for(auto& drawable: drawables) {
-            if(drawable->intersects(less->boundingBox)) {
-                less->add(drawable);
-            }
-            if(drawable->intersects(greater->boundingBox)) {
-                greater->add(drawable);
-            }
-        }
-        auto ratio = static_cast<FloatType>(less->size()) / greater->size();
-        if(ratio > 1.0) ratio = 1.0 / ratio;
-        if(ratio < 0.1 ||
-           size() - less->size() < 10 ||
-           size() - greater->size() < 10) {
-            // We have a bad cut, so just give up honestly.
-            less = nullptr;
-            greater = nullptr;
-            return;
-        }
-        else {
-            if(concurrency >= 2) {
-                double nn = concurrency / 2.0;
-                std::thread t1([&]() {
-           
-                    less->partition(std::ceil(nn));
-                });
-                std::thread t2([&]() {
-                    greater->partition(std::floor(nn));
-                });
-                t1.join();
-                t2.join();
-            }
-            else {
-                less->partition();
-                greater->partition();
-            }
-        }
     }
     
     void BonsaiTree::treeHealth(size_t &totalContained, size_t &totalLeaves) {
@@ -383,5 +313,51 @@ namespace NM {
             totalContained += size();
             totalLeaves++;
         }
+    }
+    
+    std::string BonsaiTree::toString() const {
+        std::stringstream ss;
+        toStringRecursive(ss, 0, 0);
+        return ss.str();
+    }
+    
+    void BonsaiTree::toStringRecursive(std::ostream &ss,
+                                       size_t nodeIdx,
+                                       size_t depth) const {
+        auto spaceOut = [&]() {
+            for(int i = 0; i < depth; ++i) {
+                ss << "    ";
+            }
+        };
+        auto& node = nodes[nodeIdx];
+        spaceOut();
+        if(node.isLeaf) {
+            ss << "{Leaf (" << node.begin << "," << node.end;
+            ss << "), " << node.end - node.begin << " total}";
+            ss << std::endl;
+        }
+        else {
+            ss << std::fixed;
+            ss << std::setprecision(5);
+            ss << "{Node (" << node.begin << "," << node.end << ")";
+            ss << ", " << node.end - node.begin << " total\n";
+            spaceOut();
+            auto ourSize = static_cast<FloatType>(node.end) - node.begin;
+            auto l = nodes[node.leftIndex()];
+            auto leftPercent = (l.end - l.begin) / ourSize;
+            ss << "    Left (" << leftPercent * 100 << "%):\n";
+            toStringRecursive(ss, node.leftIndex(), depth + 1);
+            spaceOut();
+            auto r = nodes[node.rightIndex()];
+            auto rightPercent = (r.end - r.begin) / ourSize;
+            ss << "    Right (" << rightPercent*100 << "%):\n";
+            toStringRecursive(ss, node.rightIndex(), depth + 1);
+            spaceOut();
+            ss << "}\n";
+        }
+    }
+    
+    std::ostream& operator<<(std::ostream& os , const BonsaiTree& t) {
+        return os << t.toString();
     }
 }

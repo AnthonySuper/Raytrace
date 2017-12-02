@@ -31,11 +31,8 @@ namespace NM {
         bonsai.expandBox();
         bonsai.partition(getConcurrency());
         size_t t = 0, n = 0;
-        std::cout << "Stored " << t << " nodes in " << n << " leaves" << std::endl;
-        std::cout << "Avg. Objects per Leaf: " << static_cast<double>(t) / n << std::endl;
-        std::cout << "Total objects added is " << i;
-        std::cout << ", redundency of ";
-        std::cout << t / static_cast<double>(i) << std::endl;
+        std::cout << bonsai << std::endl;
+        
     }
 
     RayIntersection Scene::traceIntersection(const Ray& in) const {
@@ -50,7 +47,7 @@ namespace NM {
     }
     
     void Scene::intersect(RayResult &r) const {
-        bonsai.intersectRecursive(r);
+        bonsai.intersectStack(r);
     }
 
     void Scene::colorize(const RayResult &ri,
@@ -146,6 +143,15 @@ namespace NM {
             t.join();
         }
         progressBar.join();
+        std::cout << std::endl;
+        auto t = bonsai.getIntersects();
+        std::cout << "We performed " << t.first << " intersections " << std::endl;
+        std::cout << "Thanks to our BVH, we skipped " << t.second << " intersections. ";
+        auto f = 1.0 + t.first + t.second;
+        std::cout << std::endl;
+        std::cout << ((t.first) / f)*100 << "% of possible tests tested";
+        std::cout << std::endl;
+        std::cout << ((t.second) / f)*100 << "% of possible tests skipped";
         std::cout << std::endl;
     }
 
