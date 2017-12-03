@@ -208,4 +208,51 @@ namespace NM {
         return norm.toUnit();
     }
     
+    RayIntersection Model::Face::checkIntersection(const Ray& ray) const {
+        auto r = tri.checkIntersection(ray);
+        if(! r) return r;
+        r.assignNormal(calcNormal(r));
+        r.material = material.get();
+        return r;
+    }
+
+    Vec4 Model::Face::midpoint() const {
+        return (1.0 / 3.0) * (tri.a + tri.b + tri.c);
+    }
+
+    void Model::Face::expandToFit(Box& b) const {
+        b.expandToFit(tri);
+    }
+
+    bool Model::Face::intersects(RayResult &r) const {
+        auto res = checkIntersection(r.originalRay);
+        if(! res) return false;
+        return r.swapDistance(
+            res.getDistance(),
+            res.surfaceNormal(),
+            res.material
+        );
+    }
+
+    Model::Face::~Face() {}
+
+    Model::Face::Face(const Triangle& coords, const Triangle& norms) :
+            tri{coords},
+            normals{norms},
+            material{std::make_shared<Material>()} {}
+
+    Model::Face::Face(const Triangle& coords) :
+            tri{coords},
+            normals{{},{},{}},
+            material{std::make_shared<Material>()} {}
+
+    Model::Face::Face() :
+            tri{{}, {}, {}},
+            normals{{}, {}, {}},
+            material{std::make_shared<Material>()} {}
+
+    Model::Face::Face(const Triangle& coords, const Triangle& norms,
+                        const std::shared_ptr<Material> material) :
+            tri{coords}, normals{norms}, material{material} {}
+            
 }

@@ -1,4 +1,4 @@
-CXX := g++
+CXX := clang++
 OBJDIR := ./obj
 SRCDIR := ./src
 TESTDIR := ./test

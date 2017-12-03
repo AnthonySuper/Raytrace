@@ -65,28 +65,25 @@ namespace NM {
         
         friend struct WavefrontParser;
         
-        struct Face {
+        struct Face : public Drawable {
             Triangle tri;
             Triangle normals;
-            Face() :
-            tri{{}, {}, {}},
-            normals{{}, {}, {}},
-            material{std::make_shared<Material>()} {}
+            Face();
             
-            inline Face(const Triangle& coords) :
-            tri{coords},
-            normals{{},{},{}},
-            material{std::make_shared<Material>()} {}
+            Face(const Triangle& coords);
             
-            inline Face(const Triangle& coords, const Triangle& norms) :
-            tri{coords},
-            normals{norms},
-            material{std::make_shared<Material>()} {}
+            Face(const Triangle& coords, const Triangle& norms);
+
+            virtual size_t complexity() const override final;
+            virtual Vec4 midpoint() const override final;
+            virtual RayIntersection checkIntersection(const Ray&) const override final;
+            virtual void expandToFit(Box&) const override final;
+            virtual bool intersects(RayResult& r) const override final;
+            virtual ~Face();
             
-            inline Face(const Triangle& coords, const Triangle& norms,
-                        const std::shared_ptr<Material> material) :
-            tri{coords}, normals{norms}, material{material} {}
-            
+            Face(const Triangle& coords, 
+                 const Triangle& norms,
+                 const std::shared_ptr<Material> material);
             Vec4 calcNormal(const RayIntersection& ray) const;
             std::shared_ptr<Material> material;
         };

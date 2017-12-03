@@ -25,16 +25,6 @@ namespace NM {
     Vec4 Sphere::midpoint() const {
         return position;
     }
-
-    bool Sphere::intersects(const Box& b) const {
-        Vec4 clamped;
-        for(int i = 0; i < 3; ++i) {
-            clamped[i] = std::max(b.min[i],
-                    std::min(position[i], b.max[i]));
-        }
-        auto toCenter = clamped - position;
-        return toCenter.magnitude() < radius;
-    }
     
     bool Sphere::intersects(RayResult& r) const {
         return intersectsInline(r);
