@@ -202,9 +202,11 @@ namespace NM {
                                       node.bounds.surfaceArea());
         if(split == -1) {
             printSpaces();
+            /*
             std::cout << "Found a leaf at depth " << depth;
             std::cout << ", marking and returning...";
             std::cout << std::endl;
+             */g
             node.isLeaf = true;
             return;
         }
