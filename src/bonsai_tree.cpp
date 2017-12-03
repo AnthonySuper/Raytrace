@@ -201,8 +201,9 @@ namespace NM {
                                       drawables.begin() + end,
                                       node.bounds.surfaceArea());
         if(split == -1) {
-            printSpaces();
             /*
+            printSpaces();
+            
             std::cout << "Found a leaf at depth " << depth;
             std::cout << ", marking and returning...";
             std::cout << std::endl;
