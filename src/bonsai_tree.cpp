@@ -206,7 +206,7 @@ namespace NM {
             std::cout << "Found a leaf at depth " << depth;
             std::cout << ", marking and returning...";
             std::cout << std::endl;
-             */g
+             */
             node.isLeaf = true;
             return;
         }
