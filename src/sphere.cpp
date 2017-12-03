@@ -37,22 +37,7 @@ namespace NM {
     }
     
     bool Sphere::intersects(RayResult& r) const {
-        const auto& ray = r.originalRay;
-        auto cVec = (position - ray.position);
-        auto vMag = cVec.dot(ray.direction);
-        if(vMag < 0) return false; // intersects *behind* ray!
-        auto vMagSquared = vMag * vMag;
-        auto cMag = cVec.magnitude();
-        cMag *= cMag; // And also this
-        auto result = (radiusSquared - (cMag - vMagSquared));
-        if(result < 0) return false;
-        auto dist = vMag - sqrt(result);
-        if(! r.betterDistance(dist)) return false;
-        auto q = ray.position + (vMag - sqrt(result))*ray.direction;
-        auto norm = (q - position).toUnit();
-        return r.swapDistance(dist,
-                              norm,
-                              material.get());
+        return intersectsInline(r);
     }
     
     void Sphere::expandToFit(NM::Box &b) const {

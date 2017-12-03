@@ -2,6 +2,7 @@
 #include <globals.hpp>
 #include <ray.hpp>
 #include <material.hpp>
+#include <limits>
 
 namespace NM {
     class RayResult {
@@ -36,8 +37,7 @@ namespace NM {
         bool swapDistance(double newDist, const Vec4& sn, const Material* mtlPtr);
         
         inline bool betterDistance(double newDist) const {
-            return (newDist > 0 &&
-                                    newDist < distance);
+            return (newDist > 0 && newDist < distance);
         }
         
         inline Vec4 point() const {

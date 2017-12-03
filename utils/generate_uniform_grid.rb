@@ -1,5 +1,5 @@
 require 'set'
-POS_MAX = 100
+POS_MAX = 500
 O3_BASE = %Q{
 eye #{3.times.map{POS_MAX + 10}.join(" ")}
 look 0 0 0

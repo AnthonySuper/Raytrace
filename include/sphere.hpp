@@ -23,6 +23,23 @@ namespace NM {
         virtual RayIntersection checkIntersection(const Ray&) const override final;
         virtual size_t complexity() const override final;
         virtual Vec4 midpoint() const override final;
+        inline bool intersectsInline(RayResult &r) const {
+            const auto& ray = r.originalRay;
+            auto cVec = (position - ray.position);
+            auto vMag = cVec.dot(ray.direction);
+            if(vMag < 0) return false; // intersects *behind* ray!
+            auto vMagSquared = vMag * vMag;
+            auto cMag = cVec.dot(cVec);
+            auto result = (radiusSquared - (cMag - vMagSquared));
+            if(result < 0) return false;
+            auto dist = vMag - sqrt(result);
+            if(! r.betterDistance(dist)) return false;
+            auto q = ray.position + (vMag - sqrt(result))*ray.direction;
+            auto norm = (q - position).toUnit();
+            return r.swapDistance(dist,
+                                norm,
+                                material.get());
+        }
         virtual bool intersects(const Box& b) const override final;
         virtual bool intersects(RayResult&) const override final;
         virtual void expandToFit(Box& b) const override final;

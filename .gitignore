@@ -1,4 +1,7 @@
 build/
+Raytrace.kdev4
+.kdev4/
+kbuild/
 cbuild/
 docs/
 obj/

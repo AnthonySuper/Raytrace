@@ -6,7 +6,7 @@
 
 
 namespace NM {
-	using FloatType = double;
+	using FloatType = double_t;
     
     struct Constants {
         constexpr static FloatType epsilon = 0.00000001;

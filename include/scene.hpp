@@ -37,6 +37,12 @@ namespace NM {
         std::vector<Light> lights;
         friend std::ostream& operator<<(std::ostream&, const Scene&);
         size_t getConcurrency() const;
+        inline FloatType raySavings() const {
+            auto p = bonsai.getIntersects();
+            return (
+                static_cast<FloatType>(p.first) / p.second
+            ) * 100;
+        }
         BonsaiTree bonsai;
     };
     

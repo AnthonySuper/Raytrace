@@ -1,4 +1,5 @@
 #include <bonsai_tree.hpp>
+#include <cassert>
 
 namespace NM {
 
@@ -62,7 +63,7 @@ namespace NM {
     }
     
     void BonsaiTree::Node::generateBounds(const ItemVector& iv) {
-        bounds = {{}, {}};
+        bounds = Box{};
         for(auto i = begin; i < end; ++i) {
             iv[i]->expandToFit(bounds);
         }
@@ -76,6 +77,8 @@ namespace NM {
     PartitionPair partitionOnAxis(BonsaiTree::ItemVector &iv,
                                   Vec4::Axis av,
                                   FloatType parentArea) {
+
+        constexpr static auto boxes_to_try = 10;
         int readAxis = static_cast<int>(av);
         sortDrawablesOnAxis(iv, av);
         // Set our bestCost to something really high initially
@@ -83,8 +86,10 @@ namespace NM {
         if(readAxis == 2) {
             auto& last = iv[iv.size() - 1];
         }
+        auto stride = iv.size() / boxes_to_try;
+        if(stride == 0) return {-1, -1};
         size_t bestSplit = 0;
-        for(int i = 1; i < iv.size() - 1; ++i) {
+        for(int i = stride + 1; i < iv.size() - 1; i += stride) {
             Box leftBox;
             Box rightBox;
             for(int j = 0; j < iv.size(); ++j) {
@@ -172,25 +177,30 @@ namespace NM {
         node.begin = start;
         node.end = end;
         node.generateBounds(drawables);
+        auto sa = node.bounds.surfaceArea();
         auto printSpaces = [=]() {
             for(int i = 0; i < depth; ++i) {
                 std::cout << "  ";
             }
         };
-        if((end - start) < 4) {
+        if((end - start) < 6) {
+            /*
             printSpaces();
             std::cout << "Leaf is too small to split, ignoring... " << std::endl;
+            */
             node.isLeaf = true;
             return;
         }
+        /*
         printSpaces();
         std::cout << "Splitting inside " << start << "," << end;
         std::cout << " at depth " << depth << " and node " << node.nodeIndex;
         std::cout << std::endl;
+        */
         auto split = getBestPartition(drawables.begin() + start,
                                       drawables.begin() + end,
                                       node.bounds.surfaceArea());
-        if(split == -1 || (end - start) < depth * 2 || (end - start) < 6) {
+        if(split == -1) {
             printSpaces();
             std::cout << "Found a leaf at depth " << depth;
             std::cout << ", marking and returning...";
@@ -201,67 +211,113 @@ namespace NM {
         split += start;
         auto ri = node.rightIndex();
         auto li = node.leftIndex();
+        /*
         printSpaces();
         std::cout << "Should split (" << start << "," << end << ")";
         std::cout << " at split " << split << std::endl;
         printSpaces();
         std::cout << "Generating left... (in index " << li << ")" << std::endl;
+        */
         buildRecursive(start,
                        split,
                        li,
                        depth + 1);
-
+        assert((
+            sa != nodes[li].bounds.surfaceArea()
+        ));
+        /*
         printSpaces();
         std::cout << "Generating right... (in index " << ri << ")" << std::endl;
+        */
         buildRecursive(split,
                        end,
                        ri,
                        depth + 1);
+        assert((
+            sa != nodes[ri].bounds.surfaceArea() * 1.1
+        ));
     }
     
     void BonsaiTree::intersectStack(NM::RayResult & r) const {
-        const auto& rr = r.originalRay;
-        const auto& iv = r.invDir;
-        auto distanceTo = [&](const Node* n) {
-            return n->bounds.intersectOrInf(rr, iv);
-        };
-        
-        using Tup = std::pair<const Node*, FloatType>;
-        std::vector<Tup> stack;
-        stack.reserve(15);
-        const Node* node = &nodes[0];
-        FloatType dist = distanceTo(node);
-        auto loopBody = [&]() {
-            if(dist >= r.distance) {
-                intersectsSkipped.fetch_add(node->end - node->begin,
-                                            std::memory_order_relaxed);
-                return;
-            }
-            if(node->isLeaf) {
-                checkLeaf(*node, r);
-                return;
-            }
-            auto l = &nodes[node->leftIndex()];
-            auto r = &nodes[node->rightIndex()];
-            auto ld = distanceTo(l);
-            auto rd = distanceTo(r);
-            intersectsTested.fetch_add(2, std::memory_order_relaxed);
-            if(ld < rd) {
-                stack.emplace_back(r, rd);
-                stack.emplace_back(l, ld);
+        constexpr FloatType FLOATMAX = std::numeric_limits<FloatType>::max();
+        treelessIntersects.fetch_add(drawableSize(),
+                                     std::memory_order_relaxed);
+        const auto rr = r.originalRay;
+        const auto iv = r.invDir;
+        auto distanceTo = [=](const Node* n) -> FloatType {
+            auto t = n->bounds.intersectDist(rr, iv);
+            if(t.first < 0) {
+                if(t.second < 0) return -1.0;
+                else return 0.0;
             }
             else {
-                stack.emplace_back(l, ld);
-                stack.emplace_back(r, rd);
+                return t.first;
             }
         };
-        while(true) {
-            loopBody();
-            if(stack.size() == 0) return;
-            auto p = stack[stack.size() - 1];
-            node = p.first;
-            dist = p.second;
-            stack.pop_back();
+        constexpr size_t STACK_SIZE = 70;
+        struct Tup {
+            const Node* first;
+            FloatType second;
+        };
+        using Stack = std::array<Tup, STACK_SIZE>;
+        Stack stack;
+        size_t stackPtr = 0;
+        auto push = [&](const Node *n, FloatType t) {
+            if(stackPtr + 1 >= STACK_SIZE) {
+                throw std::runtime_error("Stack overflow");
+            }
+            stack[stackPtr].first = n;
+            stack[stackPtr].second = t;
+            stackPtr++;
+        };
+        auto pop = [&]() {
+            if(stackPtr == 0) {
+                throw std::runtime_error("Stack Underflow!");
+            }
+            auto tmp = stack[stackPtr - 1];
+            stackPtr--;
+            return tmp;
+        };
+        auto empty = [&]() {
+            return stackPtr == 0;
+        };
+        size_t itested = 0;
+        auto d = distanceTo(&nodes[0]);
+        push(&nodes[0], d);
+        while(! empty()) {
+            auto t = pop();
+            FloatType dist = t.second;
+            const Node* n = t.first;
+            if(dist >= r.distance) {
+                continue;
+            }
+            if(n->isLeaf) {
+                for(auto i = n->begin; i < n->end; ++i) {
+                    drawables[i]->intersects(r);
+                    
+                }
+                continue;
+            }
+            auto ln = &nodes[n->leftIndex()];
+            auto rn = &nodes[n->rightIndex()];
+            auto ld = distanceTo(ln);
+            auto rd = distanceTo(rn);
+            if(ld >= 0 && rd >= 0) {
+                if(ld < rd) {
+                    push(rn, rd);
+                    push(ln, ld);
+                }
+                else {
+                    push(ln, ld);
+                    push(rn, rd);
+                }
+            }
+            else if(ld >= 0) {
+                push(ln, ld);
+            }
+            else if(rd >= 0) {
+                push(rn, rd);
+            }
         }
     }
     
@@ -340,17 +396,17 @@ namespace NM {
             ss << std::fixed;
             ss << std::setprecision(5);
             ss << "{Node (" << node.begin << "," << node.end << ")";
-            ss << ", " << node.end - node.begin << " total\n";
+            ss << ", " << node.end - node.begin << " total, SA " << node.bounds.surfaceArea() << "\n";
             spaceOut();
             auto ourSize = static_cast<FloatType>(node.end) - node.begin;
             auto l = nodes[node.leftIndex()];
-            auto leftPercent = (l.end - l.begin) / ourSize;
-            ss << "    Left (" << leftPercent * 100 << "%):\n";
+            auto leftPercent = (l.bounds.surfaceArea() / node.bounds.surfaceArea())*100;
+            ss << "    Left (" << leftPercent << "%SA):\n";
             toStringRecursive(ss, node.leftIndex(), depth + 1);
             spaceOut();
             auto r = nodes[node.rightIndex()];
-            auto rightPercent = (r.end - r.begin) / ourSize;
-            ss << "    Right (" << rightPercent*100 << "%):\n";
+            auto rightPercent = (r.bounds.surfaceArea() / node.bounds.surfaceArea())*100;
+            ss << "    Right (" << rightPercent << "% SA):\n";
             toStringRecursive(ss, node.rightIndex(), depth + 1);
             spaceOut();
             ss << "}\n";

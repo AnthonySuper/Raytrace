@@ -54,7 +54,6 @@ namespace NM {
             Vec4& accum,
             const Vec4& refAt,
             unsigned int depth) const {
-        
         if(! ri) return;
         Vec4 toC = (ri.originalRay.position - ri.point()).toUnit();
         Vec4 normal = ri.surfaceNormal;
@@ -72,6 +71,7 @@ namespace NM {
                 toLightUnit
             };
             RayResult res{lightRay};
+            res.distance = toLight.magnitude();
             intersect(res);
             // This light did nothing due to a shadow, rip in peace
             if(res && res.distance < toLight.magnitude()) continue;
@@ -133,8 +133,10 @@ namespace NM {
                 size_t ourIdx = idx;
                 if(ourIdx > raysSize) return;
                 outputProgress("Tracing progress", ourIdx, raysSize);
+                std::cout << "\t Savings: " << raySavings();
+                std::cout.flush();
                 std::this_thread::sleep_for(
-                        std::chrono::nanoseconds(250)
+                        std::chrono::milliseconds(250)
                         );
 
                 }
@@ -146,12 +148,10 @@ namespace NM {
         std::cout << std::endl;
         auto t = bonsai.getIntersects();
         std::cout << "We performed " << t.first << " intersections " << std::endl;
-        std::cout << "Thanks to our BVH, we skipped " << t.second << " intersections. ";
-        auto f = 1.0 + t.first + t.second;
+        std::cout << "Without our BVH, we needed " << t.second << " intersections. ";
+        auto f = static_cast<FloatType>(t.second);
         std::cout << std::endl;
-        std::cout << ((t.first) / f)*100 << "% of possible tests tested";
-        std::cout << std::endl;
-        std::cout << ((t.second) / f)*100 << "% of possible tests skipped";
+        std::cout << ((t.first) / f)*100 << "% intersections actually performed";
         std::cout << std::endl;
     }
 

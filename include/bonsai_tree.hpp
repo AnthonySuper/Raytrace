@@ -7,6 +7,8 @@
 #include <vector>
 #include <sphere.hpp>
 #include <iomanip>
+#include <atomic>
+#include <memory>
 
 namespace NM {
 
@@ -15,7 +17,7 @@ namespace NM {
         using T = Drawable*;
         using ItemVector = std::vector<T>;
         using ItemIdx = ItemVector::size_type;
-        static constexpr const FloatType IntersectCost =  1.5;
+        static constexpr const FloatType IntersectCost =  5.0;
         static constexpr const FloatType TraversalCost = 1.0;
         
     protected:
@@ -45,6 +47,7 @@ namespace NM {
         BonsaiTree(const Box&);
         mutable std::atomic<unsigned long> intersectsTested;
         mutable std::atomic<unsigned long> intersectsSkipped;
+        mutable std::atomic<unsigned long> treelessIntersects;
         
     public:
         constexpr static size_t threshold = 7;
@@ -65,7 +68,7 @@ namespace NM {
         }
         
         inline std::pair<unsigned int, unsigned int> getIntersects() const {
-            return {intersectsTested, intersectsSkipped};
+            return {intersectsTested, treelessIntersects};
         }
         
         inline size_t drawableSize() const {

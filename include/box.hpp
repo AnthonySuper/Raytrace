@@ -41,6 +41,11 @@ namespace NM {
             return (rr.distance < 0 && tmax > 0) ||
                 (tmin < rr.distance && tmax > 0);
         }
+
+        inline FloatType intersectMinDist(const Ray& r, const Vec4& invDir) const {
+            auto t = intersectDist(r, invDir);
+            return t.first > 0 ? t.first : t.second;
+        }
         
         inline FloatType intersectOrInf(const Ray& r, const Vec4& invDir) const {
             auto t = intersectDist(r, invDir);
