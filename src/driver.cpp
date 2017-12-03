@@ -49,7 +49,7 @@ namespace NM {
                 lineStream >> fname;
                 auto transform = dt.toMatrix();
                 auto model = driver.readModelFile(fname);
-                driver.models.emplace_back(model, transform);
+                driver.models.emplace_back(transform, model);
             }
             else if(header == "eye") {
                 readVec(lineStream, driver.eye);
@@ -136,7 +136,7 @@ namespace NM {
         os << "[";
         int i = 0;
         for(const auto &model: driver.models) {
-            os << model;
+            os << model.transform;
             i++;
             if(i != driver.models.size()) {
                 os << ", ";
@@ -144,7 +144,6 @@ namespace NM {
         }
         return os << "}";
     }
-    
  
     std::ostream& operator<<(std::ostream& os, const Driver::DriverModel & dr) {
         return os << "{" << dr.model <<
@@ -180,7 +179,10 @@ namespace NM {
     Scene Driver::getScene() const {
         Scene s;
         for(auto& m : models) {
-            s.addObject(m);
+            for(auto f : m.model->faces) {
+                s.faces.emplace_back(m.transform,
+                                     f);
+            }
         }
         for(auto& sp: spheres) {
             s.addObject(sp);

@@ -13,10 +13,7 @@ namespace NM {
     public:
         constexpr static bool concurrent = true;
         constexpr static bool shouldLog = true;
-        
         Vec4 ambient;
-        void addObject(const TransformedDrawable&);
-        void addObject(TransformedDrawable&&);
         void addObject(const Sphere &);
         void addObject(const Light &);
         RayIntersection traceIntersection(const Ray& in) const;
@@ -31,8 +28,8 @@ namespace NM {
          */
         void finalize();
         unsigned int recursionDepth;
+        std::vector<Face> faces;
     private:
-        std::vector<TransformedDrawable> drawables;
         std::vector<Sphere> spheres;
         std::vector<Light> lights;
         friend std::ostream& operator<<(std::ostream&, const Scene&);

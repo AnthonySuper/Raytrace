@@ -18,7 +18,8 @@ set(PROJECT_DRAWABLE_SRCS
     src/transformed_drawable.cpp
     src/sphere.cpp
     src/model.cpp
-    src/triangle.cpp)
+    src/triangle.cpp
+    src/face.cpp)
 
 set(PROJECT_UTIL_SRCS
     src/errors.cpp
@@ -56,7 +57,8 @@ SET(PROJECT_DRAWABLE_INCLUDES
     include/model.hpp
     include/transformed_drawable.hpp
     include/sphere.hpp
-    include/triangle.hpp)
+    include/triangle.hpp
+    include/face.hpp)
 
 set(PROJECT_UTIL_INCLUDES
     include/globals.hpp

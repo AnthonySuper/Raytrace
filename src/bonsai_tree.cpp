@@ -222,9 +222,11 @@ namespace NM {
                        split,
                        li,
                        depth + 1);
+        /*
         assert((
             sa != nodes[li].bounds.surfaceArea()
         ));
+         */
         /*
         printSpaces();
         std::cout << "Generating right... (in index " << ri << ")" << std::endl;
@@ -233,9 +235,11 @@ namespace NM {
                        end,
                        ri,
                        depth + 1);
+        /*
         assert((
             sa != nodes[ri].bounds.surfaceArea() * 1.1
         ));
+         */
     }
     
     void BonsaiTree::intersectStack(NM::RayResult & r) const {

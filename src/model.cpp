@@ -174,85 +174,15 @@ namespace NM {
     RayIntersection Model::checkIntersection(const NM::Ray & r) const {
         Material useMaterial;
         RayIntersection toRet;
-        ssize_t intersectedIdx = -1;
-        for(size_t i = 0; i < faces.size(); ++i) {
-            auto& face = faces[i];
-            const auto& tr = face.tri;
-            const auto res = tr.checkIntersection(r);
-            if(toRet.compareExchange(res)) {
-                intersectedIdx = i;
-            }
-        }
-        if(! toRet) return toRet;
-        auto& intersectedFace = faces.at(intersectedIdx);
-        toRet.material = intersectedFace.material.get();
-        toRet.assignNormal(intersectedFace.calcNormal(toRet));
         return toRet;
     }
     
     void Model::expandToFit(NM::Box &b) const {
-        for(auto& face: faces) {
-            b.expandToFit(face.tri);
-        }
+        
     }
     
     size_t Model::complexity() const {
         return faces.size();
     }
-    
-    Vec4 Model::Face::calcNormal(const NM::RayIntersection &ri) const {
-        auto bc = tri.toBarycentric(ri.point());
-        auto norm = normals.a * bc[2] +
-            normals.b * bc[0] +
-            normals.c * bc[1];
-        return norm.toUnit();
-    }
-    
-    RayIntersection Model::Face::checkIntersection(const Ray& ray) const {
-        auto r = tri.checkIntersection(ray);
-        if(! r) return r;
-        r.assignNormal(calcNormal(r));
-        r.material = material.get();
-        return r;
-    }
-
-    Vec4 Model::Face::midpoint() const {
-        return (1.0 / 3.0) * (tri.a + tri.b + tri.c);
-    }
-
-    void Model::Face::expandToFit(Box& b) const {
-        b.expandToFit(tri);
-    }
-
-    bool Model::Face::intersects(RayResult &r) const {
-        auto res = checkIntersection(r.originalRay);
-        if(! res) return false;
-        return r.swapDistance(
-            res.getDistance(),
-            res.surfaceNormal(),
-            res.material
-        );
-    }
-
-    Model::Face::~Face() {}
-
-    Model::Face::Face(const Triangle& coords, const Triangle& norms) :
-            tri{coords},
-            normals{norms},
-            material{std::make_shared<Material>()} {}
-
-    Model::Face::Face(const Triangle& coords) :
-            tri{coords},
-            normals{{},{},{}},
-            material{std::make_shared<Material>()} {}
-
-    Model::Face::Face() :
-            tri{{}, {}, {}},
-            normals{{}, {}, {}},
-            material{std::make_shared<Material>()} {}
-
-    Model::Face::Face(const Triangle& coords, const Triangle& norms,
-                        const std::shared_ptr<Material> material) :
-            tri{coords}, normals{norms}, material{material} {}
             
 }

@@ -68,6 +68,18 @@ namespace NM {
         Scene getScene() const;
         
         unsigned int recursionLevel = 0;
+        
+        struct ModelTransform {
+            Mat4 transform;
+            std::shared_ptr<Model> model;
+            inline ModelTransform(const Mat4 &m,
+                                  const std::shared_ptr<Model> mo) :
+            transform(m), model(mo) {}
+            
+            inline ModelTransform() :
+            transform{}, model{nullptr} {}
+        };
+        
     private:
         Vec4 eye;
         Vec4 look;
@@ -79,7 +91,7 @@ namespace NM {
         friend std::istream& operator>>(std::istream&, Driver& driver);
         friend std::ostream& operator<<(std::ostream& os, const Driver& driver);
         std::unordered_map<std::string, std::shared_ptr<Model>> modelDict;
-        std::vector<TransformedDrawable> models;
+        std::vector<ModelTransform> models;
         std::vector<Sphere> spheres;
         std::vector<Light> lights;
         Vec4 ambient;

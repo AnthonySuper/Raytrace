@@ -7,6 +7,7 @@
 #include <triangle.hpp>
 #include <drawable.hpp>
 #include <wavefront_material_parser.hpp>
+#include <face.hpp>
 #include <vector>
 #include <istream>
 #include <string>
@@ -65,29 +66,6 @@ namespace NM {
         
         friend struct WavefrontParser;
         
-        struct Face : public Drawable {
-            Triangle tri;
-            Triangle normals;
-            Face();
-            
-            Face(const Triangle& coords);
-            
-            Face(const Triangle& coords, const Triangle& norms);
-
-            virtual size_t complexity() const override final;
-            virtual Vec4 midpoint() const override final;
-            virtual RayIntersection checkIntersection(const Ray&) const override final;
-            virtual void expandToFit(Box&) const override final;
-            virtual bool intersects(RayResult& r) const override final;
-            virtual ~Face();
-            
-            Face(const Triangle& coords, 
-                 const Triangle& norms,
-                 const std::shared_ptr<Material> material);
-            Vec4 calcNormal(const RayIntersection& ray) const;
-            std::shared_ptr<Material> material;
-        };
-        
         Model(const Model&) = default;
         Model(Model&&) = default;
         Model() = default;
@@ -97,9 +75,9 @@ namespace NM {
         virtual size_t complexity() const override final;
         virtual ~Model() override = default;
         virtual void expandToFit(Box& b) const override final;
+        std::vector<Face> faces;
         
     private:
-        std::vector<Face> faces;
         MaterialLibrary materials;
         friend std::ostream& operator<<(std::ostream&, const Model&);
         

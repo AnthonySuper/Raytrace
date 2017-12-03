@@ -5,13 +5,6 @@
 
 
 namespace NM {
-    void Scene::addObject(const NM::TransformedDrawable & tm) {
-        drawables.emplace_back(tm);
-    }
-
-    void Scene::addObject(TransformedDrawable && tm) {
-        drawables.emplace_back(std::forward<TransformedDrawable>(tm));
-    }
 
     void Scene::addObject(const NM::Sphere & s) {
         spheres.emplace_back(s);
@@ -26,23 +19,16 @@ namespace NM {
         bonsai.reset();
         for(auto& sphere: spheres) {
             bonsai.add(&sphere);
-            ++i;
+        }
+        for(auto& f: faces) {
+            bonsai.add(&f);
         }
         bonsai.expandBox();
         bonsai.partition(getConcurrency());
-        size_t t = 0, n = 0;
-        std::cout << bonsai << std::endl;
-        
     }
 
     RayIntersection Scene::traceIntersection(const Ray& in) const {
         RayIntersection toRet;
-        for(const auto &s: drawables) {
-            toRet.compareExchange(s.checkIntersection(in));
-        }
-        for(const auto &s: spheres) {
-            toRet.compareExchange(s.checkIntersection(in));
-        }
         return toRet;
     }
     
@@ -170,9 +156,6 @@ namespace NM {
             os << "\t\t" << l << endl;
         }
         os << "\t Drawables:" << endl;
-        for(auto& d: s.drawables) {
-            os << "\t\t" << d << endl;
-        }
         os << "\t Spheres:" << endl;
         for(auto& sp : s.spheres) {
             os << "\t\t" << sp << endl;
