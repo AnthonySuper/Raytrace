@@ -100,7 +100,7 @@ namespace NM {
         for(int i = 0; i < conc; ++i) {
             workThreads.emplace_back([&]() {
                     while(true) {
-                    size_t ourIdx = idx++;
+                        size_t ourIdx = idx++;
                     if(ourIdx >= raysSize) return;
                     auto ourRay = rays[ourIdx];
                     RayResult ourResult{ourRay};
