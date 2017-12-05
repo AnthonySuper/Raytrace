@@ -1,5 +1,20 @@
 #include <image.hpp>
 #include <iostream>
+#include <errors.hpp>
+#define cimg_display 0
+#define cimg_use_png 1
+#include <CImg.h>
+#include <regex>
+
+static std::string getExt(std::string in) {
+    std::regex pattern("\\.(.+)",
+            std::regex_constants::extended);
+    std::smatch m;
+    if(! std::regex_search(in, m, pattern)) {
+        throw NM::InvalidFilenameError(in);
+    }
+    return m[m.size() - 1].str();
+}
 
 namespace NM {
     Image::Image(size_t height, size_t width) :
@@ -41,5 +56,30 @@ namespace NM {
             }
         }
         os.flush();
+    }
+
+    std::unique_ptr<cimg_library::CImg<>> Image::getCImg() {
+        std::unique_ptr<cimg_library::CImg<>> cimg(
+                new cimg_library::CImg<>(width, height, 1, 4)
+        );
+        for(size_t i = 0; i < width; ++i) {
+            for(size_t j = 0; j < height; ++j) {
+                for(size_t c = 0; c < 3; ++c) {
+                    (*cimg)(j, i, 0, c) = at(i,j)[c];
+                }
+            }
+        }
+        cimg->normalize(0, 255);
+        cimg->get_shared_channel(3).fill(255);
+        return std::move(cimg);
+    }
+
+    void Image::writeFile(std::string fname) {
+        auto ext = getExt(fname);
+        auto img = getCImg();
+        for(int i = 0; i < 4; ++i) {
+            std::cout << (*img)(0, 0, 0, i) << std::endl;
+        }
+        img->save(fname.c_str());
     }
 };

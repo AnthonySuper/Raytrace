@@ -4,6 +4,12 @@
 #include <stdexcept>
 #include <ostream>
 
+// Forward declare CImg
+namespace cimg_library {
+    template<typename T>
+    struct CImg;
+}
+
 namespace NM {
     class Image {
     public:
@@ -17,7 +23,9 @@ namespace NM {
         Vec4 at(size_t h, size_t w) const;
         PixelList& getPixels();
         void writePPM(std::ostream &is);
+        void writeFile(std::string fname);
 
+        std::unique_ptr<cimg_library::CImg<float>> getCImg();
     private:
         PixelList pixels;
     };

@@ -20,3 +20,4 @@ utils/out/*
 *.png
 *.tar.gz
 *.tar.lzma
+raytracer.dSYM/
