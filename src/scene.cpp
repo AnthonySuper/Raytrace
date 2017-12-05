@@ -84,6 +84,53 @@ namespace NM {
         return color;
     }
 
+    Vec4 Scene::refractDirection(Vec4 w,
+            Vec4 pt,
+            Vec4 n,
+            FloatType eta_in,
+            FloatType eta_out) const {
+        auto etar = eta_in / eta_out;
+        auto a = -etar;
+        auto wn = w.dot(n);
+        auto radsq = (etar * etar) * (wn * wn - 1.0) + 1.0;
+        if(radsq < 0.0) {
+            // no refraction I guess lmao
+            return {0, 0, 0};
+        }
+        auto b = (etar * wn) - std::sqrt(radsq);
+        auto t = (a * w) + (b * n);
+        return t.toUnit();
+    }
+
+    void Scene::refractRay(RayResult &ri,
+            Vec4& color,
+            size_t depth) const {
+        if(depth == 0 || ! ri) return;
+        Vec4 t1 = refractDirection(- ri.originalRay.direction,
+                ri.point(),
+                ri.surfaceNormal,
+                ri.eta,
+                ri.material.eta);
+        if(t1 == Vec4{0.0, 0.0, 0.0}) return;
+        const Sphere* sp = dynamic_cast<const Sphere*>(ri.drawable);
+        if(sp == nullptr || sp->material == nullptr) return;
+        Vec4 pointOut = sp->refractExit({ri.point(), t1});
+        Vec4 nin = (sp->position - pointOut).toUnit();
+        Vec4 outDir = refractDirection(- t1,
+                pointOut,
+                nin,
+                ri.material.eta,
+                ri.eta);
+        RayResult rr({pointOut, outDir.toUnit()});
+        intersect(rr);
+        Vec4 outColor;
+        colorize(rr,
+                 outColor,
+                 {1, 1, 1},
+                 depth - 1);
+        color += (outColor.pairwiseProduct(Vec4{1.0, 1.0, 1.0} - ri.material.opacity));
+    }
+
     void Scene::colorize(RayResult &ri,
             Vec4& accum,
             const Vec4& refAt,
@@ -101,7 +148,7 @@ namespace NM {
                               light,
                               mtl);
         }
-        accum += refAt.pairwiseProduct(color);
+        accum += refAt.pairwiseProduct(color).pairwiseProduct(mtl.opacity);
         if(depth > 0) {
             // Time to recurse
             Vec4 toCamera = -1 * ri.originalRay.direction;
@@ -109,10 +156,15 @@ namespace NM {
             Vec4 reflect = ((2 * n.dot(toCamera)) * n) - toCamera;
             RayResult r2 = {{ri.point(), reflect.toUnit()}};
             intersect(r2);
-            Vec4 newRefAt = mtl.attunation.pairwiseProduct(refAt);
+            Vec4 newRefAt = mtl.attunation.pairwiseProduct(refAt).pairwiseProduct(mtl.opacity);
             colorize(r2,
                     accum,
                     newRefAt,
+                    depth - 1);
+        }
+        if(depth > 0 && mtl.opacity != Vec4{1.0, 1.0, 1.0}) {
+            refractRay(ri,
+                    accum,
                     depth - 1);
         }
     }

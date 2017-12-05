@@ -50,6 +50,14 @@ namespace NM {
         r.surfaceNormal = (r.point() - position).toUnit();
         r.material = *material;
     }
+
+    Vec4 Sphere::refractExit(const Ray & r) const {
+        auto &point = r.position;
+        auto &dir = r.direction;
+        auto fac = 2 * (position - point).dot(dir);
+        auto exit = point + (fac * r.direction);
+        return exit;
+    }
     
     
     

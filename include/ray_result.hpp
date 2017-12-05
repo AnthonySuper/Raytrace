@@ -35,6 +35,10 @@ namespace NM {
         const Drawable* drawable = nullptr;
         
         Material material;
+
+        bool isRefracted = false;
+
+        FloatType eta = 1.0;
         
         bool swapDistance(double newDist, const Drawable *dr);
         

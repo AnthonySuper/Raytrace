@@ -25,6 +25,8 @@ namespace NM {
         virtual Vec4 midpoint() const override final;
         virtual void swapInfo(RayResult&) const override final;
         
+        Vec4 refractExit(const Ray& rayIn) const;
+        
         inline bool intersectsInline(RayResult &r) const {
             const auto& ray = r.originalRay;
             auto cVec = (position - ray.position);

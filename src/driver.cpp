@@ -79,6 +79,12 @@ namespace NM {
                 readVec(lineStream, mat->ambient);
                 readVec(lineStream, mat->diffuse);
                 readVec(lineStream, mat->specular);
+                readVec(lineStream, mat->attunation);
+                if(! lineStream.eof()) {
+                    readVec(lineStream, mat->opacity);
+                    lineStream >> mat->eta;
+                }
+                std::cout << (*mat) << std::endl;
                 // TODO: Actually read Attunation coefficients
                 mat->specularExpon = 16;
                 driver.spheres.emplace_back(rad, pos, mat);

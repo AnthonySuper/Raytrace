@@ -8,6 +8,8 @@ namespace NM {
         os << ", spec: " << m.specular;
         os << ", att: " << m.attunation;
         os << ", specExpon: " << m.specularExpon;
+        os << ", opacity: " << m.opacity;
+        os << ", eta: " << m.eta;
         os << "}";
         return os;
     }

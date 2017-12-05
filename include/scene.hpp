@@ -30,6 +30,14 @@ namespace NM {
         unsigned int recursionDepth;
         std::vector<Face> faces;
     private:
+        Vec4 refractDirection(Vec4 w,
+                Vec4 pt,
+                Vec4 n,
+                FloatType eta_in,
+                FloatType eta_out) const;
+        void refractRay(RayResult &r,
+                Vec4& color,
+                size_t depth) const;
         std::vector<Sphere> spheres;
         std::vector<Light> lights;
         friend std::ostream& operator<<(std::ostream&, const Scene&);

@@ -9,7 +9,7 @@ int main(int argc, char** argv) {
     using std::cerr;
     using std::cout;
     using std::endl;
-    if(argc < 2) {
+    if(argc < 3) {
         cerr << "No input!" << endl;
         return -1;
     }

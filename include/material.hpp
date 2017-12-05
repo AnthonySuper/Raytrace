@@ -28,6 +28,8 @@ namespace NM {
         Vec4 diffuse;
         Vec4 specular;
         Vec4 attunation = {1, 1, 1};
+        Vec4 opacity = {1, 1, 1};
+        FloatType eta = 1.0;
         FloatType specularExpon = 16;
         FloatType dissolve;
         IlluminationMode illum;
