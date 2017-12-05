@@ -3,6 +3,7 @@
 #include <vector>
 #include <stdexcept>
 #include <ostream>
+#include <memory>
 
 // Forward declare CImg
 namespace cimg_library {
