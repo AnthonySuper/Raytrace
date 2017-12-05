@@ -2,10 +2,11 @@
 
 namespace NM {
     WavefrontMaterialParser::WavefrontMaterialParser(std::istream& i, std::string fn) :
-    is(i), fileName(fn), library(std::make_shared<MaterialLibrary>())
-    {}
+    is(i), fileName(fn), library(std::make_shared<WavefrontMaterialLibrary>())
+    {
+    }
     
-    std::shared_ptr<MaterialLibrary> WavefrontMaterialParser::parse() {
+    std::shared_ptr<WavefrontMaterialLibrary> WavefrontMaterialParser::parse() {
         while(! is.eof()) {
             std::string lineHeader;
             is >> lineHeader;
@@ -34,12 +35,35 @@ namespace NM {
             else if(lineHeader == "Ks") {
                 readSpecularExponent();
             }
+            else if(lineHeader == "map_Kd") {
+                readMapKd();
+            }
             else {
                 is.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             }
         }
         flushMaterial();
         return library;
+    }
+    
+    void WavefrontMaterialParser::readMapKd() {
+        using EI = WavefrontMaterial::ExtImage;
+        std::string fname;
+        is >> fname;
+        
+        try {
+            std::string dummy;
+            // Eat the rest of the line in case we encounter some sort of weird parse error
+            std::getline(is, dummy);
+            EI *ext = new EI(fname.c_str());
+            currentExtras.m_kd = std::unique_ptr<EI>(ext);
+        }
+        catch(cimg_library::CImgIOException &e) {
+            std::cerr << "Could not read texture image '" << fname << ", skipping...";
+            std::cerr << std::endl;
+            
+        }
+        
     }
     
     void WavefrontMaterialParser::parseNewMaterial() {
@@ -86,8 +110,9 @@ namespace NM {
     
     void WavefrontMaterialParser::flushMaterial() {
         currentMaterial.reflectivity = 0.5;
+        currentExtras.originalMaterial = currentMaterial;
         library->emplace(currentMatName,
-                         std::make_shared<Material>(currentMaterial));
+                         std::make_shared<WavefrontMaterial>(std::move(currentExtras)));
         currentMatName.clear();
         currentMaterial = Material();
     }

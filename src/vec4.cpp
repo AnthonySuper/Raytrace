@@ -15,7 +15,8 @@ namespace NM {
         is >> y;
         is >> z;
         if(! is) {
-            throw ParseError("Coordinate read failed");
+            vec = {x, y, (1 - x - y)};
+            return is;
         }
         is >> w;
         if( ! is) {

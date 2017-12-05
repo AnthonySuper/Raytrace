@@ -3,12 +3,10 @@
 namespace NM {
     
     bool RayResult::swapDistance(double newDist,
-                                 const Vec4& sn,
-                                 const Material *mtlPtr) {
+                                 const Drawable *ptr) {
         if(betterDistance(newDist)) {
             distance = newDist;
-            material = mtlPtr;
-            surfaceNormal = sn;
+            drawable = ptr;
             return true;
         }
         return false;

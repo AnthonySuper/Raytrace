@@ -47,24 +47,3 @@ TEST_CASE("Surface normals") {
         REQUIRE(inter.surfaceNormal == exp);
     }
 }
-
-TEST_CASE("Sphere box intersection with basic spheres") {
-    NM::Sphere sp{2, {0.0, 0.0, 0.0}};
-
-    SECTION("With a box that's totally contained") {
-        NM::Box b{{0, 0, 0}, {1, 1, 1}};
-        REQUIRE(sp.intersects(b));
-    }
-
-    SECTION("With a box that grazes the edge") {
-        NM::Box b{{0, 0, 1.9},
-            {3, 3, 3}};
-        REQUIRE(sp.intersects(b));
-    }
-
-    SECTION("With a box that doesn't intersect") {
-        NM::Box b{{0, 0, 2.1},
-            {4, 4, 4}};
-        REQUIRE(sp.intersects(b) == false);
-    }
-}

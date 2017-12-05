@@ -46,6 +46,11 @@ namespace NM {
         return ss.str();
     }
     
+    void Sphere::swapInfo(NM::RayResult &r) const {
+        r.surfaceNormal = (r.point() - position).toUnit();
+        r.material = *material;
+    }
+    
     
     
     std::ostream& operator<<(std::ostream& os, const Sphere& s) {

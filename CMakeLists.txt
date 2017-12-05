@@ -6,19 +6,21 @@ enable_testing()
 
 set(PROJECT_GEOMETRY_SRCS
     src/vec4.cpp
+    src/vec2.cpp
     src/mat4.cpp
     src/transforms.cpp
     src/ray_intersection.cpp
     src/ray.cpp
     src/ray_result.cpp
-    src/box.cpp)
+    src/box.cpp
+    src/triangle.cpp
+    src/tri2.cpp)
 
 set(PROJECT_DRAWABLE_SRCS
     src/drawable.cpp
     src/transformed_drawable.cpp
     src/sphere.cpp
     src/model.cpp
-    src/triangle.cpp
     src/face.cpp)
 
 set(PROJECT_UTIL_SRCS
@@ -33,6 +35,7 @@ set(PROJECT_TRACE_SRCS
     src/image.cpp
     src/material.cpp
     src/wavefront_material_parser.cpp
+    src/wavefront_material.cpp
     src/light.cpp
     src/bonsai_tree.cpp)
 
@@ -45,19 +48,21 @@ SET(PROJECT_SRCS
 
 set(PROJECT_GEOMETRY_INCLUDES
     include/vec4.hpp
+    include/vec2.hpp
     include/mat4.hpp
     include/transforms.hpp
     include/ray.hpp
     include/ray_intersection.hpp
     include/ray_result.hpp
-    include/box.hpp)
+    include/box.hpp
+    include/tri2.hpp
+    include/triangle.hpp)
 
 SET(PROJECT_DRAWABLE_INCLUDES
     include/drawable.hpp
     include/model.hpp
     include/transformed_drawable.hpp
     include/sphere.hpp
-    include/triangle.hpp
     include/face.hpp)
 
 set(PROJECT_UTIL_INCLUDES
@@ -72,6 +77,7 @@ set(PROJECT_TRACE_INCLUDES
     include/image.hpp
     include/material.hpp
     include/wavefront_material_parser.hpp
+    include/wavefront_material.hpp
     include/light.hpp
     include/bonsai_tree.hpp)
 
@@ -114,6 +120,11 @@ source_group(util\\includes FILES ${PROJECT_UTIL_INCLUDES})
 source_group(trace\\srcs FILES ${PROJECT_TRACE_SRCS})
 source_group(trace\\includes FILES ${PROJECT_TRACE_INCLUDES})
 
+if(APPLE)
+    include_directories(AFTER "/opt/X11/include")
+endif()
+
+
 source_group(test_sources FILES ${PROJECT_TEST_SRCS})
 
 add_executable(raytrace main.cpp
@@ -126,6 +137,13 @@ target_link_libraries(catch_test pthread)
 target_include_directories(catch_test PUBLIC include/)
 target_include_directories(catch_test PUBLIC lib/)
 target_include_directories(raytrace PUBLIC include/)
+target_include_directories(raytrace PUBLIC lib/)
+
+
+find_package(PNG)
+
+include_directories(${PNG_INCLUDE_DIRS})
+target_link_libraries(raytrace ${PNG_LIBRARIES})
 
 set(CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

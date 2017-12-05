@@ -3,11 +3,17 @@ look 0 0 0
 up 0 1 0
 d 10
 bounds -2 -2 2 2
-res 2000 2000
-light 25 5 25 1 0.7.2 0.2
-light -25 5 25 1 0.7 0.2 0.2
-light 0 20 25 1 0.6 0.6 0.6
+res 5000 5000
+light 0 10 70 1 0.8 0.8 0.8
+light 5 -9 10 1 0.8 0.2 0.2
+light 0 5 -5 1 0.8 0.8 0.8
+light 0 5 10 1 0.8 0.8 0.8
+light 0 10 70 0.
+light -5 -9 10 1 0.8 0.2 0.2
 recursionLevel 1
 ambient 0 0 0
-model 1.0 0.0 0.0 0 5 0 0 0 dragontri.obj
+model 1.0 0.0 0.0 0 5 0 0 0 dragon-texture.obj
+sphere 0 5 -21 6 0.2 0.2 0.2 0.2 0.2 0.2 0 0 0 1 1 1
+sphere -5 0 5 2 0.2 0.2 0.2 0.2 0.2 0.2 0 0 0 1 1 1 
+sphere 5 -2 5 2 0.2 0.2 0.2 0.2 0.2 0.2 0 0 0 1 1 1 
 model 0.0 1.0 0.0 20 0.2 0 -13 0 temple.obj

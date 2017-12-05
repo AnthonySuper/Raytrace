@@ -116,6 +116,9 @@ namespace NM {
         auto itr = modelDict.find(fname);
         if(itr == modelDict.end()) {
             std::ifstream readStream(fname);
+            if(! readStream.is_open()) {
+                throw FileNotFoundError(fname);
+            }
                 auto read = std::make_shared<Model>(Model::fromStream(readStream));
                 modelDict.emplace(fname,
                                   read);

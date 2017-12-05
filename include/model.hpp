@@ -6,6 +6,7 @@
 #include <ray.hpp>
 #include <triangle.hpp>
 #include <drawable.hpp>
+#include <wavefront_material.hpp>
 #include <wavefront_material_parser.hpp>
 #include <face.hpp>
 #include <vector>
@@ -54,13 +55,15 @@ namespace NM {
         private:
             Vec4 coordinateToPoint(FaceElement::ElmType);
             Vec4 coordinateToNormal(FaceElement::ElmType);
+            Vec4 coordinateToTexture(FaceElement::ElmType);
             ssize_t wfToC(FaceElement::ElmType);
             PointVector points;
             PointVector normals;
+            PointVector textures;
             FaceList faces;
-            using MtlPtr = std::shared_ptr<Material>;
+            using MtlPtr = std::shared_ptr<WavefrontMaterial>;
             MtlPtr getMaterial(const std::string& key);
-            MaterialLibrary materials;
+            WavefrontMaterialLibrary materials;
             
         };
         
@@ -74,11 +77,12 @@ namespace NM {
         virtual std::string print() override;
         virtual size_t complexity() const override final;
         virtual ~Model() override = default;
+        virtual void swapInfo(RayResult&) const override final;
         virtual void expandToFit(Box& b) const override final;
         std::vector<Face> faces;
         
     private:
-        MaterialLibrary materials;
+        WavefrontMaterialLibrary materials;
         friend std::ostream& operator<<(std::ostream&, const Model&);
         
     };

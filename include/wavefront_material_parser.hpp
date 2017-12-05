@@ -1,20 +1,21 @@
 #pragma once
 #include <limits>
 #include <vec4.hpp>
-#include <material.hpp>
+#include <wavefront_material.hpp>
 
 namespace NM {
     struct WavefrontMaterialParser {
         std::istream& is;
         WavefrontMaterialParser(std::istream&, std::string fileName = "");
-        std::shared_ptr<MaterialLibrary> parse();
+        std::shared_ptr<WavefrontMaterialLibrary> parse();
         
     private:
         std::string fileName;
-        std::shared_ptr<MaterialLibrary> library;
+        std::shared_ptr<WavefrontMaterialLibrary> library;
         bool hasFirstPush = false;
         std::string currentMatName;
         Material currentMaterial;
+        WavefrontMaterial currentExtras;
         void parseNewMaterial();
         void readKa();
         void readKd();
@@ -23,6 +24,7 @@ namespace NM {
         void readIllum();
         void readSpecularExponent();
         void flushMaterial();
+        void readMapKd();
         Vec4 readVec();
         FloatType readTruncedFloat();
         FloatType readFloat();

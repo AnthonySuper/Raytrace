@@ -18,7 +18,7 @@ namespace NM {
         void addObject(const Light &);
         RayIntersection traceIntersection(const Ray& in) const;
         void intersect(RayResult &) const;
-        void colorize(const RayResult& rr,
+        void colorize(RayResult& rr,
                       Vec4 &color,
                       const Vec4& refAt = {1.0, 1.0, 1.0},
                       unsigned int depth = 0) const;
@@ -34,6 +34,11 @@ namespace NM {
         std::vector<Light> lights;
         friend std::ostream& operator<<(std::ostream&, const Scene&);
         size_t getConcurrency() const;
+        Vec4 colorRay(Vec4 point,
+                      Vec4 normal,
+                      Vec4 toC,
+                      const Light& light,
+                      const Material& mtl) const;
         inline FloatType raySavings() const {
             auto p = bonsai.getIntersects();
             return (

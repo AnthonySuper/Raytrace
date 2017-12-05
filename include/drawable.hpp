@@ -14,6 +14,7 @@ namespace NM {
         virtual size_t complexity() const;
         virtual void expandToFit(Box&) const = 0;
         virtual bool intersects(RayResult& r) const;
+        virtual void swapInfo(RayResult&) const = 0;
         virtual ~Drawable() = default;
     
     };

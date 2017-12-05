@@ -5,6 +5,8 @@
 #include <limits>
 
 namespace NM {
+    class Drawable;
+    
     class RayResult {
     public:
         
@@ -29,12 +31,12 @@ namespace NM {
          * How far away is the current "good" intersection?
          */
         FloatType distance = std::numeric_limits<FloatType>::max();
-        /**
-         * What is the material of the current "good" intersection?
-         */
-        const Material* material = nullptr;
         
-        bool swapDistance(double newDist, const Vec4& sn, const Material* mtlPtr);
+        const Drawable* drawable = nullptr;
+        
+        Material material;
+        
+        bool swapDistance(double newDist, const Drawable *dr);
         
         inline bool betterDistance(double newDist) const {
             return (newDist > 0 && newDist < distance);

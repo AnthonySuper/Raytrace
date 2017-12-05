@@ -6,18 +6,22 @@ namespace NM {
         std::string line;
         std::string header;
         std::string lastMaterial;
+        
         while(std::getline(stream, line)) {
             std::istringstream lineStream(line);
             header.clear();
             lineStream >> header;
-            if(header == "v" || header == "vn") {
+            if(header == "v" || header == "vn" || header == "vt") {
                 Vec4 vec{0, 0, 0};
                 lineStream >> vec;
                 if(header == "v") {
                     toRet.points.push_back(vec);
                 }
-                else {
+                else if(header == "vn") {
                     toRet.normals.push_back(vec);
+                }
+                else {
+                    toRet.textures.push_back(vec);
                 }
             }
             else if(header == "f") {
@@ -33,6 +37,9 @@ namespace NM {
                 std::string fname;
                 lineStream >> fname;
                 std::ifstream ifs(fname);
+                if(! ifs.is_open()) {
+                    throw FileNotFoundError(fname);
+                }
                 WavefrontMaterialParser parser(ifs);
                 toRet.materials = *(parser.parse());
             }
@@ -53,20 +60,26 @@ namespace NM {
             };
             auto mtl = getMaterial(fd.materialName);
             // TODO: Cleanup
+            Triangle normals{{}, {}, {}};
+            Triangle coords{{}, {}, {}};
             if(fd[0].normIdx != 0) {
-                Triangle normals {
+                normals = Triangle{
                     coordinateToNormal(fd[0].normIdx),
                     coordinateToNormal(fd[1].normIdx),
                     coordinateToNormal(fd[2].normIdx)
                 };
-                
-                toReturn.faces.emplace_back(points, normals, mtl);
             }
-            else {
-                toReturn.faces.emplace_back(points,
-                                            Triangle{{}, {}, {}},
-                                            mtl);
+            if(fd[0].texIdx != 0) {
+                coords = Triangle{
+                    coordinateToTexture(fd[0].texIdx),
+                    coordinateToTexture(fd[1].texIdx),
+                    coordinateToTexture(fd[2].texIdx)
+                };
             }
+            toReturn.faces.emplace_back(points,
+                                        normals,
+                                        mtl,
+                                        coords);
         }
         toReturn.materials = materials;
         return toReturn;
@@ -81,6 +94,10 @@ namespace NM {
         return points.at(wfToC(e));
     }
     
+    Vec4 Model::WavefrontParser::coordinateToTexture(FaceElement::ElmType e) {
+        return textures.at(wfToC(e));
+    }
+    
     Vec4 Model::WavefrontParser::coordinateToNormal(FaceElement::ElmType e) {
         return normals.at(wfToC(e));
     }
@@ -90,7 +107,7 @@ namespace NM {
         auto f = materials.find(key);
         auto itr = f != materials.end() ? f : materials.begin();
         if(itr == materials.end()) {
-            return std::make_shared<Material>();
+            return nullptr;
         }
         else {
             return (*itr).second;
@@ -133,6 +150,9 @@ namespace NM {
     }
     
     Model Model::fromStream(std::istream &is) {
+        if(is.eof()) {
+            throw NM::FileNotFoundError("Coudln't find file whatever");
+        }
         return WavefrontParser::fromStream(is);
     }
     
@@ -164,7 +184,7 @@ namespace NM {
         os << m.faces.size() << " faces, ";
         os << m.materials.size() << " materials: ";
         for(const auto& p : m.materials) {
-            os << "['" << p.first << ":\t" << *p.second << "]";
+            os << "['" << p.first << ":\t" << p.second->originalMaterial << "]";
             os << std::endl;
         }
         os << "}";
@@ -178,6 +198,10 @@ namespace NM {
     }
     
     void Model::expandToFit(NM::Box &b) const {
+        
+    }
+    
+    void Model::swapInfo(NM::RayResult &) const {
         
     }
     
