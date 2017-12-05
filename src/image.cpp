@@ -1,5 +1,6 @@
 #include <image.hpp>
 #include <iostream>
+#include <timer.hpp>
 #include <errors.hpp>
 #define cimg_display 0
 #define cimg_use_png 1
@@ -33,7 +34,6 @@ namespace NM {
     }
 
     void Image::writePPM(std::ostream& os) {
-        std::cout << "WritePPM" << std::endl;
         os << "P3" << "\n";
         os << width << " " << height << " 255" << "\n";
         int alongRow = 0;
@@ -58,18 +58,20 @@ namespace NM {
         os.flush();
     }
 
-    std::unique_ptr<cimg_library::CImg<>> Image::getCImg() {
-        std::unique_ptr<cimg_library::CImg<>> cimg(
-                new cimg_library::CImg<>(width, height, 1, 4)
+    std::unique_ptr<cimg_library::CImg<unsigned char>> Image::getCImg() {
+        std::unique_ptr<cimg_library::CImg<unsigned char>> cimg(
+                new cimg_library::CImg<unsigned char>(width, height, 1, 4)
         );
         for(size_t i = 0; i < width; ++i) {
             for(size_t j = 0; j < height; ++j) {
                 for(size_t c = 0; c < 3; ++c) {
-                    (*cimg)(j, i, 0, c) = at(i,j)[c];
+                    auto ch = at(i, j)[c] * 255;
+                    unsigned char r =  std::max(0.0,
+                            std::min(255.0, ch));
+                    (*cimg)(j, i, 0, c) = r;
                 }
             }
         }
-        cimg->normalize(0, 255);
         cimg->get_shared_channel(3).fill(255);
         return std::move(cimg);
     }
@@ -80,6 +82,8 @@ namespace NM {
         for(int i = 0; i < 4; ++i) {
             std::cout << (*img)(0, 0, 0, i) << std::endl;
         }
+        std::cout << std::numeric_limits<unsigned char>::max() << std::endl;
         img->save(fname.c_str());
+        Timer::report("Wrote image");
     }
 };

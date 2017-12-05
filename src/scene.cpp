@@ -1,7 +1,7 @@
 #include <scene.hpp>
 #include <globals.hpp>
 #include <chrono>
-
+#include <timer.hpp>
 
 
 namespace NM {
@@ -17,30 +17,27 @@ namespace NM {
     void Scene::finalize() {
         auto start = std::chrono::system_clock::now();
         std::cout << "Starting scene finalize.";
-        auto timeReport = [&]() {
-            auto end = std::chrono::system_clock::now();
-            auto dur = (end - start);
-            auto s = std::chrono::duration_cast<std::chrono::milliseconds>(dur);
-            std::cout << s.count() << "ms" << std::endl;
-            start = end;
-        };
         bonsai.reset();
         for(auto& sphere: spheres) {
             bonsai.add(&sphere);
         }
-        std::cout << "Added " << spheres.size() << " spheres in ";
-        timeReport();
+        Timer::report(
+                std::string("Added ") + 
+                std::to_string(spheres.size()) + 
+                std::string(" spheres")
+        );
         for(auto& f: faces) {
             bonsai.add(&f);
         }
-        std::cout << "Added " << faces.size() << " faces in ";
-        timeReport();
+        Timer::report(
+                std::string("Added ") + 
+                std::to_string(faces.size()) +
+                std::string(" faces")
+        );
         bonsai.expandBox();
-        std::cout << "Expanded overall box in ";
-        timeReport();
+        std::cout << "Starting BVH construction (may take a bit)" << std::endl;
         bonsai.partition(getConcurrency());
-        std::cout << "Partitioned in ";
-        timeReport();
+        Timer::report("Constructed BVH");
     }
 
     RayIntersection Scene::traceIntersection(const Ray& in) const {

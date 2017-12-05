@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <unordered_set>
+#include <timer.hpp>
 
 int main(int argc, char** argv) {
     using std::cerr;
@@ -19,6 +20,7 @@ int main(int argc, char** argv) {
     NM::Image img(std::get<0>(res), std::get<1>(res));
     s.recursionDepth = d.recursionLevel;
     s.render(img, d.getCamera());
+    NM::Timer::report("Rendered ");
     img.writeFile(argv[2]);
     return 0;
 }

@@ -25,7 +25,7 @@ namespace NM {
         void writePPM(std::ostream &is);
         void writeFile(std::string fname);
 
-        std::unique_ptr<cimg_library::CImg<float>> getCImg();
+        std::unique_ptr<cimg_library::CImg<unsigned char>> getCImg();
     private:
         PixelList pixels;
     };

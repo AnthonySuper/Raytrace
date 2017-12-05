@@ -27,7 +27,8 @@ set(PROJECT_UTIL_SRCS
     src/errors.cpp
     src/file_utils.cpp
     src/wavefront_material_parser.cpp
-    src/driver.cpp)
+    src/driver.cpp
+    src/timer.cpp)
 
 set(PROJECT_TRACE_SRCS
     src/camera.cpp
@@ -69,7 +70,8 @@ set(PROJECT_UTIL_INCLUDES
     include/globals.hpp
     include/errors.hpp
     include/file_utils.hpp
-    include/driver.hpp)
+    include/driver.hpp
+    include/timer.hpp)
 
 set(PROJECT_TRACE_INCLUDES
     include/camera.hpp
