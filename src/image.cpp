@@ -65,10 +65,10 @@ namespace NM {
         for(size_t i = 0; i < width; ++i) {
             for(size_t j = 0; j < height; ++j) {
                 for(size_t c = 0; c < 3; ++c) {
-                    auto ch = at(i, j)[c] * 255;
+                    auto ch = at(j, i)[c] * 255;
                     unsigned char r =  std::max(0.0,
                             std::min(255.0, ch));
-                    (*cimg)(j, i, 0, c) = r;
+                    (*cimg)(i, j, 0, c) = r;
                 }
             }
         }
