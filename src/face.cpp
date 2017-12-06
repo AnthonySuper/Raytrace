@@ -79,7 +79,11 @@ namespace NM {
         r.surfaceNormal = calcNormal(barycentric);
         if(mat) {
             r.material = getMaterial(barycentric, *mat);
-            r.material.attunation = {0, 0, 0};
+            auto tmp = r.material.diffuse.pairwiseProduct(
+                    r.material.specular
+            );
+            tmp = tmp.pairwiseProduct(tmp);
+            r.material.attunation = tmp;
         }
         else {
             r.material = Material{};
