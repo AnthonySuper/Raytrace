@@ -1,6 +1,7 @@
 #pragma once
 #include <vec4.hpp>
 #include <globals.hpp>
+#include <errors.hpp>
 #include <string>
 #include <sstream>
 #include <cmath>
@@ -191,10 +192,10 @@ namespace NM {
         /**
          * @brief An exception to be thrown when a Matrix cannot be inverted.
          */
-        class NonInvertableError: std::runtime_error {
+        class NonInvertableError: public TracerError {
         public:
             NonInvertableError() :
-                runtime_error("Matrix is not inverable")
+                TracerError("Matrix is not inverable")
             {}
         };
         

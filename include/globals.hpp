@@ -5,6 +5,11 @@
 
 
 
+/**
+ * @brief overall namespace for everything in the raytracer.
+ *
+ * "NM" stands for "Noided Media."
+ */
 namespace NM {
 	using FloatType = double_t;
     

@@ -73,7 +73,7 @@ namespace NM {
             }
         }
         cimg->get_shared_channel(3).fill(255);
-        return std::move(cimg);
+        return cimg;
     }
 
     void Image::writeFile(std::string fname) {

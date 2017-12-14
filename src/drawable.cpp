@@ -1,14 +1,10 @@
 #include <drawable.hpp>
 
 namespace NM {
-    std::string Drawable::print() {
+    std::string Drawable::print() const {
         return "{UnprintableDrawable}";
     }
     
-    size_t Drawable::complexity() const {
-        return 0;
-    }
-
     Vec4 Drawable::midpoint() const {
         return {0, 0, 0};
     }
@@ -17,4 +13,7 @@ namespace NM {
         return false;
     }
     
+    std::ostream& operator<<(std::ostream& os, const Drawable& d) {
+        return os << d.print();
+    }
 }

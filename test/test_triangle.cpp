@@ -26,7 +26,7 @@ TEST_CASE("Triangles intersection calculation") {
             {-10, 1, 0},
             {-10, 0, 1}
         };
-        REQUIRE(t.checkIntersection(cast) == false);
+        REQUIRE(t.intersectionDistance(cast) < 0);
     }
     
     SECTION("With an intersecting triangle") {
@@ -35,10 +35,8 @@ TEST_CASE("Triangles intersection calculation") {
             {1, -1, 0},
             {1, -1, -1}
         };
-        auto res = t.checkIntersection(cast);
-        REQUIRE(res == true);
-        Vec4 exp{1, 0, 0};
-        REQUIRE(res.point() == exp);
+        auto res = t.intersectionDistance(cast);
+        REQUIRE(res > 0);
     }
 }
 

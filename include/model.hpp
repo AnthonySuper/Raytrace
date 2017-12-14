@@ -73,9 +73,7 @@ namespace NM {
         Model(Model&&) = default;
         Model() = default;
         
-        virtual RayIntersection checkIntersection(const Ray&) const override final;
-        virtual std::string print() override;
-        virtual size_t complexity() const override final;
+        virtual std::string print() const override;
         virtual ~Model() override = default;
         virtual void swapInfo(RayResult&) const override final;
         virtual void expandToFit(Box& b) const override final;

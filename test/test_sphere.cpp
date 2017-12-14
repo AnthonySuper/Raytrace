@@ -36,6 +36,7 @@ TEST_CASE("Surface normals") {
         }};
         s.intersects(inter);
         Vec4 exp = Vec4{1, 0, 0}.toUnit();
+        s.swapInfo(inter);
         REQUIRE(inter.surfaceNormal == exp);
     }
     SECTION("With a hit from above") {
@@ -44,6 +45,7 @@ TEST_CASE("Surface normals") {
         }};
         s.intersects(inter);
         Vec4 exp = Vec4{0, 1, 0}.toUnit();
+        s.swapInfo(inter);
         REQUIRE(inter.surfaceNormal == exp);
     }
 }

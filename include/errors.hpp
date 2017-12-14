@@ -3,10 +3,15 @@
 #include <string>
 
 namespace NM {
+    
+    class TracerError : public std::runtime_error {
+    public:
+        TracerError(const std::string &);
+    };
     /**
      * @brief An error thrown when parsing fails.
      */
-    class ParseError : std::runtime_error {
+    class ParseError : public TracerError {
     public:
         ParseError();
         ParseError(std::string what);
@@ -15,7 +20,7 @@ namespace NM {
     /**
      * @brief An error thrown when a file cannot be open.
      */
-    class FileNotFoundError : std::runtime_error {
+    class FileNotFoundError : TracerError {
     public:
         FileNotFoundError();
         FileNotFoundError(std::string fname);
@@ -24,7 +29,7 @@ namespace NM {
     /**
      * @brief An error thrown when the name of a file is invalid/
      */
-    class InvalidFilenameError : std::runtime_error {
+    class InvalidFilenameError : public TracerError {
     public:
         InvalidFilenameError();
         InvalidFilenameError(std::string fname);
@@ -33,7 +38,7 @@ namespace NM {
     /**
      * @brief An error thrown when you dereference an invalid intersection
      */
-    class InvalidIntersectionError : std::runtime_error {
+    class InvalidIntersectionError : public TracerError {
     public:
         InvalidIntersectionError();
     };

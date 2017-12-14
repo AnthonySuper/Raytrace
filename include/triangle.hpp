@@ -1,10 +1,15 @@
 #pragma once
 #include <vec4.hpp>
 #include <mat4.hpp>
-#include <ray_intersection.hpp>
 #include <ostream>
+#include <ray.hpp>
 
 namespace NM {
+    /**
+     * @brief model a triangle in 3D space.
+     *
+     * This is essentially a collection of three points.
+     */
     struct Triangle {
         Vec4 a, b, c, normal;
         inline Triangle(const Vec4& _a, const Vec4& _b, const Vec4& _c) :
@@ -25,9 +30,10 @@ namespace NM {
         }
         
         bool operator==(const Triangle& rhs) const;
+        
         /**
          @brief Check for the intersection between this triangle and a ray
-         
+
          This uses the
          <a href="http://webserver2.tecgraf.puc-rio.br/~mgattass/cg/trbRR/Fast%20MinimumStorage%20RayTriangle%20Intersection.pdf">
          "Fast Minimum Storage Ray/Triangle Intersection"
@@ -36,13 +42,10 @@ namespace NM {
          This algorithm essentially uses some geometry to move the triangle
          to the origin of the ray, then algebriac trickery to do
          Cramer's rule must faster than normally possible.
-         
-         coordOut returns where the ray hit the triangle in baycentric coordinates.
-         coordOut[x] refers to the distance alone (ba).
-         coordOut[y] refers to the distance along (ca)
-         coordOut[z] refers to the distance along (cb)
+         @return the distance from ray.position to this triangle, or -1 
+         if there isn't an intersection.
          */
-        inline RayIntersection checkIntersection(const Ray& ray) const {
+        inline double intersectionDistance(const Ray& ray) const {
             Vec4 edgeA = (b - a);
             Vec4 edgeB = (c - a);
             // P = D x E2
@@ -52,7 +55,7 @@ namespace NM {
             // If det is zero then we can't do this calculation, so
             // our ray is oblique to the triangle, essentially
             if(det > - Constants::epsilon && det < Constants::epsilon) {
-                return {};
+                return -1;
             }
             // Find the inverse det to apply to each member of the vector
             FloatType invDet = (1.0 / det);
@@ -64,7 +67,7 @@ namespace NM {
             // so we can bail more quickly, basically)
             FloatType u = (toVert.dot(pvec)) * invDet;
             if(u < 0.0 || u > 1.0) {
-                return {};
+                return -1;
             }
             // Q in the original paper
             Vec4 q = toVert.cross(edgeA);
@@ -72,7 +75,7 @@ namespace NM {
             FloatType v = invDet * ray.direction.dot(q);
             // One again, bail early if we're able
             if(v < 0.0 || (u + v) > 1.0) {
-                return {};
+                return -1;
             }
             // Finally find our T parameter
             FloatType t = invDet * edgeB.dot(q);
@@ -80,15 +83,11 @@ namespace NM {
             // along the triangle. In this case, we consider no intersection to
             // have taken place.
             if(t > Constants::epsilon) {
-                return {
-                    ray.position + (ray.direction * t),
-                    normal,
-                    ray
-                };
+                return t;
             }
             // There's an "intersection" but it's behind us or on our origin.
             // Either way, we don't care about it for purposes of raytracing.
-            return {};
+            return -1;
         }
         
         Vec4 toBarycentric(const Vec4& point) const;

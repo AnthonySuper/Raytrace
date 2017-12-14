@@ -102,8 +102,3 @@ TEST_CASE("Vec4 can be read via streams with w") {
     REQUIRE(toRead == expect);
 }
 
-TEST_CASE("Vec4 throws when reading from a bad stream") {
-    Vec4 toRead{0, 0, 0};
-    std::istringstream ios("1 garbage 2 3");
-    REQUIRE_THROWS(ios >> toRead);
-}
