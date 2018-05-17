@@ -3,13 +3,7 @@
 
 namespace NM {
 
-    BonsaiTree::BonsaiTree(const Box& b) : 
-        boundingBox(b) {}
-
     void BonsaiTree::add(Drawable *drawable) {
-        if(greater != nullptr) {
-            throw std::runtime_error("Added child to completed drawable tree");
-        }
         drawables.push_back(drawable);
     }
 
@@ -24,21 +18,12 @@ namespace NM {
     }
     
     BonsaiTree::BonsaiTree() :
-    boundingBox{{0, 0, 0}, {0, 0, 0}},
-    greater(nullptr),
-    less(nullptr)
+    boundingBox{{0, 0, 0}, {0, 0, 0}}
     {}
     
     BonsaiTree::BonsaiTree(const BonsaiTree& bt) :
     boundingBox(bt.boundingBox), drawables(bt.drawables), intersectsTested(0),
     intersectsSkipped(0) {
-        if(bt.greater) {
-            greater = std::unique_ptr<BonsaiTree>(
-                new BonsaiTree(*bt.greater)
-                                                  );
-            less = std::unique_ptr<BonsaiTree>(
-                new BonsaiTree(*bt.less));
-        }
     }
     
 
@@ -83,13 +68,10 @@ namespace NM {
         sortDrawablesOnAxis(iv, av);
         // Set our bestCost to something really high initially
         FloatType bestCost = std::numeric_limits<FloatType>::max();
-        if(readAxis == 2) {
-            auto& last = iv[iv.size() - 1];
-        }
         auto stride = iv.size() / boxes_to_try;
         if(stride == 0) return {-1, -1};
         size_t bestSplit = 0;
-        for(int i = stride + 1; i < iv.size() - 1; i += stride) {
+        for(size_t i = stride + 1; i < iv.size() - 1; i += stride) {
             Box leftBox;
             Box rightBox;
             for(int j = 0; j < iv.size(); ++j) {
@@ -177,76 +159,35 @@ namespace NM {
         node.begin = start;
         node.end = end;
         node.generateBounds(drawables);
-        auto sa = node.bounds.surfaceArea();
-        auto printSpaces = [=]() {
-            for(int i = 0; i < depth; ++i) {
-                std::cout << "  ";
-            }
-        };
         if((end - start) < 6) {
-            /*
-            printSpaces();
-            std::cout << "Leaf is too small to split, ignoring... " << std::endl;
-            */
             node.isLeaf = true;
             return;
         }
-        /*
-        printSpaces();
-        std::cout << "Splitting inside " << start << "," << end;
-        std::cout << " at depth " << depth << " and node " << node.nodeIndex;
-        std::cout << std::endl;
-        */
+
         auto split = getBestPartition(drawables.begin() + start,
                                       drawables.begin() + end,
                                       node.bounds.surfaceArea());
         if(split == -1) {
-            /*
-            printSpaces();
-            
-            std::cout << "Found a leaf at depth " << depth;
-            std::cout << ", marking and returning...";
-            std::cout << std::endl;
-             */
+
             node.isLeaf = true;
             return;
         }
         split += start;
         auto ri = node.rightIndex();
         auto li = node.leftIndex();
-        /*
-        printSpaces();
-        std::cout << "Should split (" << start << "," << end << ")";
-        std::cout << " at split " << split << std::endl;
-        printSpaces();
-        std::cout << "Generating left... (in index " << li << ")" << std::endl;
-        */
+
         buildRecursive(start,
                        split,
                        li,
                        depth + 1);
-        /*
-        assert((
-            sa != nodes[li].bounds.surfaceArea()
-        ));
-         */
-        /*
-        printSpaces();
-        std::cout << "Generating right... (in index " << ri << ")" << std::endl;
-        */
+
         buildRecursive(split,
                        end,
                        ri,
                        depth + 1);
-        /*
-        assert((
-            sa != nodes[ri].bounds.surfaceArea() * 1.1
-        ));
-         */
     }
     
     void BonsaiTree::intersectStack(NM::RayResult & r) const {
-        constexpr FloatType FLOATMAX = std::numeric_limits<FloatType>::max();
         treelessIntersects.fetch_add(drawableSize(),
                                      std::memory_order_relaxed);
         const auto rr = r.originalRay;
@@ -361,21 +302,12 @@ namespace NM {
     }
     
     void BonsaiTree::reset() {
-        greater = nullptr;
-        less = nullptr;
         boundingBox = {{0, 0, 0}, {0, 0, 0}};
         drawables.clear();
     }
     
     void BonsaiTree::treeHealth(size_t &totalContained, size_t &totalLeaves) {
-        if(greater) {
-            greater->treeHealth(totalContained, totalLeaves);
-            less->treeHealth(totalContained, totalLeaves);
-        }
-        else {
-            totalContained += size();
-            totalLeaves++;
-        }
+
     }
     
     std::string BonsaiTree::toString() const {

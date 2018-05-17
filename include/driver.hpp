@@ -11,7 +11,7 @@
 #include <globals.hpp>
 #include <transforms.hpp>
 #include <file_utils.hpp>
-#include <transformed_drawable.hpp>
+
 #include <camera.hpp>
 #include <scene.hpp>
 

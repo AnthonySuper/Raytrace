@@ -5,6 +5,10 @@
 
 
 namespace NM {
+    /**
+     * @brief represent a Triangular Face
+     * @ingroup drawable
+     */
     class Face : public Drawable {
         using MatPtr = std::shared_ptr<WavefrontMaterial>;
         Triangle points;
@@ -19,10 +23,26 @@ namespace NM {
              const Triangle& texture = {{}, {}, {}});
         Face(const Mat4&,
              const Face&);
-        virtual RayIntersection checkIntersection(const Ray&) const override final;
-        virtual std::string print() override final;
+
+        /**
+         * @brief returns a human-readable face description.
+         *
+         * This description includes normals and points, not the material.
+         */
+        virtual std::string print() const override final;
+        /**
+         * @brief calculate the midpoint.
+         *
+         * This is just the average of the three points.
+         * @todo verify that's geometrically okay.
+         */
         virtual Vec4 midpoint() const override final;
-        virtual size_t complexity() const override final;
+
+        /**
+         * @brief expand the box to fit.
+         *
+         * Just calls Box#expandToFit with #points
+         */
         virtual void expandToFit(Box&) const override final;
         virtual bool intersects(RayResult& r) const override final;
         virtual void swapInfo(RayResult&) const override final;

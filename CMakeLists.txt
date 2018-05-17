@@ -6,19 +6,15 @@ enable_testing()
 
 set(PROJECT_GEOMETRY_SRCS
     src/vec4.cpp
-    src/vec2.cpp
     src/mat4.cpp
     src/transforms.cpp
-    src/ray_intersection.cpp
     src/ray.cpp
     src/ray_result.cpp
     src/box.cpp
-    src/triangle.cpp
-    src/tri2.cpp)
+    src/triangle.cpp)
 
 set(PROJECT_DRAWABLE_SRCS
     src/drawable.cpp
-    src/transformed_drawable.cpp
     src/sphere.cpp
     src/model.cpp
     src/face.cpp)
@@ -49,20 +45,16 @@ SET(PROJECT_SRCS
 
 set(PROJECT_GEOMETRY_INCLUDES
     include/vec4.hpp
-    include/vec2.hpp
     include/mat4.hpp
     include/transforms.hpp
     include/ray.hpp
-    include/ray_intersection.hpp
     include/ray_result.hpp
     include/box.hpp
-    include/tri2.hpp
     include/triangle.hpp)
 
 SET(PROJECT_DRAWABLE_INCLUDES
     include/drawable.hpp
     include/model.hpp
-    include/transformed_drawable.hpp
     include/sphere.hpp
     include/face.hpp)
 
@@ -146,6 +138,7 @@ find_package(PNG)
 
 include_directories(${PNG_INCLUDE_DIRS})
 target_link_libraries(raytrace ${PNG_LIBRARIES})
+target_link_libraries(catch_test ${PNG_LIBRARIES})
 
 set(CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

@@ -2,7 +2,6 @@
 #include <model.hpp>
 #include <camera.hpp>
 #include <image.hpp>
-#include <transformed_drawable.hpp>
 #include <bonsai_tree.hpp>
 #include <light.hpp>
 #include <atomic>
@@ -16,7 +15,6 @@ namespace NM {
         Vec4 ambient;
         void addObject(const Sphere &);
         void addObject(const Light &);
-        RayIntersection traceIntersection(const Ray& in) const;
         void intersect(RayResult &) const;
         void colorize(RayResult& rr,
                       Vec4 &color,

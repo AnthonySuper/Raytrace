@@ -114,7 +114,7 @@ namespace NM {
         }
     }
     
-    std::string Model::print() {
+    std::string Model::print() const {
         std::stringstream ss;
         ss << *this;
         return ss.str();
@@ -191,22 +191,12 @@ namespace NM {
         return os;
     }
     
-    RayIntersection Model::checkIntersection(const NM::Ray & r) const {
-        Material useMaterial;
-        RayIntersection toRet;
-        return toRet;
-    }
-    
     void Model::expandToFit(NM::Box &b) const {
         
     }
     
     void Model::swapInfo(NM::RayResult &) const {
         
-    }
-    
-    size_t Model::complexity() const {
-        return faces.size();
     }
             
 }

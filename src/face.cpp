@@ -24,12 +24,9 @@ namespace NM {
      {}
     
     
-    RayIntersection Face::checkIntersection(const NM::Ray &r) const {
-        auto ri = points.checkIntersection(r);
-        return ri;
-    }
+   
     
-    std::string Face::print() {
+    std::string Face::print() const {
         std::stringstream ss;
         ss << "{Face: " << points << "," << normals << "}";
         return ss.str();
@@ -41,20 +38,17 @@ namespace NM {
                           points.c);
     }
     
-    size_t Face::complexity() const {
-        return 3;
-    }
+
     
     void Face::expandToFit(NM::Box & b) const {
         b.expandToFit(points);
     }
     
     bool Face::intersects(NM::RayResult &r) const {
-        auto rr = checkIntersection(r.originalRay);
-        if(! rr) return false;
-        auto dist = rr.getDistance();
+        auto dist = points.intersectionDistance(r.originalRay);
+        if(dist < 0) return false;
         if(! r.betterDistance(dist)) return false;
-        return r.swapDistance(rr.getDistance(),
+        return r.swapDistance(dist,
                               this);
     }
     

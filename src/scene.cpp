@@ -15,7 +15,6 @@ namespace NM {
     }
     
     void Scene::finalize() {
-        auto start = std::chrono::system_clock::now();
         std::cout << "Starting scene finalize.";
         bonsai.reset();
         for(auto& sphere: spheres) {
@@ -38,11 +37,6 @@ namespace NM {
         std::cout << "Starting BVH construction (may take a bit)" << std::endl;
         bonsai.partition(getConcurrency());
         Timer::report("Constructed BVH");
-    }
-
-    RayIntersection Scene::traceIntersection(const Ray& in) const {
-        RayIntersection toRet;
-        return toRet;
     }
     
     void Scene::intersect(RayResult &r) const {

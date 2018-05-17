@@ -2,29 +2,33 @@
 
 namespace NM {
     
+    TracerError::TracerError(const std::string &w) :
+        std::runtime_error(w)
+    {}
+    
     ParseError::ParseError() :
-        runtime_error("Error parsing something")
+        TracerError("Error parsing something")
     {}
     
     ParseError::ParseError(std::string what) :
-        std::runtime_error(what)
+        TracerError(what)
     {}
     
     FileNotFoundError::FileNotFoundError() :
-        std::runtime_error("File not found") {}
+        TracerError("File not found") {}
     
     FileNotFoundError::FileNotFoundError(std::string fname) :
-    std::runtime_error("File `" + fname + "` not found") {}
+    TracerError("File `" + fname + "` not found") {}
     
     
     InvalidFilenameError::InvalidFilenameError() :
-    std::runtime_error("Filename is invalidly formatted") {}
+    TracerError("Filename is invalidly formatted") {}
     
     InvalidFilenameError::InvalidFilenameError(std::string fname) :
-    std::runtime_error("Filename `" + fname + "` not found") {}
+    TracerError("Filename `" + fname + "` not found") {}
     
     InvalidIntersectionError::InvalidIntersectionError() :
-    std::runtime_error("Tried to perform an invalid operation on a non-existant intersection")
+    TracerError("Tried to perform an invalid operation on a non-existant intersection")
     {}
     
     
