@@ -5,8 +5,10 @@ It features parallel ray tracing, recursive ray tracing, reflections, semitransp
 It also uses a Bounding Volume Hierarchy in order to trace things faster.
 It's not quite as optimized as it theoretically could be, but it's decently fast, and makes good use of CPU cores.
 
-![An example image](custom_drivers/driver01-small.png)
+## Gallery
 
+![An example image](custom_drivers/driver01-small.png)
+![Another example image](custom_driver/driver00.png)
 
 ## Building
 
