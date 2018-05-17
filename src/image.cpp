@@ -79,10 +79,6 @@ namespace NM {
     void Image::writeFile(std::string fname) {
         auto ext = getExt(fname);
         auto img = getCImg();
-        for(int i = 0; i < 4; ++i) {
-            std::cout << (*img)(0, 0, 0, i) << std::endl;
-        }
-        std::cout << std::numeric_limits<unsigned char>::max() << std::endl;
         img->save(fname.c_str());
         Timer::report("Wrote image");
     }

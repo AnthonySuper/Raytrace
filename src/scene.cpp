@@ -76,7 +76,6 @@ namespace NM {
         if(twice < 0) return color;
         Vec4 spr = (twice * normal) - toLightUnit;
         FloatType cspr = toC.dot(spr);
-        
         if(cspr < 0) return color;
         FloatType expon = std::pow(cspr, mtl.specularExpon);
         Vec4 modSpec = mtl.specular.pairwiseProduct(light.color);
@@ -149,17 +148,18 @@ namespace NM {
                               mtl);
         }
         accum += refAt.pairwiseProduct(color).pairwiseProduct(mtl.opacity);
-        if(depth > 0) {
+        auto newRef = mtl.attunation.pairwiseProduct(refAt)
+            .pairwiseProduct(mtl.opacity);
+        if(depth > 0 && newRef.magnitude() > 0.1) {
             // Time to recurse
             Vec4 toCamera = -1 * ri.originalRay.direction;
             const Vec4& n = normal;
             Vec4 reflect = ((2 * n.dot(toCamera)) * n) - toCamera;
             RayResult r2 = {{ri.point(), reflect.toUnit()}};
             intersect(r2);
-            Vec4 newRefAt = mtl.attunation.pairwiseProduct(refAt).pairwiseProduct(mtl.opacity);
             colorize(r2,
                     accum,
-                    newRefAt,
+                    newRef,
                     depth - 1);
         }
         if(depth > 0 && mtl.opacity != Vec4{1.0, 1.0, 1.0}) {

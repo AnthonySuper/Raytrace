@@ -71,6 +71,7 @@ namespace NM {
         if(wf.m_kd) {
             m.diffuse = (m.diffuse.pairwiseProduct(calcTexture(wf.m_kd.get(), uv)));
         }
+        m.attunation = {0, 0, 0};
         return m;
     }
     

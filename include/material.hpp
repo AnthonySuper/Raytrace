@@ -27,7 +27,7 @@ namespace NM {
         Vec4 ambient;
         Vec4 diffuse;
         Vec4 specular;
-        Vec4 attunation = {1, 1, 1};
+        Vec4 attunation = {0.0, 0.0, 0.0};
         Vec4 opacity = {1, 1, 1};
         FloatType eta = 1.0;
         FloatType specularExpon = 16;
