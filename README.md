@@ -10,6 +10,8 @@ It's not quite as optimized as it theoretically could be, but it's decently fast
 ![An example image](custom_drivers/driver01-small.png)
 ![Another example image](custom_driver/driver00.png)
 
+There's also a [neat animated video](https://www.youtube.com/watch?v=xh-0_TiNCvU) made by tracing frames individually and then stitching them together with a script.
+
 ## Building
 
 ### Get Dependencies 
