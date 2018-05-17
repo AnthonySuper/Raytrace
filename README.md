@@ -94,11 +94,15 @@ Some image viewers don't like images this big, so you may wish to modify the res
 Alternatively, resize the image with the `convert` command.
 
 
+## Getting Documentation
+
+You can get extended documentation via Doxygen.
+Just run `make docs` to build the files.
+
 ## Notes
-- This program will chew up 100% of the CPU time as it runs in paralell with enough threads to keep every core busy.
+- This program will chew up 100% of the CPU time as it runs in parallel with enough threads to keep every core busy.
   If the entire machine grinds to a halt while running it on a complex scene, this is probably why.
 - This program assumes that we should use the only material in a .mtlib file for all faces if there is only one material in that file.
   It will otherwise perform colorization correctly, although it will pick a random material for any faces before the first `usemtl` line.
 - In *extremely* rare cases, the BVH construction will hit a strange memory error and crash.
   I have no idea why this happens, but it should not occur on the provided driver files.
-

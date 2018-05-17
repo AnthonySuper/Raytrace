@@ -41,4 +41,4 @@ clean:
 	rm -f $(TESTTARGET)
 
 docs:
-	Doxygen ./Doxyfile
+	doxygen ./Doxyfile
