@@ -15,7 +15,8 @@ There's also a [neat animated video](https://www.youtube.com/watch?v=xh-0_TiNCvU
 ## Building
 
 ### Get Dependencies 
-You'll need `libpng` in your path.
+You'll need `libpng` installed to output to PNGs.
+You'll also need a C++14-compatible compiler. 
 
 ### Compiling
 Unpack the tar.
@@ -25,7 +26,6 @@ Then, run this command.
 make
 ```
 
-You will need a C++ compiler that supports C++14.
 Note that this will compile with `-Ofast -march=native -flto`, so the speed of compilation will be rather slow.
 Sorry.
 
